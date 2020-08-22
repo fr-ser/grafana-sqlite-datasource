@@ -1,5 +1,7 @@
 # Grafana SQLite Datasource
 
+![CI Tests](https://github.com/fr-ser/grafana-sqlite-datasource/workflows/main/badge.svg)
+
 This is a Grafana backend plugin to allow using a SQLite database as a data source.
 
 ## Getting started
