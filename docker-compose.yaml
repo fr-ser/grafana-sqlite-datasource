@@ -1,0 +1,10 @@
+version: "3.6"
+
+services:
+  grafana:
+    image: grafana/grafana:7.0.6
+    volumes:
+      - "./grafana.ini:/etc/grafana/grafana.ini"
+      - "./:/var/lib/grafana/plugins/sqlite-datasource"
+    ports:
+      - 3000:3000
