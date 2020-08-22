@@ -5,6 +5,9 @@ import (
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
+
+	// register sqlite driver
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {

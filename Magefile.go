@@ -4,14 +4,52 @@ package main
 
 import (
 	"fmt"
+
 	// mage:import
 	build "github.com/grafana/grafana-plugin-sdk-go/build"
+	"github.com/magefile/mage/sh"
 )
 
-// Hello prints a message (shows that you can define custom Mage targets).
-func Hello() {
-	fmt.Println("hello plugin developer!")
+// Install dependencies (yarn and go mod)
+func Install() error {
+	if err := sh.Run("yarn", "install"); err != nil {
+		return err
+	}
+	return sh.Run("go", "mod", "download")
+}
+
+// BuildRelease builds the JavaScript frontend and Go Backend code
+func BuildRelease() error {
+	if err := sh.Run("yarn", "build"); err != nil {
+		return err
+	}
+	build.BuildAll()
+	return nil
+}
+
+// Bootstrap starts the docker-compose file (grafana mostly)
+func Bootstrap() error {
+	if err := Teardown(); err != nil {
+		return err
+	}
+
+	if err := sh.Run("docker-compose", "up", "-d"); err != nil {
+		return err
+	}
+	fmt.Println("Go to http://localhost:3000/")
+	return nil
+}
+
+// Teardown starts the docker-compose file (grafana mostly)
+func Teardown() error {
+	if err := sh.Run(
+		"docker-compose", "down", "--remove-orphans", "--volumes", "--timeout=2",
+	); err != nil {
+		return err
+	}
+	fmt.Println("Go to http://localhost:3000/")
+	return nil
 }
 
 // Default configures the default target.
-var Default = build.BuildAll
+var Default = BuildRelease

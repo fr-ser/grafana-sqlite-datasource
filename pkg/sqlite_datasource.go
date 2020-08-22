@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"math/rand"
-	"net/http"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -20,7 +18,7 @@ func newDatasource() datasource.ServeOpts {
 	// into `NewInstanceManger` is called when the instance is created
 	// for the first time or when a datasource configuration changed.
 	im := datasource.NewInstanceManager(newDataSourceInstance)
-	ds := &SampleDatasource{
+	ds := &SQLiteDatasource{
 		im: im,
 	}
 
@@ -30,9 +28,9 @@ func newDatasource() datasource.ServeOpts {
 	}
 }
 
-// SampleDatasource is an example datasource used to scaffold
+// SQLiteDatasource is an example datasource used to scaffold
 // new datasource plugins with an backend.
-type SampleDatasource struct {
+type SQLiteDatasource struct {
 	// The instance manager can help with lifecycle management
 	// of datasource instances in plugins. It's not a requirements
 	// but a best practice that we recommend that you follow.
@@ -43,7 +41,7 @@ type SampleDatasource struct {
 // req contains the queries []DataQuery (where each query contains RefID as a unique identifer).
 // The QueryDataResponse contains a map of RefID to the response for each query, and each response
 // contains Frames ([]*Frame).
-func (td *SampleDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+func (td *SQLiteDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	log.DefaultLogger.Info("QueryData", "request", req)
 
 	// create response struct
@@ -65,7 +63,7 @@ type queryModel struct {
 	Format string `json:"format"`
 }
 
-func (td *SampleDatasource) query(ctx context.Context, query backend.DataQuery) backend.DataResponse {
+func (td *SQLiteDatasource) query(ctx context.Context, query backend.DataQuery) backend.DataResponse {
 	// Unmarshal the json into our queryModel
 	var qm queryModel
 
@@ -100,36 +98,13 @@ func (td *SampleDatasource) query(ctx context.Context, query backend.DataQuery) 
 	return response
 }
 
-// CheckHealth handles health checks sent from Grafana to the plugin.
-// The main use case for these health checks is the test button on the
-// datasource configuration page which allows users to verify that
-// a datasource is working as expected.
-func (td *SampleDatasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
-	var status = backend.HealthStatusOk
-	var message = "Data source is working"
-
-	if rand.Int()%2 == 0 {
-		status = backend.HealthStatusError
-		message = "randomized error"
-	}
-
-	return &backend.CheckHealthResult{
-		Status:  status,
-		Message: message,
-	}, nil
-}
-
-type instanceSettings struct {
-	httpClient *http.Client
-}
+type instanceSettings struct{}
 
 func newDataSourceInstance(setting backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
-	return &instanceSettings{
-		httpClient: &http.Client{},
-	}, nil
+	return &instanceSettings{}, nil
 }
 
 func (s *instanceSettings) Dispose() {
-	// Called before creatinga a new instance to allow plugin authors
+	// Called before creating a new instance to allow plugin authors
 	// to cleanup.
 }
