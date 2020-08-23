@@ -3,19 +3,15 @@ name: main
 on: push
 
 jobs:
-  test-frontend:
+  test-plugin-selenium:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [12.0.x, 12.x]
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 12.0.x
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 12.0.x
       - name: Cache Node.js modules
         uses: actions/cache@v2
         with:
@@ -26,8 +22,12 @@ jobs:
             ${{ runner.OS }}-
       - name: Install dependencies
         run: yarn --frozen-lockfile
-      - name: Run Frontend Unit Tests
-        run: yarn test
+      - name: Run Selenium Tests
+        uses: magefile/mage-action@v1
+        with:
+          version: latest
+          args: -v selenium
+
 
   test-backend:
     runs-on: ubuntu-latest
@@ -48,4 +48,4 @@ jobs:
         uses: magefile/mage-action@v1
         with:
           version: latest
-          args: test
+          args: -v test

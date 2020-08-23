@@ -6,5 +6,20 @@ services:
     volumes:
       - "./grafana.ini:/etc/grafana/grafana.ini"
       - "./:/var/lib/grafana/plugins/sqlite-datasource"
+      - "./data.db:/app/data.db"
     ports:
       - 3000:3000
+  selenium:
+    image: selenium/standalone-chrome:84.0
+    shm_size: 2gb
+    ports:
+      - 4444:4444
+      - 5900:5900
+    environment:
+      VNC_NO_PASSWORD: "1"
+  start-setup:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - grafana
+      - selenium
+    command: grafana:3000 selenium:4444

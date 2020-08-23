@@ -10,12 +10,16 @@
   },
   "author": "Sergej Herbert",
   "license": "Apache-2.0",
+  "repository": "https://github.com/fr-ser/grafana-sqlite-datasource.git",
   "devDependencies": {
     "@grafana/data": "7.0.1",
-    "@grafana/toolkit": "7.0.1",
     "@grafana/runtime": "7.0.1",
+    "@grafana/toolkit": "7.0.1",
     "@grafana/ui": "7.0.1",
-    "@types/lodash": "latest"
+    "@types/lodash": "latest",
+    "@types/selenium-webdriver": "^4.0.9",
+    "selenium-webdriver": "^4.0.0-alpha.7",
+    "chromedriver": "^84.0.0"
   },
   "engines": {
     "node": ">=12 <13"

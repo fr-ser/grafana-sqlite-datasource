@@ -33,7 +33,7 @@ func Bootstrap() error {
 		return err
 	}
 
-	if err := sh.Run("docker-compose", "up", "-d"); err != nil {
+	if err := sh.Run("docker-compose", "up", "-d", "grafana"); err != nil {
 		return err
 	}
 	fmt.Println("Go to http://localhost:3000/")
@@ -49,6 +49,19 @@ func Teardown() error {
 	}
 	fmt.Println("Go to http://localhost:3000/")
 	return nil
+}
+
+// Selenium tests the plugin via selenium
+func Selenium() error {
+	if err := Teardown(); err != nil {
+		return err
+	}
+
+	if err := sh.Run("docker-compose", "run", "--rm", "start-setup"); err != nil {
+		return err
+	}
+
+	return sh.Run("yarn", "test")
 }
 
 // Default configures the default target.
