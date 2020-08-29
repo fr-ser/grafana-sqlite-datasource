@@ -49,3 +49,4 @@ Resources
 - https://dh1tw.de/2019/12/cross-compiling-golang-cgo-projects/
 - https://github.com/grafana/google-sheets-datasource/issues/104
 - https://github.com/grafana/grafana-plugin-sdk-go/issues/188
+- https://github.com/grafana/grafana/blob/master/scripts/build/build.sh
