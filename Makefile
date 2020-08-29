@@ -30,7 +30,7 @@ test: backend-test build-frontend build-backend selenium-test
 build-backend:
 	CGO_ENABLED=1 go build \
 		-o dist/gpx_sqlite-datasource_linux_amd64 \
-		-ldflags '-w -s -extldflags "-static"' \
+		-ldflags '-extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
 

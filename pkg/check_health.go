@@ -3,26 +3,12 @@ package main
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/mattn/go-sqlite3"
 )
-
-type pluginConfig struct {
-	Path string
-}
-
-func getConfig(settings *backend.DataSourceInstanceSettings) (pluginConfig, error) {
-	var config pluginConfig
-	err := json.Unmarshal(settings.JSONData, &config)
-	if err != nil {
-		return config, err
-	}
-	return config, nil
-}
 
 func checkDbExists(path string) (bool, error) {
 	info, err := os.Stat(path)

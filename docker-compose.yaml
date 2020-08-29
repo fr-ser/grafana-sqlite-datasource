@@ -5,6 +5,7 @@ services:
     image: grafana/grafana:7.0.6
     volumes:
       - "./grafana.ini:/etc/grafana/grafana.ini"
+      - "./datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml"
       - "./:/var/lib/grafana/plugins/sqlite-datasource"
       - "./data.db:/app/data.db"
     ports:

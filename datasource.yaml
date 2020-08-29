@@ -1,0 +1,9 @@
+apiVersion: 1
+datasources:
+  - name: sqlite
+    type: frser-sqlite-datasource
+    access: proxy
+    isDefault: true
+    editable: true
+    jsonData:
+      path: /app/data.db
