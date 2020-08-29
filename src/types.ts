@@ -1,12 +1,13 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
-export interface MyQuery extends DataQuery {
+export interface SQLiteQuery extends DataQuery {
   queryText?: string;
-  constant: number;
+  format: 'time_series';
 }
 
-export const defaultQuery: Partial<MyQuery> = {
-  constant: 6.5,
+export const defaultQuery: Partial<SQLiteQuery> = {
+  queryText: 'SELECT 1',
+  format: 'time_series',
 };
 
 /**
