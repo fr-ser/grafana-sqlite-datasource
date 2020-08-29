@@ -1,8 +1,9 @@
 # Grafana SQLite Datasource
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![stability-wip](https://img.shields.io/badge/stability-work_in_progress-lightgrey.svg)
 
-![CI Tests](https://github.com/fr-ser/grafana-sqlite-datasource/workflows/Test%20%26%20Build/badge.svg)
+[![CI Tests](https://github.com/fr-ser/grafana-sqlite-datasource/workflows/Test%20%26%20Build/badge.svg)](https://github.com/fr-ser/grafana-sqlite-datasource/actions)
 
 This is a Grafana backend plugin to allow using a SQLite database as a data source.
 
@@ -37,7 +38,7 @@ mage bootstrap # credentials admin / admin123
 ## Testing
 
 ```BASH
-make test ## the selenium tests require a dist directory (run make build first)
+make test
 ```
 
 ## TODO: Cross compilation
