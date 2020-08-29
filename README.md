@@ -2,7 +2,7 @@
 
 ![stability-wip](https://img.shields.io/badge/stability-work_in_progress-lightgrey.svg)
 
-![CI Tests](https://github.com/fr-ser/grafana-sqlite-datasource/workflows/main/badge.svg)
+![CI Tests](https://github.com/fr-ser/grafana-sqlite-datasource/workflows/Test%20%26%20Build/badge.svg)
 
 This is a Grafana backend plugin to allow using a SQLite database as a data source.
 
@@ -19,26 +19,32 @@ found at:
 
 - yarn
 - go
-- mage: Makefile with go - comes with the plugin toolkit 🤷
 - docker-compose
 
 ### (First Time) Installation
 
 ```BASH
-mage -v install
+make install
 ```
 
 ### Start up Grafana
 
 ```BASH
-mage -v # this build the frontend and backend
+make build # this build the frontend and backend
 mage bootstrap # credentials admin / admin123
 ```
 
 ## Testing
 
-Currently there are only backend (go) tests. Run via:
-
 ```BASH
-mage -v test
+make test ## the selenium tests require a dist directory (run make build first)
 ```
+
+## TODO: Cross compilation
+
+Resources
+
+- https://www.arp242.net/static-go.html
+- https://dh1tw.de/2019/12/cross-compiling-golang-cgo-projects/
+- https://github.com/grafana/google-sheets-datasource/issues/104
+- https://github.com/grafana/grafana-plugin-sdk-go/issues/188

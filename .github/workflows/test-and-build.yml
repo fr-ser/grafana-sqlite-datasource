@@ -1,0 +1,89 @@
+name: Test & Build
+
+on: push
+
+jobs:
+
+  test-plugin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: Run tests
+        run: make backend-test
+
+  build-plugin-go:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build linux version
+        run: make build-backend
+      - name: Upload linux binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-executable
+          path: ./dist/gpx_sqlite-datasource_linux_amd64
+
+
+  test-plugin-selenium:
+    runs-on: ubuntu-latest
+    needs:
+      - test-plugin
+      - build-plugin-go
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 12.0.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.0.x
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Build frontend
+        run: make build-frontend
+      - name: Download linux binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-executable
+          path: ./dist/
+      - name: make plugin executable
+        run: chmod +x ./dist/gpx_sqlite-datasource_linux_amd64
+      - name: Run Selenium Tests
+        run: make selenium-test
+      - name: The job has failed
+        if: ${{ failure() }}
+        run: docker-compose logs grafana
+
