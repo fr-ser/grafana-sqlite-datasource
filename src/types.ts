@@ -1,11 +1,13 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
 export interface SQLiteQuery extends DataQuery {
-  queryText?: string;
+  rawQueryText: string;
+  queryText: string;
 }
 
 export const defaultQuery: Partial<SQLiteQuery> = {
-  queryText: 'SELECT 1 as time, 4 as value',
+  rawQueryText: 'SELECT 1 as time, 4 as value where time >= $__from and time < $__to',
+  queryText: 'SELECT 1 as time, 4 as value where time >= 1234 and time < 134567',
 };
 
 /**

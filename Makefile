@@ -19,6 +19,9 @@ selenium-test: bootstrap
 	npx jest --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
 	@echo
 
+frontend-test:
+	yarn test
+
 backend-test:
 	@echo
 	go test ./pkg/...
