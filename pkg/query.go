@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
@@ -21,6 +22,8 @@ type sqlColumn struct {
 	// This determines which row property to use
 	Type string
 
+	// TimeData contains time values (if Type == "TIME")
+	TimeData []time.Time
 	// IntData contains integer values (if Type == "INTEGER")
 	IntData []int64
 
@@ -88,7 +91,19 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) error {
 			column.Type = valueType
 		}
 
-		if valueType == "INTEGER" && column.Type == "INTEGER" {
+		if valueType == "INTEGER" && column.Type == "TIME" {
+			columns[i].TimeData = append(columns[i].TimeData, time.Unix(intV, 0))
+		} else if valueType == "FLOAT" && column.Type == "TIME" {
+			columns[i].TimeData = append(columns[i].TimeData, time.Unix(int64(floatV), 0))
+		} else if column.Type == "TIME" {
+			t, err := time.Parse(time.RFC3339, fmt.Sprintf("%v", values[i]))
+			if err != nil {
+				log.DefaultLogger.Warn(
+					"Could parse (RFC3339) value to timestamp", "value", fmt.Sprintf("%v", values[i]),
+				)
+			}
+			columns[i].TimeData = append(columns[i].TimeData, t)
+		} else if valueType == "INTEGER" && column.Type == "INTEGER" {
 			columns[i].IntData = append(columns[i].IntData, intV)
 		} else if column.Type == "INTEGER" {
 			if v, err := strconv.ParseInt(string(stringV), 10, 64); err == nil {
@@ -110,14 +125,13 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) error {
 			columns[i].StringData = append(columns[i].StringData, fmt.Sprintf("%f", floatV))
 		} else {
 			columns[i].StringData = append(columns[i].StringData, fmt.Sprintf("%v", values[i]))
-
 		}
 	}
 
 	return nil
 }
 
-func fetchData(dbPath string, queryText string) (columns []*sqlColumn, err error) {
+func fetchData(dbPath string, qm queryModel) (columns []*sqlColumn, err error) {
 
 	db, err := sql.Open("sqlite3", dbPath)
 	defer db.Close()
@@ -126,9 +140,9 @@ func fetchData(dbPath string, queryText string) (columns []*sqlColumn, err error
 		return columns, err
 	}
 
-	rows, err := db.Query(queryText)
+	rows, err := db.Query(qm.QueryText)
 	if err != nil {
-		log.DefaultLogger.Error("Could execute query", "query", queryText, "err", err)
+		log.DefaultLogger.Error("Could execute query", "query", qm.QueryText, "err", err)
 		return columns, err
 	}
 	defer rows.Close()
@@ -163,6 +177,13 @@ func fetchData(dbPath string, queryText string) (columns []*sqlColumn, err error
 			)
 			columns[idx].Type = "STRING"
 		}
+
+		for _, timeColumnName := range qm.TimeColumns {
+			if columns[idx].Name == timeColumnName {
+				columns[idx].Type = "TIME"
+				break
+			}
+		}
 	}
 
 	for rows.Next() {
@@ -182,10 +203,8 @@ func fetchData(dbPath string, queryText string) (columns []*sqlColumn, err error
 }
 
 type queryModel struct {
-	QueryText      string   `json:"queryText"`
-	TimeColumns    []string `json:"timeColumns"`
-	IntegerColumns []string `json:"integerColumns"`
-	FloatColumns   []string `json:"floatColumns"`
+	QueryText   string   `json:"queryText"`
+	TimeColumns []string `json:"timeColumns"`
 }
 
 func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.DataResponse) {
@@ -197,7 +216,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		return response
 	}
 
-	columns, err := fetchData(config.Path, qm.QueryText)
+	columns, err := fetchData(config.Path, qm)
 	if err != nil {
 		response.Error = err
 		return response
@@ -207,6 +226,10 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 
 	for _, column := range columns {
 		switch column.Type {
+		case "TIME":
+			frame.Fields = append(
+				frame.Fields, data.NewField(column.Name, nil, column.TimeData),
+			)
 		case "FLOAT":
 			frame.Fields = append(
 				frame.Fields, data.NewField(column.Name, nil, column.FloatData),

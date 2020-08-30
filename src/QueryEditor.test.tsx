@@ -1,17 +1,11 @@
 import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import { QueryEditor } from './QueryEditor';
 
-jest.mock('@grafana/runtime', () => ({
-  getTemplateSrv: () => {
-    return {
-      replace: jest.fn(input => `${input}-replaced`),
-    };
-  },
-}));
 describe('QueryEditor', () => {
-  it('converts query variables on change', async () => {
+  it('allows editing the rawQuery', async () => {
     const onChangeMock = jest.fn();
     const onRunQueryMock = jest.fn();
     const { findByRole } = render(<QueryEditor onChange={onChangeMock} onRunQuery={onRunQueryMock} />);
@@ -28,11 +22,34 @@ describe('QueryEditor', () => {
       fireEvent.blur(queryInput);
     });
 
-    expect(queryInput).toBeTruthy();
     expect(onRunQueryMock).toHaveBeenCalled();
     expect(onChangeMock).toHaveBeenLastCalledWith({
       rawQueryText: 'Some Input',
-      queryText: 'Some Input-replaced',
+    });
+  });
+
+  it('allows setting time columns', async () => {
+    const onChangeMock = jest.fn();
+    const onRunQueryMock = jest.fn();
+    const { findByRole, findByText } = render(<QueryEditor onChange={onChangeMock} onRunQuery={onRunQueryMock} />);
+
+    const selector = await findByRole('time-column-selector');
+    const selectorInput = selector.querySelector('input') as HTMLInputElement;
+    const addButton = await findByText('Add', { selector: 'button span' });
+
+    await act(async () => {
+      // add a column
+      await userEvent.type(selectorInput, 'test_column', { delay: 1 });
+      userEvent.click(addButton);
+
+      // remove a default column
+      const timeTag = await findByText('time', { selector: 'div>span' });
+      userEvent.click(timeTag.parentElement!.querySelector('svg') as SVGElement);
+    });
+
+    expect(onRunQueryMock).toHaveBeenCalled();
+    expect(onChangeMock).toHaveBeenLastCalledWith({
+      timeColumns: ['ts', 'test_column'],
     });
   });
 });

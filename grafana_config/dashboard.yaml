@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: "Sine Wave Example"
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: true
+    editable: true
+    updateIntervalSeconds: 300
+    allowUiUpdates: true
+    options:
+      path: /app/dashboards

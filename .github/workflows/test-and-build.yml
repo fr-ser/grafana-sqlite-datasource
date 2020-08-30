@@ -106,7 +106,7 @@ jobs:
         run: chmod +x ./dist/gpx_sqlite-datasource_linux_amd64
       - name: Run Selenium Tests
         run: make selenium-test
-      - name: The job has failed
+      - name: Debug Logs
         if: ${{ failure() }}
         run: docker-compose logs grafana
 

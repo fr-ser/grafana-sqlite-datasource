@@ -4,10 +4,12 @@ services:
   grafana:
     image: grafana/grafana:7.0.6
     volumes:
-      - "./grafana.ini:/etc/grafana/grafana.ini"
-      - "./datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml"
-      - "./:/var/lib/grafana/plugins/sqlite-datasource"
-      - "./data.db:/app/data.db"
+      - "./grafana_config/data.db:/app/data.db"
+      - "./grafana_config/grafana.ini:/etc/grafana/grafana.ini"
+      - "./grafana_config/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml"
+      - "./grafana_config/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml"
+      - "./grafana_config/dashboard.json:/app/dashboards/dashboard.json"
+      - "./dist:/var/lib/grafana/plugins/sqlite-datasource"
     ports:
       - 3000:3000
   selenium:
