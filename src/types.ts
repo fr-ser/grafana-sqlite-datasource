@@ -7,8 +7,13 @@ export interface SQLiteQuery extends DataQuery {
 }
 
 export const defaultQuery: Partial<SQLiteQuery> = {
-  rawQueryText: 'SELECT 1 as time, 4 as value where time >= $__from / 1000 and time < $__to / 1000',
-  queryText: 'SELECT 1 as time, 4 as value where time >= 1234 and time < 134567',
+  rawQueryText:
+    "SELECT CAST(strftime('%s', 'now', '-1 minute') as INTEGER) as time, 4 as value \n" +
+    'WHERE time >= $__from / 1000 and time < $__to / 1000',
+  queryText: `
+    SELECT CAST(strftime('%s', 'now', '-1 minute') as INTEGER) as time, 4 as value
+    WHERE time >= 1234 and time < 134567
+  `,
   timeColumns: ['time', 'ts'],
 };
 

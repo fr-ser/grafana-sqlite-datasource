@@ -1,4 +1,4 @@
-import { TextArea, TagsInput, InlineFormLabel } from '@grafana/ui';
+import { TextArea, TagsInput, InlineFormLabel, Tooltip } from '@grafana/ui';
 import { QueryEditorProps } from '@grafana/data';
 import defaults from 'lodash/defaults';
 import React, { ChangeEvent, PureComponent } from 'react';
@@ -44,13 +44,15 @@ export class QueryEditor extends PureComponent<Props> {
           />
         </div>
         <div className="gf-form">
-          <div style={{ display: 'flex', flexDirection: 'column', marginRight: 15 }} role="time-column-selector">
-            <InlineFormLabel>Time formatted columns</InlineFormLabel>
-            <TagsInput
-              onChange={(tags: string[]) => this.onUpdateColumnTypes('timeColumns', tags)}
-              tags={timeColumns}
-            />
-          </div>
+          <Tooltip placement="right-start" content="Columns with these names, will be formatted as time">
+            <div style={{ display: 'flex', flexDirection: 'column', marginRight: 15 }} role="time-column-selector">
+              <InlineFormLabel>Time formatted columns</InlineFormLabel>
+              <TagsInput
+                onChange={(tags: string[]) => this.onUpdateColumnTypes('timeColumns', tags)}
+                tags={timeColumns}
+              />
+            </div>
+          </Tooltip>
         </div>
       </>
     );

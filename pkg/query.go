@@ -96,11 +96,17 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) error {
 		} else if valueType == "FLOAT" && column.Type == "TIME" {
 			columns[i].TimeData = append(columns[i].TimeData, time.Unix(int64(floatV), 0))
 		} else if column.Type == "TIME" {
-			t, err := time.Parse(time.RFC3339, fmt.Sprintf("%v", values[i]))
+			val := fmt.Sprintf("%v", values[i])
+			t, err := time.Parse(time.RFC3339, val)
 			if err != nil {
-				log.DefaultLogger.Warn(
-					"Could parse (RFC3339) value to timestamp", "value", fmt.Sprintf("%v", values[i]),
-				)
+				// try parsing the string as a number
+				if f, err := strconv.ParseFloat(val, 64); err == nil {
+					t = time.Unix(int64(f), 0)
+				} else {
+					log.DefaultLogger.Warn(
+						"Could parse (RFC3339) value to timestamp", "value", val,
+					)
+				}
 			}
 			columns[i].TimeData = append(columns[i].TimeData, t)
 		} else if valueType == "INTEGER" && column.Type == "INTEGER" {
