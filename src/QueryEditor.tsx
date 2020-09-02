@@ -1,60 +1,66 @@
-import { TextArea, TagsInput, InlineFormLabel, Tooltip } from '@grafana/ui';
+import { TextArea, TagsInput, Icon, Alert, InlineFormLabel } from '@grafana/ui';
 import { QueryEditorProps } from '@grafana/data';
 import defaults from 'lodash/defaults';
-import React, { ChangeEvent, PureComponent } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 
 import { DataSource } from './DataSource';
 import { defaultQuery, MyDataSourceOptions, SQLiteQuery } from './types';
 
 type Props = QueryEditorProps<DataSource, SQLiteQuery, MyDataSourceOptions>;
 
-export class QueryEditor extends PureComponent<Props> {
-  onQueryTextChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    const { onChange, query } = this.props;
+export function QueryEditor(props: Props) {
+  function onQueryTextChange(event: ChangeEvent<HTMLTextAreaElement>) {
+    const { onChange, query } = props;
     onChange({
       ...query,
       rawQueryText: event.target.value,
     });
-  };
+  }
 
-  sendQuery = () => this.props.onRunQuery();
-
-  onUpdateColumnTypes = (columnKey: string, columns: string[]) => {
-    const { onChange, query } = this.props;
+  function onUpdateColumnTypes(columnKey: string, columns: string[]) {
+    const { onChange, query } = props;
     onChange({
       ...query,
       [columnKey]: columns,
     });
 
-    this.sendQuery();
-  };
-
-  render() {
-    const query = defaults(this.props.query, defaultQuery);
-    const { rawQueryText, timeColumns } = query;
-
-    return (
-      <>
-        <div className="gf-form">
-          <TextArea
-            role="query-editor-input"
-            value={rawQueryText}
-            onBlur={this.sendQuery}
-            onChange={this.onQueryTextChange}
-          />
-        </div>
-        <div className="gf-form">
-          <Tooltip placement="right-start" content="Columns with these names, will be formatted as time">
-            <div style={{ display: 'flex', flexDirection: 'column', marginRight: 15 }} role="time-column-selector">
-              <InlineFormLabel>Time formatted columns</InlineFormLabel>
-              <TagsInput
-                onChange={(tags: string[]) => this.onUpdateColumnTypes('timeColumns', tags)}
-                tags={timeColumns}
-              />
-            </div>
-          </Tooltip>
-        </div>
-      </>
-    );
+    props.onRunQuery();
   }
+
+  const query = defaults(props.query, defaultQuery);
+  const { rawQueryText, timeColumns } = query;
+  const [showHelp, setShowHelp] = useState(false);
+
+  return (
+    <>
+      <div className="gf-form">
+        <TextArea
+          style={{ height: 100 }}
+          role="query-editor-input"
+          value={rawQueryText}
+          onBlur={() => props.onRunQuery()}
+          onChange={onQueryTextChange}
+        />
+      </div>
+      <div className="gf-form">
+        <div style={{ display: 'flex', flexDirection: 'column', marginRight: 15 }} role="time-column-selector">
+          <InlineFormLabel>
+            <div style={{ whiteSpace: 'nowrap' }} onClick={() => setShowHelp(!showHelp)}>
+              Time formatted columns <Icon name={showHelp ? 'angle-down' : 'angle-right'} />
+            </div>
+          </InlineFormLabel>
+          <TagsInput onChange={(tags: string[]) => onUpdateColumnTypes('timeColumns', tags)} tags={timeColumns} />
+        </div>
+      </div>
+      {showHelp && (
+        <Alert title="Time formatted columns" severity="info">
+          Columns with these names, will be formatted as time. This is required as SQLite has no native "time" format,
+          but mostly strings and numbers. See:{' '}
+          <a href="https://www.sqlite.org/datatype3.html" target="_blank">
+            SQLite3 Data Types Documentation
+          </a>
+        </Alert>
+      )}
+    </>
+  );
 }
