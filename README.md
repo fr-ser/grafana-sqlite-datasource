@@ -7,46 +7,39 @@
 
 This is a Grafana backend plugin to allow using a SQLite database as a data source.
 
-The plugin was built using the grafana plugin sdk and npx grafana toolkit. Information can be
-found at:
+## Development and Contributing
 
-- https://grafana.com/tutorials/build-a-data-source-backend-plugin/
-- https://github.com/grafana/grafana-plugin-sdk-go
-- https://github.com/grafana/grafana/tree/master/packages/grafana-toolkit
+Any contribution is welcome. Some information regarding the local setup can be found in the
+[DEVELOPMENT.md file](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/DEVELOPMENT.md).
 
-## Getting started
+## Plugin installation
 
-### Requirements
+The most up to date (but also most generic) information can always be found here:
+[Grafana Website - Plugin Installation](https://grafana.com/docs/grafana/latest/plugins/installation/#install-grafana-plugins)
 
-- yarn
-- go
-- docker-compose
+### Installing the Plugin on an Existing Grafana with the CLI
 
-### (First Time) Installation
+Grafana comes with a command line tool that can be used to install plugins.
 
-```BASH
-make install
-```
+1. Run this command: `grafana-cli plugins install frser-sqlite-datasource`
+2. Restart the Grafana server.
+3. Login in with a user that has admin rights. This is needed to create datasources.
+4. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
-### Start up Grafana
+### Installing the Plugin Manually on an Existing Grafana
 
-```BASH
-make build # this build the frontend and backend
-mage bootstrap # credentials admin / admin123
-```
+If the server where Grafana is installed has no access to the Grafana.com server, then the plugin can be downloaded and manually copied to the server.
 
-## Testing
+2. Get the zip file from https://github.com/fr-ser/grafana-sqlite-datasource/archive/vX.X.X.zip
+3. Extract the zip file into the data/plugins subdirectory for Grafana:
+   `unzip grafana-sqlite-datasource-X.X.X.zip -d YOUR_PLUGIN_DIR/grafana-sqlite-datasource`
+4. Restart the Grafana server
+5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
-```BASH
-make test
-```
+## Configuring the datasource in Grafana
 
-## TODO: Cross compilation
+The only required configuration is the path to the SQLite database (local path on the Grafana Server)
 
-Resources
-
-- https://www.arp242.net/static-go.html
-- https://dh1tw.de/2019/12/cross-compiling-golang-cgo-projects/
-- https://github.com/grafana/google-sheets-datasource/issues/104
-- https://github.com/grafana/grafana-plugin-sdk-go/issues/188
-- https://github.com/grafana/grafana/blob/master/scripts/build/build.sh
+1. Add an SQLite datasource.
+2. Set the path to the database (the grafana process needs to find the SQLite database under this path).
+3. Save the datasource and use it.
