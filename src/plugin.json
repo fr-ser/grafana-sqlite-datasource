@@ -26,7 +26,16 @@
         "url": "https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/LICENSE"
       }
     ],
-    "screenshots": [],
+    "screenshots": [
+      {
+        "name": "Example Dashboard",
+        "path": "img/sine-wave-example-dashboard.png"
+      },
+      {
+        "name": "Example Panel Edit",
+        "path": "img/sine-wave-timeseries-panel-edit.png"
+      }
+    ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
