@@ -64,15 +64,6 @@ build-backend-all:
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
 
-	docker run --rm -v "$${PWD}":/usr/src/app -w /usr/src/app \
-		-e CGO_ENABLED=1 -e GOOS=darwin -e GOARCH=amd64 \
-		cross-build \
-		go build -o dist/gpx_sqlite-datasource_darwin_amd64 \
-		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension \
-		./pkg
-
-
 
 build-frontend:
 	yarn build
