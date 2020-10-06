@@ -1,3 +1,6 @@
+UNAME_OS := $(shell uname -s)
+UNAME_ARC := $(shell uname -m)
+
 install-go:
 	go mod download
 
@@ -30,14 +33,28 @@ backend-test:
 test: backend-test build-frontend build-backend selenium-test
 	docker-compose down --remove-orphans --volumes --timeout=2
 
-build-backend:
+build-backend-local:
+ifeq ($(UNAME_OS), Linux)
 	CGO_ENABLED=1 go build \
 		-o dist/gpx_sqlite-datasource_linux_amd64 \
 		-ldflags '-extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
+else ifeq ($(UNAME_OS), Darwin)
+	CGO_ENABLED=1 go build \
+		-o dist/gpx_sqlite-datasource_darwin_amd64 \
+		-ldflags '-extldflags "-static"' \
+		-tags osusergo,netgo,sqlite_omit_load_extension \
+		./pkg
+else
+	CGO_ENABLED=1 go build \
+		-o dist/gpx_sqlite-datasource_windows_amd64.exe \
+		-ldflags '-extldflags "-static"' \
+		-tags osusergo,netgo,sqlite_omit_load_extension \
+		./pkg
+endif
 
-build-backend-all:
+build-backend-all: build-backend-local
 	docker build -f CrossCompiler.Dockerfile -t cross-build .
 
 	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
