@@ -1,0 +1,107 @@
+name: Build All
+
+
+on: [workflow_dispatch]
+
+jobs:
+
+  build-cross:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build cross compiled versions
+        run: make build-backend-all
+      - name: Upload dist folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-cross
+          path: ./dist/
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build linux version
+        run: make build-backend-local
+      - name: Upload linux binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-linux
+          path: ./dist/
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build macos version
+        run: make build-backend-local
+      - name: Upload macos binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-macos
+          path: ./dist/
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build windows version
+        run: make build-backend-local
+      - name: Upload windows binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-windows
+          path: ./dist/
+

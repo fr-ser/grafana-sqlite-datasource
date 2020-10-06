@@ -64,7 +64,7 @@ jobs:
       - name: Install go dependencies
         run: make install-go
       - name: build linux version
-        run: make build-backend
+        run: make build-backend-local
       - name: Upload linux binary
         uses: actions/upload-artifact@v2
         with:
