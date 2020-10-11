@@ -32,9 +32,21 @@ If the server where Grafana is installed has no access to the Grafana.com server
 
 2. Get the zip file from https://github.com/fr-ser/grafana-sqlite-datasource/archive/vX.X.X.zip
 3. Extract the zip file into the data/plugins subdirectory for Grafana:
-   `unzip grafana-sqlite-datasource-X.X.X.zip -d YOUR_PLUGIN_DIR/grafana-sqlite-datasource`
+   `unzip frser-sqlite-datasource-X.X.X.zip -d YOUR_PLUGIN_DIR/frser-sqlite-datasource`
 4. Restart the Grafana server
 5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
+
+### ARM6 / RaspberryPi Zero W support
+
+This plugins supports ARM6 (the version running on RaspberryPi Zero W). There is a problem, though,
+with Grafana supporting ARM7 (newer Raspberries) and ARM6 at the same time. Grafana chooses
+the correct plugin by file name. But both ARM6 and ARM7 are named
+`<plugin_dir>/frser-sqlite-datasource/dist/gpx_sqlite-datasource_linux_arm`.
+
+Currently the ARM7 build is named like this by default and ARM6 ist added as `..._arm6`. In order
+to run this plugin on an ARM6 machine you need to rename the file
+`<plugin_dir>/frser-sqlite-datasource/dist/gpx_sqlite-datasource_linux_arm6` to
+`<plugin_dir>/frser-sqlite-datasource/dist/gpx_sqlite-datasource_linux_arm`.
 
 ## Configuring the datasource in Grafana
 
