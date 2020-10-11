@@ -3,7 +3,6 @@ module grafana-sqlite-datasource
 go 1.15
 
 require (
-	github.com/PuerkitoBio/goquery v1.5.1 // indirect
 	github.com/google/go-cmp v0.5.2
 	github.com/grafana/grafana-plugin-sdk-go v0.78.0
 	github.com/magefile/mage v1.10.0 // indirect

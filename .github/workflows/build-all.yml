@@ -5,32 +5,46 @@ on: [workflow_dispatch]
 
 jobs:
 
-  build-cross:
+  build-arm6:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.14
-      - uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Install go dependencies
-        run: make install-go
-      - name: build cross compiled versions
-        run: make build-backend-all
+      - name: build backend plugin
+        run: make build-backend-cross-linux-arm6
       - name: Upload dist folder
         uses: actions/upload-artifact@v2
         with:
-          name: plugin-cross
+          name: plugin-arm6
           path: ./dist/
 
-  build-linux:
+  build-arm7:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: build backend plugin
+        run: make build-backend-cross-linux-arm7
+      - name: Upload dist folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-arm7
+          path: ./dist/
+
+  build-arm64:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: build backend plugin
+        run: make build-backend-cross-linux-arm64
+      - name: Upload dist folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-arm64
+          path: ./dist/
+
+  build-linux64:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,7 +52,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.14
+          go-version: 1.15
       - uses: actions/cache@v2
         with:
           path: ~/go/pkg/mod
@@ -48,11 +62,11 @@ jobs:
       - name: Install go dependencies
         run: make install-go
       - name: build linux version
-        run: make build-backend-local
+        run: make build-backend
       - name: Upload linux binary
         uses: actions/upload-artifact@v2
         with:
-          name: plugin-linux
+          name: plugin-linux64
           path: ./dist/
 
   build-windows:
@@ -63,7 +77,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.14
+          go-version: 1.15
       - uses: actions/cache@v2
         with:
           path: ~/go/pkg/mod
@@ -73,10 +87,10 @@ jobs:
       - name: Install go dependencies
         run: make install-go
       - name: build windows version
-        run: make build-backend-local
+        run: make build-backend
       - name: Upload windows binary
         uses: actions/upload-artifact@v2
         with:
-          name: plugin-windows
+          name: plugin-windows64
           path: ./dist/
 
