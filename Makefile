@@ -30,7 +30,7 @@ backend-test:
 	go test ./pkg/...
 	@echo
 
-test: backend-test build-frontend build-backend selenium-test
+test: backend-test build-frontend build-backend-local selenium-test
 	docker-compose down --remove-orphans --volumes --timeout=2
 
 build-backend-local:
@@ -55,7 +55,7 @@ else
 endif
 
 build-backend-all: build-backend-local
-	docker build -f CrossCompiler.Dockerfile -t cross-build .
+	docker build -t cross-build ./build
 
 	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
 		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=amd64 \
@@ -73,6 +73,26 @@ build-backend-all: build-backend-local
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
 
+
+	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
+		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm64 \
+		-e CC=/opt/rpi-tools/arm-bcm2708/arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc \
+		cross-build \
+		go build -o dist/gpx_sqlite-datasource_linux_arm6 \
+		-ldflags '-w -s -extldflags "-static"' \
+		-tags osusergo,netgo,sqlite_omit_load_extension \
+		./pkg
+
+
+	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
+		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm64 \
+		-e CC=arm-linux-gnueabihf-gcc \
+		cross-build \
+		go build -o dist/gpx_sqlite-datasource_linux_arm7 \
+		-ldflags '-w -s -extldflags "-static"' \
+		-tags osusergo,netgo,sqlite_omit_load_extension \
+		./pkg
+
 	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
 		-e CGO_ENABLED=1 -e GOOS=windows -e GOARCH=amd64 -e  CC=x86_64-w64-mingw32-gcc \
 		cross-build \
@@ -85,4 +105,4 @@ build-backend-all: build-backend-local
 build-frontend:
 	yarn build
 
-build: build-frontend build-backend
+build: build-frontend build-backend-local
