@@ -16,24 +16,7 @@ bootstrap: teardown
 teardown:
 	docker-compose down --remove-orphans --volumes --timeout=2
 
-selenium-test: bootstrap
-	@echo
-	docker-compose run --rm start-setup
-	npx jest --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
-	@echo
-
-frontend-test:
-	yarn test
-
-backend-test:
-	@echo
-	go test ./pkg/...
-	@echo
-
-test: backend-test build-frontend build-backend-local selenium-test
-	docker-compose down --remove-orphans --volumes --timeout=2
-
-build-backend-local:
+build-backend:
 ifeq ($(UNAME_OS), Linux)
 	CGO_ENABLED=1 go build \
 		-o dist/gpx_sqlite-datasource_linux_amd64 \
@@ -54,8 +37,19 @@ else
 		./pkg
 endif
 
-build-backend-all: build-backend-local
-	docker build -t cross-build ./build
+build-backend-cross-win64:
+	@docker build -t cross-build ./build
+
+	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
+		-e CGO_ENABLED=1 -e GOOS=windows -e GOARCH=amd64 -e  CC=x86_64-w64-mingw32-gcc \
+		cross-build \
+		go build -o dist/gpx_sqlite-datasource_windows_amd64.exe \
+		-ldflags '-w -s -extldflags "-static"' \
+		-tags osusergo,netgo,sqlite_omit_load_extension \
+		./pkg
+
+build-backend-cross-linux64:
+	@docker build -t cross-build ./build
 
 	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
 		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=amd64 \
@@ -65,14 +59,8 @@ build-backend-all: build-backend-local
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
 
-	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
-		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm64 -e CC=aarch64-linux-gnu-gcc \
-		cross-build \
-		go build -o dist/gpx_sqlite-datasource_linux_arm64 \
-		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension \
-		./pkg
-
+build-backend-cross-linux-arm6:
+	@docker build -t cross-build ./build
 
 	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
 		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm64 \
@@ -83,6 +71,8 @@ build-backend-all: build-backend-local
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
 
+build-backend-cross-linux-arm7:
+	docker build -t cross-build ./build
 
 	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
 		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm64 \
@@ -93,10 +83,13 @@ build-backend-all: build-backend-local
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
 
+build-backend-cross-linux-arm64:
+	docker build -t cross-build ./build
+
 	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
-		-e CGO_ENABLED=1 -e GOOS=windows -e GOARCH=amd64 -e  CC=x86_64-w64-mingw32-gcc \
+		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm64 -e CC=aarch64-linux-gnu-gcc \
 		cross-build \
-		go build -o dist/gpx_sqlite-datasource_windows_amd64.exe \
+		go build -o dist/gpx_sqlite-datasource_linux_arm64 \
 		-ldflags '-w -s -extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
@@ -105,4 +98,21 @@ build-backend-all: build-backend-local
 build-frontend:
 	yarn build
 
-build: build-frontend build-backend-local
+build: build-frontend build-backend
+
+selenium-test: bootstrap
+	@echo
+	docker-compose run --rm start-setup
+	npx jest --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
+	@echo
+
+frontend-test:
+	yarn test
+
+backend-test:
+	@echo
+	go test ./pkg/...
+	@echo
+
+test: backend-test build-frontend build-backend selenium-test
+	docker-compose down --remove-orphans --volumes --timeout=2
