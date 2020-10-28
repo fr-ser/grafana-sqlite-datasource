@@ -30,9 +30,9 @@ Grafana comes with a command line tool that can be used to install plugins.
 
 If the server where Grafana is installed has no access to the Grafana.com server, then the plugin can be downloaded and manually copied to the server.
 
-2. Get the zip file from https://github.com/fr-ser/grafana-sqlite-datasource/archive/v0.1.0.zip
+2. Get the zip file from https://github.com/fr-ser/grafana-sqlite-datasource/archive/v0.1.2.zip
 3. Extract the zip file into the data/plugins subdirectory for Grafana:
-   `unzip grafana-sqlite-datasource-0.1.0.zip -d YOUR_PLUGIN_DIR/grafana-sqlite-datasource`
+   `unzip grafana-sqlite-datasource-0.1.2.zip -d YOUR_PLUGIN_DIR/grafana-sqlite-datasource`
 4. Restart the Grafana server
 5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
 

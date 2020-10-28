@@ -36,8 +36,8 @@
         "path": "img/sine-wave-timeseries-panel-edit.png"
       }
     ],
-    "version": "0.1.1",
-    "updated": "2020-10-11"
+    "version": "0.1.2",
+    "updated": "2020-10-28"
   },
   "dependencies": {
     "grafanaDependency": "7.x.x",
