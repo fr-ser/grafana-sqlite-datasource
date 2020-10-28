@@ -17,7 +17,14 @@ Any contribution is welcome. Some information regarding the local setup can be f
 The most up to date (but also most generic) information can always be found here:
 [Grafana Website - Plugin Installation](https://grafana.com/docs/grafana/latest/plugins/installation/#install-grafana-plugins)
 
-### Installing the Plugin on an Existing Grafana with the CLI (not yet approved)
+### Allowing unsigned plugins
+
+Currently, the plugin is unsigned, which requires users to allow unsigned backend plugins.
+As of right now there is no process to sign a community plugin at all ([see link](https://github.com/fr-ser/grafana-sqlite-datasource/issues/5)).
+
+To allow unsigned plugins, see the [Grafana Configuration Documentation here](https://grafana.com/docs/grafana/latest/administration/configuration/#allow_loading_unsigned_plugins).
+
+### Installing the Plugin on an Existing Grafana with the CLI
 
 Grafana comes with a command line tool that can be used to install plugins.
 
