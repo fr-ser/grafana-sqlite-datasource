@@ -1,0 +1,36 @@
+name: Test Tagged
+
+on:
+  push:
+    branches:
+      - 'release-*'
+    tags:
+      - v*
+jobs:
+
+
+  test-selenium:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 12.0.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.0.x
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Run Selenium Tests
+        run: make selenium-test
+      - name: Debug Logs
+        if: ${{ failure() }}
+        run: docker-compose logs grafana
+
