@@ -93,4 +93,3 @@ jobs:
         with:
           name: plugin-windows64
           path: ./dist/
-

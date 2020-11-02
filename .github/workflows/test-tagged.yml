@@ -8,8 +8,7 @@ on:
       - v*
 jobs:
 
-
-  test-selenium:
+  test-selenium-linux:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,4 +32,3 @@ jobs:
       - name: Debug Logs
         if: ${{ failure() }}
         run: docker-compose logs grafana
-
