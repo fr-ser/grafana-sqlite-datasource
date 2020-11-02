@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 
@@ -30,6 +31,22 @@ func createTmpDB(seedSQL string) (dbPath string, cleanup func()) {
 func getDataQuery(targetModel queryModel) backend.DataQuery {
 	jsonData, _ := json.Marshal(targetModel)
 	return backend.DataQuery{JSON: jsonData}
+}
+
+func strPointer(x string) *string {
+	return &x
+}
+
+func floatPointer(x float64) *float64 {
+	return &x
+}
+
+func intPointer(x int64) *int64 {
+	return &x
+}
+
+func timePointer(x time.Time) *time.Time {
+	return &x
 }
 
 func TestEmptyQuery(t *testing.T) {
@@ -79,9 +96,9 @@ func TestNoResults(t *testing.T) {
 
 	expectedFrame := data.NewFrame(
 		"response",
-		data.NewField("time", nil, []int64{}),
-		data.NewField("value", nil, []float64{}),
-		data.NewField("name", nil, []string{}),
+		data.NewField("time", nil, []*int64{}),
+		data.NewField("value", nil, []*float64{}),
+		data.NewField("name", nil, []*string{}),
 	)
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {

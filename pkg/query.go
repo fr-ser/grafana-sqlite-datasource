@@ -23,18 +23,18 @@ type sqlColumn struct {
 	Type string
 
 	// TimeData contains time values (if Type == "TIME")
-	TimeData []time.Time
+	TimeData []*time.Time
 	// IntData contains integer values (if Type == "INTEGER")
-	IntData []int64
+	IntData []*int64
 
 	// FloatData contains float values (if Type == "FLOAT")
-	FloatData []float64
+	FloatData []*float64
 
 	// StringData contains string values (if Type == "STRING")
-	StringData []string
+	StringData []*string
 }
 
-func transformRow(rows *sql.Rows, columns []*sqlColumn) error {
+func transformRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 	columnCount := len(columns)
 	values := make([]interface{}, columnCount)
 	valuePointers := make([]interface{}, columnCount)
@@ -79,6 +79,8 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) error {
 		case string:
 			valueType = "STRING"
 			stringV = v
+		case nil:
+			valueType = "NULL"
 		default:
 			log.DefaultLogger.Warn(
 				"Scanned row value type was unexpected",
@@ -98,63 +100,108 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) error {
 			}
 		}
 
+		// variable to indicate whether to explicitly set the value to null
+		setNull := false
+
 		if column.Type == "TIME" {
+			var value time.Time
+
 			if valueType == "INTEGER" {
-				columns[i].TimeData = append(columns[i].TimeData, time.Unix(intV, 0))
+				value = time.Unix(intV, 0)
 			} else if valueType == "FLOAT" {
-				columns[i].TimeData = append(columns[i].TimeData, time.Unix(int64(floatV), 0))
-			} else {
+				value = time.Unix(int64(floatV), 0)
+			} else if valueType != "NULL" {
 				val := fmt.Sprintf("%v", values[i])
-				t, err := time.Parse(time.RFC3339, val)
+				value, err = time.Parse(time.RFC3339, val)
 				if err != nil {
 					// try parsing the string as a number
 					if f, err := strconv.ParseFloat(val, 64); err == nil {
-						t = time.Unix(int64(f), 0)
+						value = time.Unix(int64(f), 0)
 					} else {
 						log.DefaultLogger.Warn(
 							"Could not parse (RFC3339) value to timestamp", "value", val,
 						)
+						setNull = true
 					}
 				}
-				columns[i].TimeData = append(columns[i].TimeData, t)
+			}
+
+			if setNull || valueType == "NULL" {
+				columns[i].TimeData = append(columns[i].TimeData, nil)
+			} else {
+				columns[i].TimeData = append(columns[i].TimeData, &value)
 			}
 			continue
 		}
 
 		if column.Type == "INTEGER" {
+			var value int64
+
 			if valueType == "INTEGER" {
-				columns[i].IntData = append(columns[i].IntData, intV)
+				value = intV
 			} else {
-				if v, err := strconv.ParseInt(string(stringV), 10, 64); err == nil {
-					columns[i].IntData = append(columns[i].IntData, v)
-				} else {
+				value, err = strconv.ParseInt(string(stringV), 10, 64)
+				if err != nil {
 					log.DefaultLogger.Warn("Could not convert numeric to float", "value", stringV)
+					setNull = true
 				}
+			}
+
+			if setNull || valueType == "NULL" {
+				columns[i].IntData = append(columns[i].IntData, nil)
+			} else {
+				columns[i].IntData = append(columns[i].IntData, &value)
 			}
 			continue
 		}
 
 		if column.Type == "FLOAT" {
-			if valueType == "FLOAT" && column.Type == "FLOAT" {
-				columns[i].FloatData = append(columns[i].FloatData, floatV)
-			} else if column.Type == "FLOAT" {
-				if v, err := strconv.ParseFloat(string(stringV), 64); err == nil {
-					columns[i].FloatData = append(columns[i].FloatData, v)
-				} else {
+			var value float64
+
+			if valueType == "FLOAT" {
+				value = floatV
+			} else {
+				value, err = strconv.ParseFloat(string(stringV), 64)
+
+				if err != nil {
 					log.DefaultLogger.Warn("Could not convert numeric to float", "value", stringV)
+					setNull = true
 				}
+			}
+
+			if setNull || valueType == "NULL" {
+				columns[i].FloatData = append(columns[i].FloatData, nil)
+			} else {
+				columns[i].FloatData = append(columns[i].FloatData, &value)
 			}
 			continue
 		}
 
-		// column.Type == "STRING"
-		if valueType == "INTEGER" {
-			columns[i].StringData = append(columns[i].StringData, fmt.Sprintf("%d", intV))
-		} else if valueType == "FLOAT" {
-			columns[i].StringData = append(columns[i].StringData, fmt.Sprintf("%f", floatV))
-		} else {
-			columns[i].StringData = append(columns[i].StringData, fmt.Sprintf("%v", values[i]))
+		if column.Type == "STRING" {
+			var value string
+
+			if valueType == "INTEGER" {
+				value = fmt.Sprintf("%d", intV)
+			} else if valueType == "FLOAT" {
+				value = fmt.Sprintf("%f", floatV)
+			} else {
+				value = fmt.Sprintf("%v", values[i])
+			}
+
+			if valueType == "NULL" {
+				columns[i].StringData = append(columns[i].StringData, nil)
+			} else {
+				columns[i].StringData = append(columns[i].StringData, &value)
+			}
+			continue
 		}
+
+		// column.Type == "UNKNOWN"
+		columns[i].TimeData = append(columns[i].TimeData, nil)
+		columns[i].IntData = append(columns[i].IntData, nil)
+		columns[i].FloatData = append(columns[i].FloatData, nil)
+		columns[i].StringData = append(columns[i].StringData, nil)
+
 	}
 
 	return nil

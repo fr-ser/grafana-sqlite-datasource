@@ -34,11 +34,16 @@ func TestQueryWithTimeColumn(t *testing.T) {
 
 	expectedFrame := data.NewFrame(
 		"response",
-		data.NewField("time", nil, []time.Time{
-			time.Unix(21, 0), time.Unix(22, 0), time.Unix(23, 0)},
-		),
-		data.NewField("value", nil, []float64{21.1, 22.2, 23.3}),
-		data.NewField("name", nil, []string{"one", "two", "three"}),
+		data.NewField("time", nil, []*time.Time{
+			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
+			timePointer(time.Unix(23, 0)),
+		}),
+		data.NewField("value", nil, []*float64{
+			floatPointer(21.1), floatPointer(22.2), floatPointer(23.3),
+		}),
+		data.NewField("name", nil, []*string{
+			strPointer("one"), strPointer("two"), strPointer("three"),
+		}),
 	)
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
@@ -72,12 +77,14 @@ func TestQueryWithTimeStringColumn(t *testing.T) {
 
 	expectedFrame := data.NewFrame(
 		"response",
-		data.NewField("time", nil, []time.Time{
-			time.Unix(21, 0), time.Unix(22, 0), time.Unix(23, 0)},
-		),
-		data.NewField("time_string", nil, []time.Time{
-			time.Unix(21, 0), time.Unix(22, 0), time.Unix(23, 0)},
-		),
+		data.NewField("time", nil, []*time.Time{
+			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
+			timePointer(time.Unix(23, 0)),
+		}),
+		data.NewField("time_string", nil, []*time.Time{
+			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
+			timePointer(time.Unix(23, 0)),
+		}),
 	)
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
@@ -112,9 +119,10 @@ func TestUnixTimestampAsString(t *testing.T) {
 
 	expectedFrame := data.NewFrame(
 		"response",
-		data.NewField("time", nil, []time.Time{
-			time.Unix(21, 0), time.Unix(22, 0), time.Unix(23, 0)},
-		),
+		data.NewField("time", nil, []*time.Time{
+			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
+			timePointer(time.Unix(23, 0)),
+		}),
 	)
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
