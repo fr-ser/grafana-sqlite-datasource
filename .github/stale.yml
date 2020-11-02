@@ -10,7 +10,6 @@ daysUntilClose: 14
 
 exemptLabels:
   - TODO
-  - bug
 
 exemptMilestones: true
 
