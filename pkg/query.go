@@ -83,51 +83,74 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) error {
 			log.DefaultLogger.Warn(
 				"Scanned row value type was unexpected",
 				"value", values[i], "type", fmt.Sprintf("%T", values[i]),
+				"column", column.Name,
 			)
 			valueType = "UNKNOWN"
 		}
 
-		if column.Type == "UNKNOWN" && valueType != "UNKNOWN" {
-			column.Type = valueType
+		if column.Type == "UNKNOWN" && valueType != "NULL" {
+			// we need to decide on a type for the column as we need to
+			// fill a typed list later. Multiple types are not allowed
+			if valueType == "UNKNOWN" {
+				column.Type = "STRING"
+			} else {
+				column.Type = valueType
+			}
 		}
 
-		if valueType == "INTEGER" && column.Type == "TIME" {
-			columns[i].TimeData = append(columns[i].TimeData, time.Unix(intV, 0))
-		} else if valueType == "FLOAT" && column.Type == "TIME" {
-			columns[i].TimeData = append(columns[i].TimeData, time.Unix(int64(floatV), 0))
-		} else if column.Type == "TIME" {
-			val := fmt.Sprintf("%v", values[i])
-			t, err := time.Parse(time.RFC3339, val)
-			if err != nil {
-				// try parsing the string as a number
-				if f, err := strconv.ParseFloat(val, 64); err == nil {
-					t = time.Unix(int64(f), 0)
+		if column.Type == "TIME" {
+			if valueType == "INTEGER" {
+				columns[i].TimeData = append(columns[i].TimeData, time.Unix(intV, 0))
+			} else if valueType == "FLOAT" {
+				columns[i].TimeData = append(columns[i].TimeData, time.Unix(int64(floatV), 0))
+			} else {
+				val := fmt.Sprintf("%v", values[i])
+				t, err := time.Parse(time.RFC3339, val)
+				if err != nil {
+					// try parsing the string as a number
+					if f, err := strconv.ParseFloat(val, 64); err == nil {
+						t = time.Unix(int64(f), 0)
+					} else {
+						log.DefaultLogger.Warn(
+							"Could not parse (RFC3339) value to timestamp", "value", val,
+						)
+					}
+				}
+				columns[i].TimeData = append(columns[i].TimeData, t)
+			}
+			continue
+		}
+
+		if column.Type == "INTEGER" {
+			if valueType == "INTEGER" {
+				columns[i].IntData = append(columns[i].IntData, intV)
+			} else {
+				if v, err := strconv.ParseInt(string(stringV), 10, 64); err == nil {
+					columns[i].IntData = append(columns[i].IntData, v)
 				} else {
-					log.DefaultLogger.Warn(
-						"Could parse (RFC3339) value to timestamp", "value", val,
-					)
+					log.DefaultLogger.Warn("Could not convert numeric to float", "value", stringV)
 				}
 			}
-			columns[i].TimeData = append(columns[i].TimeData, t)
-		} else if valueType == "INTEGER" && column.Type == "INTEGER" {
-			columns[i].IntData = append(columns[i].IntData, intV)
-		} else if column.Type == "INTEGER" {
-			if v, err := strconv.ParseInt(string(stringV), 10, 64); err == nil {
-				columns[i].IntData = append(columns[i].IntData, v)
-			} else {
-				log.DefaultLogger.Warn("Could not convert numeric to float", "value", stringV)
+			continue
+		}
+
+		if column.Type == "FLOAT" {
+			if valueType == "FLOAT" && column.Type == "FLOAT" {
+				columns[i].FloatData = append(columns[i].FloatData, floatV)
+			} else if column.Type == "FLOAT" {
+				if v, err := strconv.ParseFloat(string(stringV), 64); err == nil {
+					columns[i].FloatData = append(columns[i].FloatData, v)
+				} else {
+					log.DefaultLogger.Warn("Could not convert numeric to float", "value", stringV)
+				}
 			}
-		} else if valueType == "FLOAT" && column.Type == "FLOAT" {
-			columns[i].FloatData = append(columns[i].FloatData, floatV)
-		} else if column.Type == "FLOAT" {
-			if v, err := strconv.ParseFloat(string(stringV), 64); err == nil {
-				columns[i].FloatData = append(columns[i].FloatData, v)
-			} else {
-				log.DefaultLogger.Warn("Could not convert numeric to float", "value", stringV)
-			}
-		} else if column.Type == "STRING" && valueType == "INTEGER" {
+			continue
+		}
+
+		// column.Type == "STRING"
+		if valueType == "INTEGER" {
 			columns[i].StringData = append(columns[i].StringData, fmt.Sprintf("%d", intV))
-		} else if column.Type == "STRING" && valueType == "FLOAT" {
+		} else if valueType == "FLOAT" {
 			columns[i].StringData = append(columns[i].StringData, fmt.Sprintf("%f", floatV))
 		} else {
 			columns[i].StringData = append(columns[i].StringData, fmt.Sprintf("%v", values[i]))
@@ -175,13 +198,11 @@ func fetchData(dbPath string, qm queryModel) (columns []*sqlColumn, err error) {
 			columns[idx].Type = "FLOAT"
 		case "NULL", "TEXT", "BLOB":
 			columns[idx].Type = "STRING"
-		case "", "UNKNOWN":
-			columns[idx].Type = "UNKNOWN"
 		default:
 			log.DefaultLogger.Debug(
 				"Unknown database type", "type", columnTypes[idx].DatabaseTypeName(),
 			)
-			columns[idx].Type = "STRING"
+			columns[idx].Type = "UNKNOWN"
 		}
 
 		for _, timeColumnName := range qm.TimeColumns {
