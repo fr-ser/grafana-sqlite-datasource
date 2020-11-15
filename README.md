@@ -25,14 +25,15 @@ As of right now there is no process to sign a community plugin at all ([see link
 
 To allow unsigned plugins, see the [Grafana Configuration Documentation here](https://grafana.com/docs/grafana/latest/administration/configuration/#allow_loading_unsigned_plugins).
 
-### Installing the Plugin on an Existing Grafana with the CLI
+### ~~Installing the Plugin on an Existing Grafana with the CLI (not released yet)~~
 
-Grafana comes with a command line tool that can be used to install plugins.
+~~Grafana comes with a command line tool that can be used to install plugins.~~
 
-1. Run this command: `grafana-cli plugins install frser-sqlite-datasource`
-2. Restart the Grafana server.
-3. Login in with a user that has admin rights. This is needed to create datasources.
-4. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
+1. ~~Run this command: `grafana-cli plugins install frser-sqlite-datasource`~~
+2. ~~Restart the Grafana server.~~
+3. ~~Login in with a user that has admin rights. This is needed to create datasources.~~
+4. ~~To make sure the plugin was installed, check the list of installed datasources. Click the
+   Plugins item in the main menu. Both core datasources and installed datasources will appear.~~
 
 ### Installing the Plugin Manually on an Existing Grafana
 
