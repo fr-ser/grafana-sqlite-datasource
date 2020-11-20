@@ -7,9 +7,9 @@ const SELENIUM_URL = process.env.SELENIUM_URL || 'localhost:4444';
 export async function login(driver) {
   await driver.get(GRAFANA_URL);
 
-  await driver.findElement(By.css("#login-view input[name='user']")).sendKeys('admin');
-  await driver.findElement(By.css("#login-view input[name='password']")).sendKeys('admin123');
-  await driver.findElement(By.css('#login-view button')).click();
+  await driver.findElement(By.css("input[name='user']")).sendKeys('admin');
+  await driver.findElement(By.css("input[name='password']")).sendKeys('admin123');
+  await driver.findElement(By.css("button[aria-label='Login button']")).click();
   await driver.wait(until.elementLocated(By.css('.dashboard-container')), 2 * 1000);
 }
 

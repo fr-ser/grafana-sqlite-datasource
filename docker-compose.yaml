@@ -2,7 +2,7 @@ version: "3.6"
 
 services:
   grafana:
-    image: grafana/grafana:7.0.6
+    image: grafana/grafana:7.3.3
     volumes:
       - "./grafana_config/data.db:/app/data.db"
       - "./grafana_config/grafana.ini:/etc/grafana/grafana.ini"

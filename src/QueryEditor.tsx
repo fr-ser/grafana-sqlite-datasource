@@ -35,6 +35,7 @@ export function QueryEditor(props: Props) {
     <>
       <div className="gf-form">
         <TextArea
+          css={null}
           style={{ height: 100 }}
           role="query-editor-input"
           value={rawQueryText}

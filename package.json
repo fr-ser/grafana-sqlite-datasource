@@ -1,21 +1,22 @@
 {
   "name": "frser-sqlite-datasource",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "SQLite as a (Backend) Datasource",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
     "dev": "grafana-toolkit plugin:dev",
+    "sign": "grafana-toolkit plugin:sign",
     "watch": "grafana-toolkit plugin:dev --watch"
   },
   "author": "Sergej Herbert",
   "license": "Apache-2.0",
   "repository": "https://github.com/fr-ser/grafana-sqlite-datasource.git",
   "devDependencies": {
-    "@grafana/data": "7.0.1",
-    "@grafana/runtime": "7.0.1",
-    "@grafana/toolkit": "7.0.1",
-    "@grafana/ui": "7.0.1",
+    "@grafana/data": "7.3.3",
+    "@grafana/runtime": "7.3.3",
+    "@grafana/toolkit": "7.3.3",
+    "@grafana/ui": "7.3.3",
     "@testing-library/dom": "^7.23.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^10.0.0",
@@ -28,7 +29,10 @@
     "selenium-webdriver": "^4.0.0-alpha.7"
   },
   "engines": {
-    "node": ">=12 <13"
+    "node": ">=12.18 <13"
+  },
+  "resolutions": {
+    "rxjs": "6.6.3"
   },
   "jest": {
     "testEnvironment": "jest-environment-jsdom-sixteen"

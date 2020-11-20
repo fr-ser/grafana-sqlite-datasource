@@ -98,7 +98,11 @@ build-backend-cross-linux-arm64:
 build-frontend:
 	yarn build
 
-build: build-frontend build-backend
+sign-and-prepare:
+	chmod +x ./dist/gpx_*
+	yarn sign
+
+build: build-frontend build-backend sign-and-prepare
 
 selenium-test: bootstrap
 	@echo
@@ -114,5 +118,5 @@ backend-test:
 	go test ./pkg/...
 	@echo
 
-test: backend-test build-frontend build-backend selenium-test
+test: backend-test build-frontend build-backend sign-and-prepare selenium-test
 	docker-compose down --remove-orphans --volumes --timeout=2

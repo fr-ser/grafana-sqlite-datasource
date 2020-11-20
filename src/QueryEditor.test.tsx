@@ -5,10 +5,20 @@ import userEvent from '@testing-library/user-event';
 import { QueryEditor } from './QueryEditor';
 
 describe('QueryEditor', () => {
+  let onChangeMock: jest.Mock;
+  let onRunQueryMock: jest.Mock;
+  let queryEditor: JSX.Element;
+
+  beforeEach(() => {
+    onChangeMock = jest.fn();
+    onRunQueryMock = jest.fn();
+    queryEditor = (
+      <QueryEditor onChange={onChangeMock} onRunQuery={onRunQueryMock} query={null as any} datasource={null as any} />
+    );
+  });
+
   it('allows editing the rawQuery', async () => {
-    const onChangeMock = jest.fn();
-    const onRunQueryMock = jest.fn();
-    const { findByRole } = render(<QueryEditor onChange={onChangeMock} onRunQuery={onRunQueryMock} />);
+    const { findByRole } = render(queryEditor);
 
     const queryInput = await findByRole('query-editor-input');
 
@@ -29,9 +39,7 @@ describe('QueryEditor', () => {
   });
 
   it('allows setting time columns', async () => {
-    const onChangeMock = jest.fn();
-    const onRunQueryMock = jest.fn();
-    const { findByRole, findByText } = render(<QueryEditor onChange={onChangeMock} onRunQuery={onRunQueryMock} />);
+    const { findByRole, findByText } = render(queryEditor);
 
     const selector = await findByRole('time-column-selector');
     const selectorInput = selector.querySelector('input') as HTMLInputElement;

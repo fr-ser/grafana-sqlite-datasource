@@ -34,10 +34,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 12.0.x
+      - name: Use Node.js 12.18.x
         uses: actions/setup-node@v1
         with:
-          node-version: 12.0.x
+          node-version: 12.18.x
       - name: Cache Node.js modules
         uses: actions/cache@v2
         with:
@@ -86,10 +86,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 12.0.x
+      - name: Use Node.js 12.18.x
         uses: actions/setup-node@v1
         with:
-          node-version: 12.0.x
+          node-version: 12.18.x
       - name: Cache Node.js modules
         uses: actions/cache@v2
         with:
@@ -107,8 +107,10 @@ jobs:
         with:
           name: plugin-executable
           path: ./dist/
-      - name: make plugin executable
-        run: chmod +x ./dist/gpx_sqlite-datasource_linux_amd64
+      - name: sign plugin
+        env:
+          GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
+        run: make sign-and-prepare
       - name: Run Selenium Tests
         run: make selenium-test
       - name: Debug Logs
