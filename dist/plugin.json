@@ -1,0 +1,37 @@
+{
+  "type": "datasource",
+  "name": "sqlite-datasource",
+  "id": "frser-sqlite-datasource",
+  "metrics": true,
+  "backend": true,
+  "executable": "gpx_sqlite-datasource",
+  "info": {
+    "description": "SQLite as a (Backend) Datasource",
+    "author": {
+      "name": "Sergej Herbert",
+      "url": "https://github.com/fr-ser"
+    },
+    "keywords": ["sqlite"],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [
+      {
+        "name": "Website",
+        "url": "https://github.com/fr-ser/grafana-sqlite-datasource"
+      },
+      {
+        "name": "License",
+        "url": "https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/LICENSE"
+      }
+    ],
+    "screenshots": [],
+    "version": "0.2.0",
+    "updated": "2020-11-20"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=7.3.3",
+    "plugins": []
+  }
+}
