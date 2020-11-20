@@ -1,0 +1,41 @@
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+{
+  "manifestVersion": "2.0.0",
+  "signatureType": "community",
+  "signedByOrg": "frser",
+  "signedByOrgName": "frser",
+  "plugin": "frser-sqlite-datasource",
+  "version": "0.1.4",
+  "time": 1605898059547,
+  "keyId": "7e4d0c6a708866e7",
+  "files": {
+    "module.js": "9aec81ba0ca57521c17a48e42785b212cc3839ab084fe8c40712e9c2ffe46789",
+    "README.md": "88072a3db0d8594b8c606affd17df43f3e9a4781ae2c630f9d02b2cc7bb083e4",
+    "gpx_sqlite-datasource_windows_amd64.exe": "9785d89caeac2c7b4d6b9aa70fa4e75ba780d54c245db9fc536b2d69c78c767e",
+    "module.js.map": "10f4acbd2800d28042f63b10d5d2dd7268ad540d70e3635b56e0889f29051225",
+    "plugin.json": "134aa30a896c528a83c5bd24a46d9c889d4162a4c5013f4cf26d84d2dcd89584",
+    "gpx_sqlite-datasource_linux_amd64": "6cf8dfa9e6838b2a996e05d930cd0d40828abedb9b540baa6d12be35f708feaa",
+    "gpx_sqlite-datasource_linux_arm7": "354fc3011789c8f470ec49bf2f77ffe532f07fb8f948ebe2b160df7586b73304",
+    "gpx_sqlite-datasource_linux_arm64": "cfa28ded8b4a5a726efd3a0d442dedf1f1cf8d7fe6a679da3baa82bad7eb2904",
+    "index.html": "2fa2c4168c5bb7b8502989f437e4a1a71e663702b0ec9c01530215c8c026dcaf",
+    "gpx_sqlite-datasource_linux_arm6": "cc6dadaa545e9ee38651e9b6dae72a2a051eede956eef876db9ce4afa9e0ee2f",
+    "img/sine-wave-timeseries-panel-edit.png": "e70be65e8257912c150e052303aaa17808fca1127d392821713fd30a7cac1ea5",
+    "img/logo.svg": "0c351f39397f811a8ffe664474f1435f342b3be3657bd1ea6353e443acbecf6e",
+    "img/sine-wave-example-dashboard.png": "ccde2cf5e0cd648cdca99bcf8e295cefecbcf6e477645d09fceda3ee17af7737",
+    "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "module.js.LICENSE.txt": "0d8f66cd4afb566cb5b7e1540c68f43b939d3eba12ace290f18abc4f4cb53ed0"
+  }
+}
+-----BEGIN PGP SIGNATURE-----
+Version: OpenPGP.js v4.10.1
+Comment: https://openpgpjs.org
+
+wqEEARMKAAYFAl+4D0sACgkQfk0ManCIZueF1QIGOD+rSqUPAv4azLRTJ+/V
+elizR1LIv6X/rb0nCKRfnUKp1WJcf6d/KzwXqPwONa6PdwFBjwtIeGoXVF5N
+7hOgu3QCCQHHhFAGeu0jgSWqv6xN7P2HOiwplJ/5IfPAijDwa6SXMl2+V+6C
+audeS0PWQfH/VHtF7Q1yG7ccwHuWi60xGo/miA==
+=sSrL
+-----END PGP SIGNATURE-----
