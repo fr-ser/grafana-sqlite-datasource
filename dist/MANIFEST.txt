@@ -8,19 +8,19 @@ Hash: SHA512
   "signedByOrg": "frser",
   "signedByOrgName": "frser",
   "plugin": "frser-sqlite-datasource",
-  "version": "0.2.0",
-  "time": 1605897798610,
+  "version": "0.2.1",
+  "time": 1606048764339,
   "keyId": "7e4d0c6a708866e7",
   "files": {
-    "module.js": "5a090987c006271f33dcea839daf9161343430a29d7220d8d7efe0124850ae12",
-    "README.md": "daead01a08074129bffe3a8a1eff4602d0067a13e1c0e5b00851efe658d3f070",
+    "module.js": "a15f047163ae88945e73852e9440eb7de4bb9b581bbe6660fff115406155c5d2",
+    "README.md": "ec945c289107d5fd61fe5426c701704cee5cba7584f4b5af4f800ae6388e8c99",
     "gpx_sqlite-datasource_windows_amd64.exe": "9785d89caeac2c7b4d6b9aa70fa4e75ba780d54c245db9fc536b2d69c78c767e",
-    "module.js.map": "7589602e40a4ce5467f6dd94dddced9c0de3e0cd908cb5227904ece4620a24f7",
-    "plugin.json": "1ed3a67a5fc722cbb2718050bf5b56bb00b1c02f5fe8768bb4c66cfc7f8cecfa",
+    "module.js.map": "ff1e2e820653e3b12c8e51b553280a49f26b31bb0bd31a8d4d2c59d5e5a83faf",
+    "plugin.json": "a26e0e7b203463ea8a85402e108d98a2d87f67f63e3ad4bdcd8e16a0901601f2",
     "gpx_sqlite-datasource_linux_amd64": "6cf8dfa9e6838b2a996e05d930cd0d40828abedb9b540baa6d12be35f708feaa",
     "gpx_sqlite-datasource_linux_arm7": "354fc3011789c8f470ec49bf2f77ffe532f07fb8f948ebe2b160df7586b73304",
     "gpx_sqlite-datasource_linux_arm64": "cfa28ded8b4a5a726efd3a0d442dedf1f1cf8d7fe6a679da3baa82bad7eb2904",
-    "CHANGELOG.md": "634173a2c7e9d457512970e388b6bb0591138563ea241da194b114629f2007da",
+    "CHANGELOG.md": "d1faed6459f32ac4373839dee5f345623c87db05bc36c59a5c970e4e8da56838",
     "gpx_sqlite-datasource_linux_arm6": "cc6dadaa545e9ee38651e9b6dae72a2a051eede956eef876db9ce4afa9e0ee2f",
     "img/logo.svg": "0c351f39397f811a8ffe664474f1435f342b3be3657bd1ea6353e443acbecf6e",
     "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
@@ -31,9 +31,9 @@ Hash: SHA512
 Version: OpenPGP.js v4.10.1
 Comment: https://openpgpjs.org
 
-wqAEARMKAAYFAl+4DkYACgkQfk0ManCIZucNSgIECjHb79FF//jF2W3OIt8/
-2s2EOXtijLjacEM15KiZ2UZjVPZTlZ5rzkp1fZqM6rUaYjsx5/mhpa/oT00R
-MESnshQCBi3LkvoYuSnJC8b9Xymw4Qm4baqM5CqcY+85Op21PE++50XRTfp6
-o5VoT6CoLJVOWWZOx5XAIdPDWLDfEC4cGqT4
-=4Sdo
+wqIEARMKAAYFAl+6W/wACgkQfk0ManCIZucWJAIJAY7onm1cBC5yanJrv3pF
+uowDJjbNeQp145UUcRbTndfD6yhlhHoFcP57vu9WMWs4wLn7qvItBKTyt9Rj
+3c4lOIRTAgkBt1gmCAQGgO3nF6mppB/unx/BfoP2aY3U2v5SHV7IpI3Bj/rt
+RKP3dtvKbLf7beugDzCn6n6oChfr6oVkxHp1glA=
+=E+VD
 -----END PGP SIGNATURE-----
