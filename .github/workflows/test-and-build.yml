@@ -1,11 +1,6 @@
 name: Test & Build
 
-on:
-  push:
-    branches-ignore:
-      - 'release-*'
-    tags-ignore:
-      - v*
+on: [push]
 
 jobs:
 
