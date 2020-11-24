@@ -4,7 +4,6 @@
 ![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
 
 [![CI Tests](https://github.com/fr-ser/grafana-sqlite-datasource/workflows/Test%20%26%20Build/badge.svg)](https://github.com/fr-ser/grafana-sqlite-datasource/actions)
-[![CI Tests](https://github.com/fr-ser/grafana-sqlite-datasource/workflows/Test%20Tagged/badge.svg)](https://github.com/fr-ser/grafana-sqlite-datasource/actions)
 
 This is a Grafana backend plugin to allow using a SQLite database as a data source.
 

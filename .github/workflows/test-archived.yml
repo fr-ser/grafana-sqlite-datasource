@@ -1,11 +1,12 @@
-name: Test Tagged
+name: Test Archived
 
 on:
-  push:
-    branches:
-      - 'release-*'
-    tags:
-      - v*
+  workflow_dispatch:
+    inputs:
+      zip_url:
+        description: 'URL to get the packaged plugin'
+        required: true
+
 jobs:
 
   test-selenium-linux:
@@ -27,6 +28,10 @@ jobs:
             ${{ runner.OS }}-
       - name: Install dependencies
         run: yarn --frozen-lockfile
+      - name: Download plugin
+        run: sudo curl -L "${{ github.event.inputs.zip_url }}" --output ./plugin.zip
+      - name: unzip plugin
+        run: unzip ./plugin.zip && mv frser-sqlite-datasource dist
       - name: Run Selenium Tests
         run: make selenium-test
       - name: Debug Logs
