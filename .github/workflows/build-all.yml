@@ -1,6 +1,5 @@
 name: Build All
 
-
 on: [workflow_dispatch]
 
 jobs:

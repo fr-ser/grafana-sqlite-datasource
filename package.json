@@ -1,6 +1,6 @@
 {
   "name": "frser-sqlite-datasource",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "SQLite as a (Backend) Datasource",
   "scripts": {
     "build": "grafana-toolkit plugin:build",

@@ -98,7 +98,16 @@ build-backend-cross-linux-arm64:
 build-frontend:
 	yarn build
 
-build: build-frontend build-backend
+sign-and-prepare:
+	chmod +x ./dist/gpx_*
+	yarn sign
+
+package-and-zip:
+	mv ./dist frser-sqlite-datasource
+	zip frser-sqlite-datasource-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
+	mv frser-sqlite-datasource ./dist
+
+build: build-frontend build-backend sign-and-prepare
 
 selenium-test: bootstrap
 	@echo

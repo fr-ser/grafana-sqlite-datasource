@@ -21,6 +21,8 @@ coverage
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 dist/
+frser-sqlite-datasource/
+frser-sqlite-datasource-*.zip
 artifacts/
 work/
 ci/

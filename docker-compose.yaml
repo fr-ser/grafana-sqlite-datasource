@@ -9,7 +9,7 @@ services:
       - "./grafana_config/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml"
       - "./grafana_config/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml"
       - "./grafana_config/dashboard.json:/app/dashboards/dashboard.json"
-      - "./dist:/var/lib/grafana/plugins/sqlite-datasource"
+      - "./dist:/var/lib/grafana/plugins/frser-sqlite-datasource"
     ports:
       - 3000:3000
   selenium:
