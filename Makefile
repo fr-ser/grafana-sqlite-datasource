@@ -115,10 +115,10 @@ package-and-zip-arm6:
 	cp -R dist dist_old
 
 	rm dist/gpx_*
-	mv dist_old/gpx_sqlite-datasource_linux_arm6 dist/gpx_sqlite-datasource_linux_arm
+	cp dist_old/gpx_sqlite-datasource_linux_arm6 dist/gpx_sqlite-datasource_linux_arm
 	yarn sign
 	mv dist frser-sqlite-datasource
-	zip frser-sqlite-datasource-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
+	zip frser-sqlite-datasource-arm6-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
 	rm -rf frser-sqlite-datasource
 	mv dist_old dist
 
