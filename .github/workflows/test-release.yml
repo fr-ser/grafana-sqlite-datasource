@@ -1,0 +1,48 @@
+name: Test Release
+
+on:
+  release:
+    types: [published, created, released, edited]
+
+jobs:
+
+  test-selenium-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download ARM6 plugin
+        run: sudo curl -L "https://github.com/fr-ser/grafana-sqlite-datasource/releases/download/v${GITHUB_REF:11}/frser-sqlite-datasource-arm6-${GITHUB_REF:11}.zip" --output ./plugin-arm.zip
+      - name: unzip plugin-arm
+        run: unzip ./plugin-arm.zip && mv frser-sqlite-datasource frser-sqlite-datasource-arm
+      - name: check platform
+        run: ls frser-sqlite-datasource-arm/gpx_sqlite-datasource_linux_arm
+      - name: Download plugin
+        run: sudo curl -L "https://github.com/fr-ser/grafana-sqlite-datasource/releases/download/v${GITHUB_REF:11}/frser-sqlite-datasource-${GITHUB_REF:11}.zip" --output ./plugin.zip
+      - name: unzip plugin
+        run: unzip ./plugin.zip && mv frser-sqlite-datasource dist
+      - name: check platforms
+        run: >
+          ls dist/gpx_sqlite-datasource_linux_amd64 &&
+          ls dist/gpx_sqlite-datasource_linux_arm &&
+          ls dist/gpx_sqlite-datasource_linux_arm64 &&
+          ls dist/gpx_sqlite-datasource_windows_amd64.exe
+      - name: Use Node.js 12.18.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.18.x
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Run Selenium Tests
+        run: make selenium-test
+      - name: Debug Logs
+        if: ${{ failure() }}
+        run: docker-compose logs grafana
