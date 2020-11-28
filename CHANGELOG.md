@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.2.3]
+
+### Changed
+
+- Releasing arm6 (RaspberryPi Zero) as separate distribution (Github only)
+
+### Fixed
+
+- Renamed the arm7 executable to arm (newer Raspberry Models should run fine now)
+
 ## [0.2.2]
 
 ### Changed

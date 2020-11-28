@@ -105,7 +105,7 @@ jobs:
       - name: sign plugin
         env:
           GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
-        run: make sign-and-prepare
+        run: chmod +x ./dist/gpx_* && yarn sign
       - name: Run Selenium Tests
         run: make selenium-test
       - name: Debug Logs

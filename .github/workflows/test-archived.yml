@@ -32,6 +32,12 @@ jobs:
         run: sudo curl -L "${{ github.event.inputs.zip_url }}" --output ./plugin.zip
       - name: unzip plugin
         run: unzip ./plugin.zip && mv frser-sqlite-datasource dist
+      - name: check platforms
+        run: >
+          ls gpx_sqlite-datasource_linux_amd64 &&
+          ls gpx_sqlite-datasource_linux_arm &&
+          ls gpx_sqlite-datasource_linux_arm64 &&
+          ls gpx_sqlite-datasource_windows_amd64.exe
       - name: Run Selenium Tests
         run: make selenium-test
       - name: Debug Logs

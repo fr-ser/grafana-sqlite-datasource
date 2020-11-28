@@ -44,10 +44,11 @@ with Grafana supporting ARM7 (newer Raspberries) and ARM6 at the same time. Graf
 the correct plugin by file name. But both ARM6 and ARM7 are named
 `<plugin_dir>/frser-sqlite-datasource/dist/gpx_sqlite-datasource_linux_arm`.
 
-Currently the ARM7 build is named like this by default and ARM6 ist added as `..._arm6`. In order
-to run this plugin on an ARM6 machine you need to rename the file
-`<plugin_dir>/frser-sqlite-datasource/dist/gpx_sqlite-datasource_linux_arm6` to
-`<plugin_dir>/frser-sqlite-datasource/dist/gpx_sqlite-datasource_linux_arm`.
+Currently the ARM7 build is named like this by default, which is why the "official" plugin
+distribution does not support ARM6 devices.
+
+A plugin version specifically built for ARM6 devices can be found on the Github release page (see
+manual installation above).
 
 ## Configuring the datasource in Grafana
 

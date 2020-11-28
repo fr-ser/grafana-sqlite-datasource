@@ -93,21 +93,36 @@ build-backend-cross-linux-arm64:
 		-ldflags '-w -s -extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
-
+	yarn sign
 
 build-frontend:
 	yarn build
 
-sign-and-prepare:
-	chmod +x ./dist/gpx_*
-	yarn sign
-
 package-and-zip:
-	mv ./dist frser-sqlite-datasource
-	zip frser-sqlite-datasource-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
-	mv frser-sqlite-datasource ./dist
+	chmod +x ./dist/gpx_*
+	cp -R dist dist_old
 
-build: build-frontend build-backend sign-and-prepare
+	mv dist/gpx_sqlite-datasource_linux_arm7 dist/gpx_sqlite-datasource_linux_arm
+	rm dist/gpx_sqlite-datasource_linux_arm6
+	yarn sign
+	mv dist frser-sqlite-datasource
+	zip frser-sqlite-datasource-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
+	rm -rf frser-sqlite-datasource
+	mv dist_old dist
+
+package-and-zip-arm6:
+	chmod +x ./dist/gpx_*
+	cp -R dist dist_old
+
+	rm dist/gpx_*
+	mv dist_old/gpx_sqlite-datasource_linux_arm6 dist/gpx_sqlite-datasource_linux_arm
+	yarn sign
+	mv dist frser-sqlite-datasource
+	zip frser-sqlite-datasource-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
+	rm -rf frser-sqlite-datasource
+	mv dist_old dist
+
+build: build-frontend build-backend
 
 selenium-test: bootstrap
 	@echo
@@ -123,5 +138,5 @@ backend-test:
 	go test ./pkg/...
 	@echo
 
-test: backend-test build-frontend build-backend sign-and-prepare selenium-test
+test: backend-test build-frontend build-backend selenium-test
 	docker-compose down --remove-orphans --volumes --timeout=2
