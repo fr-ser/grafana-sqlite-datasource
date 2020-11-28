@@ -12,6 +12,10 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 )
 
+var mockableLongToWide = data.LongToWide
+
+const timeSeriesType = "timeseries"
+
 // this struct holds a full query result column (including data)
 // the main benefit is type safety
 type sqlColumn struct {
@@ -316,6 +320,14 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 			frame.Fields = append(
 				frame.Fields, data.NewField(column.Name, nil, column.StringData),
 			)
+		}
+	}
+
+	if dataQuery.QueryType == timeSeriesType {
+		frame, err = mockableLongToWide(frame, nil)
+		if err != nil {
+			response.Error = err
+			return response
 		}
 	}
 

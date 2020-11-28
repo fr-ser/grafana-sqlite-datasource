@@ -17,6 +17,22 @@ describe('QueryEditor', () => {
     );
   });
 
+  it('allows editing the queryType', async () => {
+    const { findByRole, findByText } = render(queryEditor);
+    const queryTypeContainer = await findByRole('query-type-container');
+
+    await act(async () => {
+      fireEvent.focus(queryTypeContainer.querySelector('input') as HTMLInputElement);
+      fireEvent.keyDown(queryTypeContainer.querySelector('input') as HTMLInputElement, { key: 'Down', code: 'Down' });
+      fireEvent.click(await findByText('Timeseries'));
+    });
+
+    expect(onRunQueryMock).toHaveBeenCalled();
+    expect(onChangeMock).toHaveBeenLastCalledWith({
+      queryType: 'timeseries',
+    });
+  });
+
   it('allows editing the rawQuery', async () => {
     const { findByRole } = render(queryEditor);
 

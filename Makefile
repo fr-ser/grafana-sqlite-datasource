@@ -93,7 +93,6 @@ build-backend-cross-linux-arm64:
 		-ldflags '-w -s -extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
-	yarn sign
 
 build-frontend:
 	yarn build

@@ -15,6 +15,7 @@ export const defaultQuery: Partial<SQLiteQuery> = {
     WHERE time >= 1234 and time < 134567
   `,
   timeColumns: ['time', 'ts'],
+  queryType: 'table',
 };
 
 /**
