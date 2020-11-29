@@ -323,7 +323,8 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		}
 	}
 
-	if dataQuery.QueryType == timeSeriesType {
+	if dataQuery.QueryType == timeSeriesType &&
+		frame.TimeSeriesSchema().Type != data.TimeSeriesTypeWide {
 		frame, err = mockableLongToWide(frame, nil)
 		if err != nil {
 			response.Error = err
