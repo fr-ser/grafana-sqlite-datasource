@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- Added option to explicitly convert backend dataframe to timeseries
+- Added option to explicitly convert backend data frame to time series
 
 ## [0.2.3]
 

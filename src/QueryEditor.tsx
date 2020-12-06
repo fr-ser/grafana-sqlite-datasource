@@ -43,8 +43,9 @@ export function QueryEditor(props: Props) {
 
   const options: Array<SelectableValue<string>> = [
     { label: 'Table', value: 'table' },
-    { label: 'Timeseries', value: 'timeseries' },
+    { label: 'Time series', value: 'time series' },
   ];
+  const selectedOption = options.find(options => options.value === query.queryType) || options[0];
 
   return (
     <>
@@ -53,9 +54,8 @@ export function QueryEditor(props: Props) {
           allowCustomValue={false}
           isSearchable={false}
           onChange={onQueryTypeChange}
-          placeholder="Table"
           options={options}
-          className="sth"
+          value={selectedOption}
         />
       </div>
       <div className="gf-form">

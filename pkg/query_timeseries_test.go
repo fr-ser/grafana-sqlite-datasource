@@ -9,7 +9,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 )
 
-func TestIgnoreNonTimeseriesQuery(t *testing.T) {
+func TestIgnoreNonTimeSeriesQuery(t *testing.T) {
 	var longToWideCalled bool
 	mockableLongToWide = func(a *data.Frame, b *data.FillMissing) (*data.Frame, error) {
 		longToWideCalled = true
@@ -40,7 +40,7 @@ func TestIgnoreNonTimeseriesQuery(t *testing.T) {
 	}
 
 	if longToWideCalled {
-		t.Errorf("Expected to not call 'longToWide' for non timeseries queries")
+		t.Errorf("Expected to not call 'longToWide' for non time series queries")
 	}
 
 	expectedFrame := data.NewFrame(
@@ -62,7 +62,7 @@ func TestIgnoreNonTimeseriesQuery(t *testing.T) {
 	}
 }
 
-func TestIgnoreWideTimeseriesQuery(t *testing.T) {
+func TestIgnoreWideTimeSeriesQuery(t *testing.T) {
 	var longToWideCalled bool
 	mockableLongToWide = func(a *data.Frame, b *data.FillMissing) (*data.Frame, error) {
 		longToWideCalled = true
@@ -79,7 +79,7 @@ func TestIgnoreWideTimeseriesQuery(t *testing.T) {
 	dataQuery := getDataQuery(queryModel{
 		QueryText: "SELECT * FROM test", TimeColumns: []string{"time"},
 	})
-	dataQuery.QueryType = "timeseries"
+	dataQuery.QueryType = "time series"
 
 	response := query(dataQuery, pluginConfig{Path: dbPath})
 	if response.Error != nil {
@@ -93,7 +93,7 @@ func TestIgnoreWideTimeseriesQuery(t *testing.T) {
 	}
 
 	if longToWideCalled {
-		t.Errorf("Expected to not call 'longToWide' for non timeseries queries")
+		t.Errorf("Expected to not call 'longToWide' for non time series queries")
 	}
 
 	expectedFrame := data.NewFrame(
@@ -112,7 +112,7 @@ func TestIgnoreWideTimeseriesQuery(t *testing.T) {
 	}
 }
 
-func TestConvertLongTimeseriesQuery(t *testing.T) {
+func TestConvertLongTimeSeriesQuery(t *testing.T) {
 	var inputFrame *data.Frame
 	mockableLongToWide = func(a *data.Frame, b *data.FillMissing) (*data.Frame, error) {
 		inputFrame = a
@@ -129,7 +129,7 @@ func TestConvertLongTimeseriesQuery(t *testing.T) {
 	dataQuery := getDataQuery(queryModel{
 		QueryText: "SELECT * FROM test", TimeColumns: []string{"time"},
 	})
-	dataQuery.QueryType = "timeseries"
+	dataQuery.QueryType = "time series"
 
 	response := query(dataQuery, pluginConfig{Path: dbPath})
 	if response.Error != nil {

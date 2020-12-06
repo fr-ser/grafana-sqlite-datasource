@@ -68,7 +68,7 @@
       "targets": [
         {
           "queryText": "with data(time, temperature, city) AS (VALUES\n(724125600, 10, 'London'), (724161600, 11, 'London'),\n(724161600, 20, 'New York'), (724197600, 21, 'New York'),\n(724125600, 25, 'Washington'), (724197600, 26, 'Washington')\n) SELECT * from data\nWHERE city in ('London','New York','Washington')\norder by time",
-          "queryType": "timeseries",
+          "queryType": "time series",
           "rawQueryText": "with data(time, temperature, city) AS (VALUES\n(724125600, 10, 'London'), (724161600, 11, 'London'),\n(724161600, 20, 'New York'), (724197600, 21, 'New York'),\n(724125600, 25, 'Washington'), (724197600, 26, 'Washington')\n) SELECT * from data\nWHERE city in (${cities:singlequote})\norder by time",
           "refId": "A",
           "timeColumns": ["time"]

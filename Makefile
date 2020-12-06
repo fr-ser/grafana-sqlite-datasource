@@ -137,5 +137,8 @@ backend-test:
 	go test ./pkg/...
 	@echo
 
-test: backend-test build-frontend build-backend selenium-test
+sign:
+	yarn sign
+
+test: backend-test build-frontend build-backend sign selenium-test
 	docker-compose down --remove-orphans --volumes --timeout=2

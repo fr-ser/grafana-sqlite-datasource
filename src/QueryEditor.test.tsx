@@ -24,12 +24,12 @@ describe('QueryEditor', () => {
     await act(async () => {
       fireEvent.focus(queryTypeContainer.querySelector('input') as HTMLInputElement);
       fireEvent.keyDown(queryTypeContainer.querySelector('input') as HTMLInputElement, { key: 'Down', code: 'Down' });
-      fireEvent.click(await findByText('Timeseries'));
+      fireEvent.click(await findByText('Time series'));
     });
 
     expect(onRunQueryMock).toHaveBeenCalled();
     expect(onChangeMock).toHaveBeenLastCalledWith({
-      queryType: 'timeseries',
+      queryType: 'time series',
     });
   });
 

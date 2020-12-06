@@ -14,7 +14,7 @@ import (
 
 var mockableLongToWide = data.LongToWide
 
-const timeSeriesType = "timeseries"
+const timeSeriesType = "time series"
 
 // this struct holds a full query result column (including data)
 // the main benefit is type safety
@@ -339,7 +339,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		}
 	}
 
-	// some plugins do not play well with the "wide format" of a timeseries
+	// some plugins do not play well with the "wide format" of a time series
 	// therefore we transform into individual frames
 	// https://github.com/fr-ser/grafana-sqlite-datasource/issues/16
 	tsSchema := frame.TimeSeriesSchema()
