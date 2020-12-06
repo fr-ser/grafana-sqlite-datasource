@@ -302,6 +302,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 
 	frame := data.NewFrame("response")
 
+	// construct a regular SQL dataframe (for time series this is usually the "long format")
 	for _, column := range columns {
 		switch column.Type {
 		case "TIME":
@@ -323,8 +324,14 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		}
 	}
 
-	if dataQuery.QueryType == timeSeriesType &&
-		frame.TimeSeriesSchema().Type != data.TimeSeriesTypeWide {
+	// default "table" case. Return whatever SQL we received
+	if dataQuery.QueryType != timeSeriesType {
+		response.Frames = append(response.Frames, frame)
+
+		return response
+	}
+
+	if frame.TimeSeriesSchema().Type != data.TimeSeriesTypeWide {
 		frame, err = mockableLongToWide(frame, nil)
 		if err != nil {
 			response.Error = err
@@ -332,8 +339,22 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		}
 	}
 
-	// add the frames to the response
-	response.Frames = append(response.Frames, frame)
+	// some plugins do not play well with the "wide format" of a timeseries
+	// therefore we transform into individual frames
+	// https://github.com/fr-ser/grafana-sqlite-datasource/issues/16
+	tsSchema := frame.TimeSeriesSchema()
+	for _, field := range frame.Fields {
+		if field.Type().Time() {
+			continue
+		}
+		partialFrame := data.NewFrame(
+			fmt.Sprintf("%s %s", field.Name, field.Labels["name"]),
+			frame.Fields[tsSchema.TimeIndex],
+			field,
+		)
+
+		response.Frames = append(response.Frames, partialFrame)
+	}
 
 	return response
 }

@@ -97,7 +97,7 @@ func TestIgnoreWideTimeseriesQuery(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"value ",
 		data.NewField("time", nil, []*time.Time{
 			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
 			timePointer(time.Unix(23, 0)),
@@ -114,16 +114,15 @@ func TestIgnoreWideTimeseriesQuery(t *testing.T) {
 
 func TestConvertLongTimeseriesQuery(t *testing.T) {
 	var inputFrame *data.Frame
-	outputFrame := data.NewFrame("response")
 	mockableLongToWide = func(a *data.Frame, b *data.FillMissing) (*data.Frame, error) {
 		inputFrame = a
-		return outputFrame, nil
+		return data.LongToWide(a, b)
 	}
 
 	dbPath, cleanup := createTmpDB(`
 		CREATE TABLE test(time INTEGER, value REAL, name TEXT);
 		INSERT INTO test(time, value, name)
-		VALUES (21, 21.1, 'one'), (21.3, 22.2, 'two'), (21, 23.3, 'three');
+		VALUES (21, 21.1, 'one'), (22, 22.2, 'two');
 	`)
 	defer cleanup()
 
@@ -140,30 +139,47 @@ func TestConvertLongTimeseriesQuery(t *testing.T) {
 	expectedInputFrame := data.NewFrame(
 		"response",
 		data.NewField("time", nil, []*time.Time{
-			timePointer(time.Unix(21, 0)), timePointer(time.Unix(21, 0)),
-			timePointer(time.Unix(21, 0)),
+			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
 		}),
-		data.NewField("value", nil, []*float64{
-			floatPointer(21.1), floatPointer(22.2), floatPointer(23.3),
-		}),
-		data.NewField("name", nil, []*string{
-			strPointer("one"), strPointer("two"), strPointer("three"),
-		}),
+		data.NewField("value", nil, []*float64{floatPointer(21.1), floatPointer(22.2)}),
+		data.NewField("name", nil, []*string{strPointer("one"), strPointer("two")}),
 	)
 
 	if diff := cmp.Diff(expectedInputFrame, inputFrame, cmpOption...); diff != "" {
+		t.Error("Unexpected input frame into the time series conversion")
 		t.Error(diff)
 	}
 
-	if len(response.Frames) != 1 {
+	if len(response.Frames) != 2 {
 		t.Errorf(
-			"Expected one frame but got - %d: Frames %+v", len(response.Frames), response.Frames,
+			"Expected two frames but got - %d: Frames %+v", len(response.Frames), response.Frames,
 		)
 	}
 
-	if diff := cmp.Diff(outputFrame, response.Frames[0], cmpOption...); diff != "" {
-		t.Error("Did not receive expected outputFrame from longToWide call")
-		t.Error(diff)
+	expectedOutputFrames := make([]*data.Frame, 2)
+	expectedOutputFrames[0] = data.NewFrame(
+		"value one",
+		data.NewField("time", nil, []time.Time{time.Unix(21, 0), time.Unix(22, 0)}),
+		data.NewField(
+			"value",
+			map[string]string{"name": "one"},
+			[]*float64{floatPointer(21.1), nil},
+		),
+	)
+	expectedOutputFrames[1] = data.NewFrame(
+		"value two",
+		data.NewField("time", nil, []time.Time{time.Unix(21, 0), time.Unix(22, 0)}),
+		data.NewField(
+			"value",
+			map[string]string{"name": "two"},
+			[]*float64{nil, floatPointer(22.2)},
+		),
+	)
 
+	for idx, frame := range response.Frames {
+		if diff := cmp.Diff(expectedOutputFrames[idx], frame, cmpOption...); diff != "" {
+			t.Error("Unexpected output frames")
+			t.Error(diff)
+		}
 	}
 }
