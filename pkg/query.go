@@ -143,10 +143,12 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 
 			if valueType == "INTEGER" {
 				value = intV
+			} else if valueType == "FLOAT" {
+				value = int64(floatV)
 			} else {
 				value, err = strconv.ParseInt(string(stringV), 10, 64)
 				if err != nil {
-					log.DefaultLogger.Warn("Could not convert numeric to float", "value", stringV)
+					log.DefaultLogger.Warn("Could not convert value to int", "value", stringV)
 					setNull = true
 				}
 			}
@@ -164,11 +166,13 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 
 			if valueType == "FLOAT" {
 				value = floatV
+			} else if valueType == "INTEGER" {
+				value = float64(intV)
 			} else {
 				value, err = strconv.ParseFloat(string(stringV), 64)
 
 				if err != nil {
-					log.DefaultLogger.Warn("Could not convert numeric to float", "value", stringV)
+					log.DefaultLogger.Warn("Could not convert value to float", "value", stringV)
 					setNull = true
 				}
 			}
@@ -245,7 +249,7 @@ func fetchData(dbPath string, qm queryModel) (columns []*sqlColumn, err error) {
 		switch columnTypes[idx].DatabaseTypeName() {
 		case "INTEGER":
 			columns[idx].Type = "INTEGER"
-		case "REAL":
+		case "REAL", "NUMERIC":
 			columns[idx].Type = "FLOAT"
 		case "NULL", "TEXT", "BLOB":
 			columns[idx].Type = "STRING"
