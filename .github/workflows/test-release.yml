@@ -2,7 +2,7 @@ name: Test Release
 
 on:
   release:
-    types: [published, created, released, edited]
+    types: [published, edited]
 
 jobs:
 

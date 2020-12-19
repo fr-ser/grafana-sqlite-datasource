@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.2.5]
+
+### Fixed
+
+- Correct handling of "NUMERIC" columns with mixed data (e.g. float and integer)
+
+## [0.2.4]
+
+### Added
+
+- Added option to explicitly convert backend data frame to time series:
+
+  - This requires the initial data frame to be in a [Long Format](https://grafana.com/docs/grafana/latest/developers/plugins/data-frames/#long-format)
+
+  - The resulting time series consists of one data frame per metric
+
 ## [0.2.3]
 
 ### Changed

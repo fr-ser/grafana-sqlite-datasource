@@ -47,6 +47,39 @@ func TestCTETableQuery(t *testing.T) {
 	}
 }
 
+// TestMixedTypes tests against a query with has floats and integers in a column
+func TestMixedTypes(t *testing.T) {
+	dbPath, cleanup := createTmpDB(`
+		CREATE TABLE test(first NUMERIC, second NUMERIC);
+		INSERT INTO test(first, second)
+		VALUES (1, 1.1), (2.2, 2);
+	`)
+	defer cleanup()
+
+	dataQuery := getDataQuery(queryModel{QueryText: "SELECT * FROM test"})
+
+	response := query(dataQuery, pluginConfig{Path: dbPath})
+	if response.Error != nil {
+		t.Errorf("Unexpected error - %s", response.Error)
+	}
+
+	if len(response.Frames) != 1 {
+		t.Errorf(
+			"Expected one frame but got - %d: Frames %+v", len(response.Frames), response.Frames,
+		)
+	}
+
+	expectedFrame := data.NewFrame(
+		"response",
+		data.NewField("first", nil, []*float64{floatPointer(1), floatPointer(2.2)}),
+		data.NewField("second", nil, []*float64{floatPointer(1.1), floatPointer(2)}),
+	)
+
+	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
+		t.Error(diff)
+	}
+}
+
 // TestSimpleTableQuery tests against a table with no provided type information from the frontend
 func TestSimpleTableQuery(t *testing.T) {
 	dbPath, cleanup := createTmpDB(`

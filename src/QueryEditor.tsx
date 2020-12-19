@@ -1,5 +1,5 @@
-import { TextArea, TagsInput, Icon, Alert, InlineFormLabel } from '@grafana/ui';
-import { QueryEditorProps } from '@grafana/data';
+import { TextArea, TagsInput, Icon, Alert, InlineFormLabel, Select } from '@grafana/ui';
+import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import defaults from 'lodash/defaults';
 import React, { ChangeEvent, useState } from 'react';
 
@@ -17,6 +17,16 @@ export function QueryEditor(props: Props) {
     });
   }
 
+  function onQueryTypeChange(value: SelectableValue<string>) {
+    const { onChange, query } = props;
+    onChange({
+      ...query,
+      queryType: value.value || 'table',
+    });
+
+    props.onRunQuery();
+  }
+
   function onUpdateColumnTypes(columnKey: string, columns: string[]) {
     const { onChange, query } = props;
     onChange({
@@ -31,8 +41,23 @@ export function QueryEditor(props: Props) {
   const { rawQueryText, timeColumns } = query;
   const [showHelp, setShowHelp] = useState(false);
 
+  const options: Array<SelectableValue<string>> = [
+    { label: 'Table', value: 'table' },
+    { label: 'Time series', value: 'time series' },
+  ];
+  const selectedOption = options.find(options => options.value === query.queryType) || options[0];
+
   return (
     <>
+      <div className="gf-form max-width-8" role="query-type-container">
+        <Select
+          allowCustomValue={false}
+          isSearchable={false}
+          onChange={onQueryTypeChange}
+          options={options}
+          value={selectedOption}
+        />
+      </div>
       <div className="gf-form">
         <TextArea
           css={null}

@@ -93,7 +93,6 @@ build-backend-cross-linux-arm64:
 		-ldflags '-w -s -extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
-	yarn sign
 
 build-frontend:
 	yarn build
@@ -138,5 +137,8 @@ backend-test:
 	go test ./pkg/...
 	@echo
 
-test: backend-test build-frontend build-backend selenium-test
+sign:
+	yarn sign
+
+test: backend-test build-frontend build-backend sign selenium-test
 	docker-compose down --remove-orphans --volumes --timeout=2

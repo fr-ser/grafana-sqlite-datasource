@@ -12,6 +12,10 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 )
 
+var mockableLongToWide = data.LongToWide
+
+const timeSeriesType = "time series"
+
 // this struct holds a full query result column (including data)
 // the main benefit is type safety
 type sqlColumn struct {
@@ -139,10 +143,12 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 
 			if valueType == "INTEGER" {
 				value = intV
+			} else if valueType == "FLOAT" {
+				value = int64(floatV)
 			} else {
 				value, err = strconv.ParseInt(string(stringV), 10, 64)
 				if err != nil {
-					log.DefaultLogger.Warn("Could not convert numeric to float", "value", stringV)
+					log.DefaultLogger.Warn("Could not convert value to int", "value", stringV)
 					setNull = true
 				}
 			}
@@ -160,11 +166,13 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 
 			if valueType == "FLOAT" {
 				value = floatV
+			} else if valueType == "INTEGER" {
+				value = float64(intV)
 			} else {
 				value, err = strconv.ParseFloat(string(stringV), 64)
 
 				if err != nil {
-					log.DefaultLogger.Warn("Could not convert numeric to float", "value", stringV)
+					log.DefaultLogger.Warn("Could not convert value to float", "value", stringV)
 					setNull = true
 				}
 			}
@@ -241,7 +249,7 @@ func fetchData(dbPath string, qm queryModel) (columns []*sqlColumn, err error) {
 		switch columnTypes[idx].DatabaseTypeName() {
 		case "INTEGER":
 			columns[idx].Type = "INTEGER"
-		case "REAL":
+		case "REAL", "NUMERIC":
 			columns[idx].Type = "FLOAT"
 		case "NULL", "TEXT", "BLOB":
 			columns[idx].Type = "STRING"
@@ -298,6 +306,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 
 	frame := data.NewFrame("response")
 
+	// construct a regular SQL dataframe (for time series this is usually the "long format")
 	for _, column := range columns {
 		switch column.Type {
 		case "TIME":
@@ -319,8 +328,37 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		}
 	}
 
-	// add the frames to the response
-	response.Frames = append(response.Frames, frame)
+	// default "table" case. Return whatever SQL we received
+	if dataQuery.QueryType != timeSeriesType {
+		response.Frames = append(response.Frames, frame)
+
+		return response
+	}
+
+	if frame.TimeSeriesSchema().Type != data.TimeSeriesTypeWide {
+		frame, err = mockableLongToWide(frame, nil)
+		if err != nil {
+			response.Error = err
+			return response
+		}
+	}
+
+	// some plugins do not play well with the "wide format" of a time series
+	// therefore we transform into individual frames
+	// https://github.com/fr-ser/grafana-sqlite-datasource/issues/16
+	tsSchema := frame.TimeSeriesSchema()
+	for _, field := range frame.Fields {
+		if field.Type().Time() {
+			continue
+		}
+		partialFrame := data.NewFrame(
+			fmt.Sprintf("%s %s", field.Name, field.Labels["name"]),
+			frame.Fields[tsSchema.TimeIndex],
+			field,
+		)
+
+		response.Frames = append(response.Frames, partialFrame)
+	}
 
 	return response
 }

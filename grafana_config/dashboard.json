@@ -16,9 +16,105 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
-  "iteration": 1598898713717,
+  "iteration": 1606638610419,
   "links": [],
   "panels": [
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 6,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null as zero",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "queryText": "with data(time, temperature, city) AS (VALUES\n(724125600, 10, 'London'), (724161600, 11, 'London'),\n(724161600, 20, 'New York'), (724197600, 21, 'New York'),\n(724125600, 25, 'Washington'), (724197600, 26, 'Washington')\n) SELECT * from data\nWHERE city in ('London','New York','Washington')\norder by time",
+          "queryType": "time series",
+          "rawQueryText": "with data(time, temperature, city) AS (VALUES\n(724125600, 10, 'London'), (724161600, 11, 'London'),\n(724161600, 20, 'New York'), (724197600, 21, 'New York'),\n(724125600, 25, 'Washington'), (724197600, 26, 'Washington')\n) SELECT * from data\nWHERE city in (${cities:singlequote})\norder by time",
+          "refId": "A",
+          "timeColumns": ["time"]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Time Series With Query Variable",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
     {
       "aliasColors": {},
       "bars": false,
@@ -30,6 +126,7 @@
           "custom": {
             "align": null
           },
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -50,9 +147,9 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 13,
-        "w": 24,
-        "x": 0,
+        "h": 12,
+        "w": 12,
+        "x": 12,
         "y": 0
       },
       "hiddenSeries": false,
@@ -70,10 +167,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.0.6",
+      "pluginVersion": "7.3.3",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -84,6 +181,7 @@
       "targets": [
         {
           "queryText": "SELECT (time / 500) * 500  as window, avg(value)\nFROM sine_wave\nWHERE time > 724107600000 / 1000 and time <= 724208400000 / 1000\nGROUP BY (time / 500) * 500",
+          "queryType": "table",
           "rawQueryText": "SELECT (time / $intervalS) * $intervalS  as window, avg(value)\nFROM sine_wave\nWHERE time > $__from / 1000 and time <= $__to / 1000\nGROUP BY (time / $intervalS) * $intervalS",
           "refId": "A",
           "timeColumns": ["time", "window"]
@@ -93,7 +191,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Time Series",
+      "title": "Sine Wave With Variable",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -135,7 +233,8 @@
       "fieldConfig": {
         "defaults": {
           "custom": {
-            "align": null
+            "align": null,
+            "filterable": false
           },
           "mappings": [],
           "thresholds": {
@@ -155,16 +254,16 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 7,
         "w": 24,
         "x": 0,
-        "y": 13
+        "y": 12
       },
       "id": 4,
       "options": {
         "showHeader": true
       },
-      "pluginVersion": "7.0.6",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
           "queryText": "SELECT 1 as time, 4 as value where time >= 1234 and time < 134567",
@@ -180,7 +279,7 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 25,
+  "schemaVersion": 26,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -191,6 +290,7 @@
           "text": "400",
           "value": "400"
         },
+        "error": null,
         "hide": 0,
         "label": "Aggregation Interval (s)",
         "name": "intervalS",
@@ -204,6 +304,34 @@
         "query": "400",
         "skipUrlSync": false,
         "type": "textbox"
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "tags": [],
+          "text": ["London", "New York", "Washington"],
+          "value": ["London", "New York", "Washington"]
+        },
+        "datasource": "sqlite",
+        "definition": "SELECT * FROM (VALUES ('London'), ('New York'), ('Washington'))",
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": "Cities",
+        "multi": true,
+        "name": "cities",
+        "options": [],
+        "query": "SELECT * FROM (VALUES ('London'), ('New York'), ('Washington'))",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
       }
     ]
   },
