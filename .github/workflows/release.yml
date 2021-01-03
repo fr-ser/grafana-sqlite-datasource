@@ -1,0 +1,213 @@
+name: Create Github Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+
+  build-arm6:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: build backend plugin
+        run: make build-backend-cross-linux-arm6
+      - name: Upload dist folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-arm6
+          path: ./dist/
+
+  build-arm7:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: build backend plugin
+        run: make build-backend-cross-linux-arm7
+      - name: Upload dist folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-arm7
+          path: ./dist/
+
+  build-arm64:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: build backend plugin
+        run: make build-backend-cross-linux-arm64
+      - name: Upload dist folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-arm64
+          path: ./dist/
+
+  build-linux64:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build linux version
+        run: make build-backend
+      - name: Upload linux binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-linux64
+          path: ./dist/
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build windows version
+        run: make build-backend
+      - name: Upload windows binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-windows64
+          path: ./dist/
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs:
+      - build-arm6
+      - build-arm7
+      - build-arm64
+      - build-linux64
+      - build-windows
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 12.18.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.18.x
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Build frontend
+        run: make build-frontend
+
+      - name: Get plugin metadata
+        id: metadata
+        run: |
+          export GRAFANA_PLUGIN_VERSION=$(cat dist/plugin.json | jq -r .info.version)
+          export GRAFANA_PLUGIN_ARTIFACT=frser-sqlite-datasource-${GRAFANA_PLUGIN_VERSION}.zip
+          export GRAFANA_PLUGIN_ARTIFACT_ARM6=frser-sqlite-datasource-arm6-${GRAFANA_PLUGIN_VERSION}.zip
+          echo "::set-output name=plugin-version::${GRAFANA_PLUGIN_VERSION}"
+          echo "::set-output name=archive::${GRAFANA_PLUGIN_ARTIFACT}"
+          echo "::set-output name=archive-arm6::${GRAFANA_PLUGIN_ARTIFACT_ARM6}"
+          echo "::set-output name=github-tag::${GITHUB_REF#refs/*/}"
+
+      - name: Check package version
+        run: if [ "v${{ steps.metadata.outputs.plugin-version }}" != "${{ steps.metadata.outputs.github-tag }}" ]; then printf "\033[0;31mPlugin version doesn't match tag name\033[0m\n"; exit 1; fi
+
+      - name: Download arm6 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-arm6
+          path: ./dist/
+      - name: package-and-zip-arm6
+        run: make package-and-zip-arm6
+        env:
+          GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
+
+      - name: Download linux64 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-linux64
+          path: ./dist/
+      - name: Download arm7 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-arm7
+          path: ./dist/
+      - name: Download arm64 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-arm64
+          path: ./dist/
+      - name: Download windows64 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-windows64
+          path: ./dist/
+      - name: package-and-zip
+        run: make package-and-zip
+        env:
+          GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
+
+      - name: Read changelog
+        id: changelog
+        run: |
+          awk '/^## / {s++} s == 1 {print}' CHANGELOG.md > release_notes.md
+          echo "::set-output name=path::release_notes.md"
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body_path: ${{ steps.changelog.outputs.path }}
+          draft: true
+
+      - name: Add arm6 plugin to release
+        id: upload-plugin-asset-arm6
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ steps.metadata.outputs.archive-arm6 }}
+          asset_name: ${{ steps.metadata.outputs.archive-arm6 }}
+          asset_content_type: application/zip
+
+      - name: Add plugin to release
+        id: upload-plugin-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ steps.metadata.outputs.archive }}
+          asset_name: ${{ steps.metadata.outputs.archive }}
+          asset_content_type: application/zip
