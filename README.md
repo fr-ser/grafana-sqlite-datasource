@@ -58,3 +58,32 @@ The only required configuration is the path to the SQLite database (local path o
 1. Add an SQLite datasource.
 2. Set the path to the database (the grafana process needs to find the SQLite database under this path).
 3. Save the datasource and use it.
+
+## Support for Time formatted columns
+
+SQLite has no native "time" format. It actually relies on strings and numbers. Since especially
+for time series Grafana expects an actual time type, however, the plugin provides a way to infer
+a real timestamp. This can be set in the query editor by providing the name of the column, which
+should be reformatted to a timestamp.
+
+The plugin supports two different inputs that can be converted to a "time" depending on the type
+of the value in the column, that should be formatted as "time":
+
+1. **A number input**: It is assumed to be a unix timestamp / unix epoch and will be converted to
+   an integer before converting it to a timestamp.
+
+2. **A string input**: The value is expected to be formatted in accordance with **RFC3339**,
+   e.g. `"2006-01-02T15:04:05Z07:00"`. Edge cases might occur and the parsing library used is the
+   source of truth here: <https://golang.org/pkg/time/#pkg-constants>.
+
+Timestamps stored as unix epoch should work out of the box, but the string formatting might require
+adjusting your current format. The below example shows how to convert a "date" column to a parsable
+timestamp:
+
+```SQL
+WITH converted AS (
+   -- a row looks like this (value, date): 1.45, '2020-12-12'
+   SELECT value,  date || 'T00:00:00Z' AS datetime FROM raw_table
+)
+SELECT datetime, value FROM converted ORDER BY datetime ASC
+```

@@ -17,6 +17,7 @@ jobs:
         run: unzip ./plugin-arm.zip && mv frser-sqlite-datasource frser-sqlite-datasource-arm
       - name: check platform
         run: ls frser-sqlite-datasource-arm/gpx_sqlite-datasource_linux_arm
+
       - name: Download plugin
         run: sudo curl -L "https://github.com/fr-ser/grafana-sqlite-datasource/releases/download/v${GITHUB_REF:11}/frser-sqlite-datasource-${GITHUB_REF:11}.zip" --output ./plugin.zip
       - name: unzip plugin

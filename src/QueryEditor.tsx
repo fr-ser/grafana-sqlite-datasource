@@ -85,6 +85,14 @@ export function QueryEditor(props: Props) {
           <a href="https://www.sqlite.org/datatype3.html" target="_blank">
             SQLite3 Data Types Documentation
           </a>
+          <br />
+          For more information (like supported formats) see:{' '}
+          <a
+            href="https://github.com/fr-ser/grafana-sqlite-datasource#support-for-time-formatted-columns"
+            target="_blank"
+          >
+            Plugin documentation
+          </a>
         </Alert>
       )}
     </>
