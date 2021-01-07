@@ -19,9 +19,7 @@ describe('configure', () => {
   it('configures the plugin', async () => {
     await driver.get(`${GRAFANA_URL}/datasources/new`);
     await driver.wait(until.elementLocated(By.css('div.add-data-source-category')), 5 * 1000);
-    await driver
-      .findElement(By.css("div.add-data-source-item[aria-label='Data source plugin item sqlite-datasource']"))
-      .click();
+    await driver.findElement(By.css("div.add-data-source-item[aria-label='Data source plugin item SQLite']")).click();
 
     await driver.wait(
       until.elementLocated(By.css("input[placeholder='(absolute) path to the SQLite database']")),

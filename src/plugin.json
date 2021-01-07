@@ -1,9 +1,10 @@
 {
   "type": "datasource",
-  "name": "sqlite-datasource",
+  "name": "SQLite",
   "id": "frser-sqlite-datasource",
   "metrics": true,
   "backend": true,
+  "category": "sql",
   "executable": "gpx_sqlite-datasource",
   "info": {
     "description": "SQLite as a (Backend) Datasource",
@@ -11,7 +12,7 @@
       "name": "Sergej Herbert",
       "url": "https://github.com/fr-ser"
     },
-    "keywords": ["sqlite"],
+    "keywords": ["sqlite", "sql"],
     "logos": {
       "small": "img/logo.svg",
       "large": "img/logo.svg"
