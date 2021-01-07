@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.2.7]
+
+### Changed
+
+- Changing plugin name to SQLite
+
+- added category to plugin.json for better grouping on the Grafana homepage
+
+- updated Readme after first official release of plugin on Grafana homepage
+
 ## [0.2.6]
 
 ### Added
