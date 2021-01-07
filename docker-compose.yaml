@@ -12,6 +12,8 @@ services:
       - "./dist:/var/lib/grafana/plugins/frser-sqlite-datasource"
     ports:
       - 3000:3000
+    depends_on:
+      - postgres
   selenium:
     image: selenium/standalone-chrome:84.0
     shm_size: 2gb
@@ -26,3 +28,10 @@ services:
       - grafana
       - selenium
     command: grafana:3000 selenium:4444
+  postgres:
+    # used to compare the sqlite plugin
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=changed_later
+      - POSTGRES_DB=db_name
