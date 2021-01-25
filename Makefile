@@ -21,19 +21,19 @@ ifeq ($(UNAME_OS), Linux)
 	CGO_ENABLED=1 go build \
 		-o dist/gpx_sqlite-datasource_linux_amd64 \
 		-ldflags '-extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension \
+		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
 else ifeq ($(UNAME_OS), Darwin)
 	CGO_ENABLED=1 go build \
 		-o dist/gpx_sqlite-datasource_darwin_amd64 \
 		-ldflags '-extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension \
+		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
 else
 	CGO_ENABLED=1 go build \
 		-o dist/gpx_sqlite-datasource_windows_amd64.exe \
 		-ldflags '-extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension \
+		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
 endif
 
@@ -45,7 +45,7 @@ build-backend-cross-win64:
 		cross-build \
 		go build -o dist/gpx_sqlite-datasource_windows_amd64.exe \
 		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension \
+		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
 
 build-backend-cross-linux64:
@@ -56,7 +56,7 @@ build-backend-cross-linux64:
 		cross-build \
 		go build -o dist/gpx_sqlite-datasource_linux_amd64 \
 		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension \
+		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
 
 build-backend-cross-linux-arm6:
@@ -68,7 +68,7 @@ build-backend-cross-linux-arm6:
 		cross-build \
 		go build -o dist/gpx_sqlite-datasource_linux_arm6 \
 		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension \
+		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
 
 build-backend-cross-linux-arm7:
@@ -80,7 +80,7 @@ build-backend-cross-linux-arm7:
 		cross-build \
 		go build -o dist/gpx_sqlite-datasource_linux_arm7 \
 		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension \
+		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
 
 build-backend-cross-linux-arm64:
@@ -91,7 +91,7 @@ build-backend-cross-linux-arm64:
 		cross-build \
 		go build -o dist/gpx_sqlite-datasource_linux_arm64 \
 		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension \
+		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
 
 build-frontend:
