@@ -14,10 +14,16 @@ describe('DataSource', () => {
       const mockReplace = jest.fn((input: string) => 'mock response');
       ds.templateSrv.replace = mockReplace;
 
-      const result = ds.applyTemplateVariables({
-        rawQueryText: 'SELECT 1',
-        queryText: '',
-      } as any);
+      const result = ds.applyTemplateVariables(
+        {
+          rawQueryText: 'SELECT 1',
+          queryText: '',
+        } as any,
+        {
+          __interval: { text: '2m', value: '2m' },
+          __interval_ms: { text: '120000', value: 120000 },
+        }
+      );
 
       expect(mockReplace.mock.calls[0][0]).toBe('SELECT 1');
       expect(result.queryText).toBe('mock response');

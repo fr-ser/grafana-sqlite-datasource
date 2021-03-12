@@ -1,4 +1,4 @@
-import { DataSourceInstanceSettings, DataFrame } from '@grafana/data';
+import { DataSourceInstanceSettings, DataFrame, ScopedVars } from '@grafana/data';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { MyDataSourceOptions, SQLiteQuery } from './types';
 
@@ -11,8 +11,8 @@ export class DataSource extends DataSourceWithBackend<SQLiteQuery, MyDataSourceO
     this.templateSrv = getTemplateSrv();
   }
 
-  applyTemplateVariables(query: SQLiteQuery): SQLiteQuery {
-    query.queryText = this.templateSrv.replace(query.rawQueryText);
+  applyTemplateVariables(query: SQLiteQuery, scopedVars: ScopedVars): SQLiteQuery {
+    query.queryText = this.templateSrv.replace(query.rawQueryText, scopedVars);
     return query;
   }
 
