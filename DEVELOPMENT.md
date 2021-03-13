@@ -21,7 +21,10 @@ found at:
 ### (First Time) Installation
 
 ```BASH
+# installing packages
 make install
+# optional: using git hooks
+git config core.hooksPath githooks
 ```
 
 ### Start up Grafana

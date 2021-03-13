@@ -138,6 +138,13 @@ jobs:
       - name: Check package version
         run: if [ "v${{ steps.metadata.outputs.plugin-version }}" != "${{ steps.metadata.outputs.github-tag }}" ]; then printf "\033[0;31mPlugin version doesn't match tag name\033[0m\n"; exit 1; fi
 
+      - name: Check changelog
+        run: |
+          if ! grep -q -F "## [${{ steps.metadata.outputs.plugin-version }}]" CHANGELOG.md; then
+            echo "Error: The latest (## [${{ steps.metadata.outputs.plugin-version }}]) tag was not found in the CHANGELOG.md." 1>&2
+            exit 1
+          fi
+
       - name: Download arm6 binary
         uses: actions/download-artifact@v2
         with:
