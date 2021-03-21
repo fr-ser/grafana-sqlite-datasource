@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.1]
+
+### Added
+
+- Enabled the `alerting` feature for the plugin (no code change)
+
 ## [1.0.0]
 
 No breaking change was introduced but due to code stability the first major version is released.

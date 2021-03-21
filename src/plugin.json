@@ -4,6 +4,7 @@
   "id": "frser-sqlite-datasource",
   "metrics": true,
   "backend": true,
+  "alerting": true,
   "category": "sql",
   "executable": "gpx_sqlite-datasource",
   "info": {
