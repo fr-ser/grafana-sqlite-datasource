@@ -12,12 +12,12 @@ This is a Grafana backend plugin to allow using a SQLite database as a data sour
 Any contribution is welcome. Some information regarding the local setup can be found in the
 [DEVELOPMENT.md file](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/DEVELOPMENT.md).
 
-## Plugin installation
+## Plugin Installation
 
 The most up to date (but also most generic) information can always be found here:
 [Grafana Website - Plugin Installation](https://grafana.com/docs/grafana/latest/plugins/installation/#install-grafana-plugins)
 
-### Installing the Plugin on an Existing Grafana with the CLI
+### Installing the Plugin on an Existing Grafana With the CLI
 
 Grafana comes with a command line tool that can be used to install plugins.
 
@@ -27,7 +27,7 @@ Grafana comes with a command line tool that can be used to install plugins.
 4. To make sure the plugin was installed, check the list of installed datasources. Click the
    Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
-### Installing the Plugin Manually on an Existing Grafana (most up to date)
+### Installing the Plugin Manually on an Existing Grafana (Most up to Date)
 
 If you need a version that is not released (yet) on the Grafana homepage or if the server where
 Grafana is installed has no access to the Grafana.com server, then the plugin can be downloaded
@@ -35,12 +35,15 @@ and manually copied to the server.
 
 1. Get the zip file from [Latest release on Github](https://github.com/fr-ser/grafana-sqlite-datasource/releases/latest)
 2. Extract the zip file into the data/plugins subdirectory for Grafana:
-   `unzip the_downloaded_file.zip -d YOUR_PLUGIN_DIR/frser-sqlite-datasource`
+   `unzip <the_download_zip_file> -d <plugin_dir>/`
+
+   Finding the plugin directory can sometimes be a challenge as this is platform and settings
+   dependent. A common location for this on Linux devices is `/var/lib/grafana/plugins/`
 3. Restart the Grafana server
 4. To make sure the plugin was installed, check the list of installed datasources. Click the
    Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
-### ARM6 / RaspberryPi Zero W support
+### ARM6 / RaspberryPi Zero W Support
 
 This plugins supports ARM6 (the version running on RaspberryPi Zero W). There is a problem, though,
 with Grafana supporting ARM7 (newer Raspberries) and ARM6 at the same time. Grafana chooses
@@ -53,7 +56,7 @@ distribution does not support ARM6 devices.
 A plugin version specifically built for ARM6 devices can be found on the Github release page (see
 manual installation above).
 
-## Configuring the datasource in Grafana
+## Configuring the Datasource in Grafana
 
 The only required configuration is the path to the SQLite database (local path on the Grafana Server)
 
@@ -61,7 +64,7 @@ The only required configuration is the path to the SQLite database (local path o
 2. Set the path to the database (the grafana process needs to find the SQLite database under this path).
 3. Save the datasource and use it.
 
-## Support for Time formatted columns
+## Support for Time Formatted Columns
 
 SQLite has no native "time" format. It actually relies on strings and numbers. Since especially
 for time series Grafana expects an actual time type, however, the plugin provides a way to infer
