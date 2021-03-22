@@ -71,7 +71,7 @@ jobs:
           name: plugin-linux64
           path: ./dist/
 
-  build-windows:
+  build-windows64:
     runs-on: windows-latest
 
     steps:
@@ -96,6 +96,31 @@ jobs:
           name: plugin-windows64
           path: ./dist/
 
+  build-darwin64:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build darwin version
+        run: make build-backend
+      - name: Upload darwin binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-darwin64
+          path: ./dist/
+
   create-release:
     runs-on: ubuntu-latest
     needs:
@@ -103,7 +128,8 @@ jobs:
       - build-arm7
       - build-arm64
       - build-linux64
-      - build-windows
+      - build-windows64
+      - build-darwin64
 
     steps:
       - uses: actions/checkout@v2
@@ -174,6 +200,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: plugin-windows64
+          path: ./dist/
+      - name: Download darwin64 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-darwin64
           path: ./dist/
       - name: package-and-zip
         run: make package-and-zip
