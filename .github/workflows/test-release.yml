@@ -27,6 +27,7 @@ jobs:
           ls dist/gpx_sqlite-datasource_linux_amd64 &&
           ls dist/gpx_sqlite-datasource_linux_arm &&
           ls dist/gpx_sqlite-datasource_linux_arm64 &&
+          ls dist/gpx_sqlite-datasource_darwin_amd64 &&
           ls dist/gpx_sqlite-datasource_windows_amd64.exe
       - name: Use Node.js 12.18.x
         uses: actions/setup-node@v1
@@ -47,3 +48,5 @@ jobs:
       - name: Debug Logs
         if: ${{ failure() }}
         run: docker-compose logs grafana
+
+        # testing on macos is currently not done as docker is not available on the macos runner

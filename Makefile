@@ -24,9 +24,10 @@ ifeq ($(UNAME_OS), Linux)
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
 else ifeq ($(UNAME_OS), Darwin)
+	# to get it working the below arguments are removed (no static linking):
+	# -ldflags '-extldflags "-static"'
 	CGO_ENABLED=1 go build \
 		-o dist/gpx_sqlite-datasource_darwin_amd64 \
-		-ldflags '-extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension \
 		./pkg
 else
