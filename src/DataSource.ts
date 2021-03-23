@@ -17,8 +17,8 @@ export class DataSource extends DataSourceWithBackend<SQLiteQuery, MyDataSourceO
   }
 
   async metricFindQuery(query: string, options?: any) {
-    if (!query || !options.variable.datasource) {
-      return Promise.resolve([]);
+    if (!query) {
+      return [];
     }
     const response = await this.query({
       targets: [

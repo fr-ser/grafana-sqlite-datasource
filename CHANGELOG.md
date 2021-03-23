@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.2]
+
+### Fixed
+
+- Fixed bug preventing using query variables when SQLite is the default datasource (<= Grafana 7.4)
+
 ## [1.0.1]
 
 ### Added
