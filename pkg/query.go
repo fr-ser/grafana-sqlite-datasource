@@ -15,6 +15,7 @@ import (
 var mockableLongToWide = data.LongToWide
 
 const timeSeriesType = "time series"
+const tableType = "table"
 
 // this struct holds a full query result column (including data)
 // the main benefit is type safety
@@ -329,11 +330,12 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 	}
 
 	// default "table" case. Return whatever SQL we received
-	if dataQuery.QueryType != timeSeriesType {
+	if dataQuery.QueryType == tableType || dataQuery.QueryType == "" {
 		response.Frames = append(response.Frames, frame)
 
 		return response
 	}
+	// as the QueryType currently only has two options no further "if check" is required
 
 	if frame.TimeSeriesSchema().Type != data.TimeSeriesTypeWide {
 		frame, err = mockableLongToWide(frame, nil)

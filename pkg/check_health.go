@@ -53,15 +53,15 @@ func (td *SQLiteDatasource) CheckHealth(ctx context.Context, req *backend.CheckH
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
 			Message: fmt.Sprintf("error getting config: %s", err),
-		}, err
+		}, nil
 	}
 
 	dbExists, err := checkDbExists(config.Path)
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
-			Message: fmt.Sprintf("error checking db: %s", err),
-		}, err
+			Message: fmt.Sprintf("error checking existence: %s", err),
+		}, nil
 	} else if !dbExists {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
