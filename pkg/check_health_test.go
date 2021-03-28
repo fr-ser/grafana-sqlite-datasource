@@ -27,13 +27,13 @@ func getReqWithPath(path string) *backend.CheckHealthRequest {
 	}
 }
 
-func TestCheckAllGood(t *testing.T) {
+func TestCheckHealthShouldPassForADB(t *testing.T) {
 	dir, _ := ioutil.TempDir("", "test-check-db")
 	defer os.RemoveAll(dir)
 	dbPath := filepath.Join(dir, "my.db")
 
 	db, _ := sql.Open("sqlite3", dbPath)
-	db.Exec("SELECT 1")
+	db.Exec("CREATE TABLE test(id int);")
 	db.Close()
 
 	ds := SQLiteDatasource{}
@@ -50,7 +50,7 @@ func TestCheckAllGood(t *testing.T) {
 	}
 }
 
-func TestCheckFileExistence(t *testing.T) {
+func TestCheckHealthShouldFailIfNoFileExists(t *testing.T) {
 	ds := SQLiteDatasource{}
 	result, err := ds.CheckHealth(ctx, getReqWithPath("hello"))
 	if err != nil {
@@ -65,10 +65,11 @@ func TestCheckFileExistence(t *testing.T) {
 	}
 }
 
-func TestCheckIsDatabase(t *testing.T) {
+func TestCheckHealthShouldFailOnTextFile(t *testing.T) {
 	f, _ := ioutil.TempFile("", "test-check-db")
 	defer syscall.Unlink(f.Name())
 	f.WriteString("not a sqlite db")
+	f.Close()
 
 	ds := SQLiteDatasource{}
 	result, err := ds.CheckHealth(ctx, getReqWithPath(f.Name()))
@@ -79,7 +80,22 @@ func TestCheckIsDatabase(t *testing.T) {
 	if result.Status != backend.HealthStatusError {
 		t.Errorf("Expected HealthStatusError, but got - %s", result.Status)
 	}
-	if result.Message != "The file at the provided location, was not a valid SQLite database" {
+	if result.Message != "The file at the provided location is not a valid SQLite database" {
 		t.Errorf("Unexpected error message: %s", result.Message)
+	}
+}
+
+func TestCheckHealthShouldPassForAnEmptyFile(t *testing.T) {
+	f, _ := ioutil.TempFile("", "test-check-db")
+	defer syscall.Unlink(f.Name())
+
+	ds := SQLiteDatasource{}
+	result, err := ds.CheckHealth(ctx, getReqWithPath(f.Name()))
+	if err != nil {
+		t.Errorf("Unexpected error - %s", err)
+	}
+
+	if result.Status != backend.HealthStatusOk {
+		t.Errorf("Expected HealthStatusOk, but got - %s", result.Status)
 	}
 }

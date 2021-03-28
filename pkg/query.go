@@ -14,7 +14,8 @@ import (
 
 var mockableLongToWide = data.LongToWide
 
-const timeSeriesType = "time series"
+// commented out as currently unused
+// const timeSeriesType = "time series"
 const tableType = "table"
 
 // this struct holds a full query result column (including data)
@@ -219,11 +220,11 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 func fetchData(dbPath string, qm queryModel) (columns []*sqlColumn, err error) {
 
 	db, err := sql.Open("sqlite3", dbPath)
-	defer db.Close()
 	if err != nil {
 		log.DefaultLogger.Error("Could not open database", "err", err)
 		return columns, err
 	}
+	defer db.Close()
 
 	rows, err := db.Query(qm.QueryText)
 	if err != nil {

@@ -22,14 +22,12 @@ func checkDbExists(path string) (bool, error) {
 
 func checkIsDB(path string) (bool, error) {
 	db, err := sql.Open("sqlite3", path)
-	defer db.Close()
 	if err != nil {
 		return false, err
 	}
+	defer db.Close()
 
-	row := db.QueryRow("SELECT 12")
-	var value int
-	err = row.Scan(&value)
+	_, err = db.Exec("pragma schema_version;")
 	if sqliteErr, ok := err.(sqlite3.Error); ok {
 		if sqliteErr.Code == sqlite3.ErrNotADB {
 			return false, nil
@@ -78,7 +76,7 @@ func (td *SQLiteDatasource) CheckHealth(ctx context.Context, req *backend.CheckH
 	} else if !isDB {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
-			Message: "The file at the provided location, was not a valid SQLite database",
+			Message: "The file at the provided location is not a valid SQLite database",
 		}, nil
 	}
 
