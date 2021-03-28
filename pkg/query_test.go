@@ -49,6 +49,10 @@ func timePointer(x time.Time) *time.Time {
 	return &x
 }
 
+func unixTimePointer(x int64) *time.Time {
+	return timePointer(time.Unix(x, 0))
+}
+
 func TestEmptyQuery(t *testing.T) {
 	dbPath, cleanup := createTmpDB(`SELECT 1`)
 	defer cleanup()

@@ -54,7 +54,8 @@ func unixEpochGroupSeconds(queryConfig *queryConfigStruct, arguments []string) (
 			"unsupported number of arguments (%d) for unixEpochGroupSeconds", len(arguments),
 		)
 	}
-	groupingInterval, err := strconv.Atoi(strings.Trim(arguments[1], " "))
+	var err error
+	queryConfig.FillInterval, err = strconv.Atoi(strings.Trim(arguments[1], " "))
 	if err != nil {
 		log.DefaultLogger.Error(
 			"Could not convert grouping interval to an integer",
@@ -66,9 +67,20 @@ func unixEpochGroupSeconds(queryConfig *queryConfigStruct, arguments []string) (
 		return "", fmt.Errorf(
 			"could not convert '%s' to an integer grouping interval", arguments[1],
 		)
-
 	}
+
+	// the gap filling value
+	if len(arguments) == 3 {
+		if strings.ToLower(strings.Trim(arguments[2], " ")) != "null" {
+			return "", fmt.Errorf("unsupported gap filling value of: `%s`", arguments[2])
+		}
+		queryConfig.ShouldFillValues = true
+	}
+
 	return fmt.Sprintf(
-		"cast((%s / %d) as int) * %d", arguments[0], groupingInterval, groupingInterval,
+		"cast((%s / %d) as int) * %d",
+		arguments[0],
+		queryConfig.FillInterval,
+		queryConfig.FillInterval,
 	), nil
 }

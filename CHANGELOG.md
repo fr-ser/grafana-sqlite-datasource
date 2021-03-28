@@ -4,11 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.2.0]
+
+### Added
+
+- The response of the plugin includes the final query as metadata and can be checked in the
+  inspector now
+- Macro `unixEpochGroupSeconds`:
+  - replace time columns with an expression to group by
+  - Allow filling up missing values with `NULL`
+
+### Fixed
+
+- return additional time formatted column for time-series formats as normal values (previously
+  they were skipped)
+
 ## [1.1.0]
 
 ### Added
 
-- Experimental support for MacOS (not static linking)
+- Experimental support for MacOS (no static linking)
 
 ## [1.0.3]
 

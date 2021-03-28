@@ -19,13 +19,14 @@ const timeSeriesType = "time series"
 const tableType = "table"
 
 type queryConfigStruct struct {
-	BaseQuery              string
-	TimeColumns            []string
-	QueryType              string
-	FinalQuery             string
-	ShouldFillValues       bool
-	ShouldFillWithPrevious bool
-	FillValue              float64
+	BaseQuery   string
+	TimeColumns []string
+	QueryType   string
+	FinalQuery  string
+
+	ShouldFillValues          bool
+	FillInterval              int
+	FillValuesTimeColumnIndex int
 }
 
 func (qc *queryConfigStruct) isTableType() bool {
@@ -54,7 +55,7 @@ type sqlColumn struct {
 	StringData []*string
 }
 
-func transformRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
+func addTransformedRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 	columnCount := len(columns)
 	values := make([]interface{}, columnCount)
 	valuePointers := make([]interface{}, columnCount)
@@ -231,7 +232,7 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 	return nil
 }
 
-func fetchData(dbPath string, queryConfig queryConfigStruct) (columns []*sqlColumn, err error) {
+func fetchData(dbPath string, queryConfig *queryConfigStruct) (columns []*sqlColumn, err error) {
 
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
@@ -279,13 +280,16 @@ func fetchData(dbPath string, queryConfig queryConfigStruct) (columns []*sqlColu
 		for _, timeColumnName := range queryConfig.TimeColumns {
 			if columns[idx].Name == timeColumnName {
 				columns[idx].Type = "TIME"
+				if queryConfig.FillValuesTimeColumnIndex == -1 {
+					queryConfig.FillValuesTimeColumnIndex = idx
+				}
 				break
 			}
 		}
 	}
 
 	for rows.Next() {
-		err := transformRow(rows, columns)
+		err := addTransformedRow(rows, columns)
 		if err != nil {
 			return columns, err
 		}
@@ -315,10 +319,11 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 	}
 
 	queryConfig := queryConfigStruct{
-		BaseQuery:   qm.QueryText,
-		FinalQuery:  qm.QueryText,
-		TimeColumns: qm.TimeColumns,
-		QueryType:   dataQuery.QueryType,
+		BaseQuery:                 qm.QueryText,
+		FinalQuery:                qm.QueryText,
+		TimeColumns:               qm.TimeColumns,
+		QueryType:                 dataQuery.QueryType,
+		FillValuesTimeColumnIndex: -1,
 	}
 
 	err = applyMacros(&queryConfig)
@@ -327,7 +332,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		return response
 	}
 
-	columns, err := fetchData(config.Path, queryConfig)
+	columns, err := fetchData(config.Path, &queryConfig)
 	if err != nil {
 		response.Error = err
 		return response
@@ -335,6 +340,14 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 
 	frame := data.NewFrame("response")
 	frame.Meta = &data.FrameMeta{ExecutedQueryString: queryConfig.FinalQuery}
+
+	if queryConfig.ShouldFillValues {
+		err := fillGaps(columns, &queryConfig)
+		if err != nil {
+			response.Error = err
+			return response
+		}
+	}
 
 	// construct a regular SQL dataframe (for time series this is usually the "long format")
 	for _, column := range columns {
@@ -374,14 +387,33 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 			response.Error = err
 			return response
 		}
+
+		// bug? if there is row with only null values "NULL" gets added as a "factor"
+		// this adds an empty string named null only field to the response. Here we remove it
+		emptyFieldIndexes := map[int]bool{}
+		for idx, field := range frame.Fields {
+			if field.Labels["name"] == "" && fieldHasOnlyNulls(field) {
+				emptyFieldIndexes[idx] = true
+			}
+		}
+
+		if len(emptyFieldIndexes) > 0 {
+			filledFields := []*data.Field{}
+			for idx, field := range frame.Fields {
+				if !emptyFieldIndexes[idx] {
+					filledFields = append(filledFields, field)
+				}
+			}
+			frame.Fields = filledFields
+		}
 	}
 
 	// some plugins do not play well with the "wide format" of a time series
 	// therefore we transform into individual frames
 	// https://github.com/fr-ser/grafana-sqlite-datasource/issues/16
 	tsSchema := frame.TimeSeriesSchema()
-	for _, field := range frame.Fields {
-		if field.Type().Time() {
+	for idx, field := range frame.Fields {
+		if idx == tsSchema.TimeIndex {
 			continue
 		}
 		partialFrame := data.NewFrame(
@@ -395,4 +427,13 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 	}
 
 	return response
+}
+
+func fieldHasOnlyNulls(field *data.Field) bool {
+	for row := 0; row < field.Len(); row++ {
+		if _, isNil := field.ConcreteAt(row); isNil {
+			return false
+		}
+	}
+	return true
 }

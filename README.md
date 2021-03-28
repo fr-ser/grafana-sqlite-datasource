@@ -101,6 +101,20 @@ This plugins supports plugins inspired by the built-in Grafana datasources (e.g.
 However, as each macro needs to be re-implemented from scratch only the following macros are
 supported. Other macros (that you might expect from other SQL databases) do not work
 
-| Macro example                        | Description                                                                                                 |
-|--------------------------------------|-------------------------------------------------------------------------------------------------------------|
-| $__unixEpochGroupSeconds("time", 10) | Will be replaced by an expression usable in GROUP BY clause. For example: `cast(("time" / 10) as int) * 10` |
+### $__unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds)
+
+Example: `$__unixEpochGroupSeconds("time", 10)`
+
+Will be replaced by an expression usable in GROUP BY clause. For example:
+`cast(("time" / 10) as int) * 10`
+
+### $__unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds, NULL)
+
+Example: `$__unixEpochGroupSeconds(timestamp, 10, NULL)`
+
+Same as above but with a fill parameter so missing points in that series will be added by grafana
+and `NULL` will be used as value.
+
+In case multiple time columns are provided the first one is chosen as the column to determine the
+gap filling. "First" in this context means first in the SELECT statement. This column to have no
+NULL values and must be ordered ascending.

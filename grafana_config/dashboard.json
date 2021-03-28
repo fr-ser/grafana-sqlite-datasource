@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
-  "iteration": 1606638610419,
+  "iteration": 1617137845700,
   "links": [],
   "panels": [
     {
@@ -182,9 +182,9 @@
         {
           "queryText": "SELECT (time / 500) * 500  as window, avg(value)\nFROM sine_wave\nWHERE time > 724107600000 / 1000 and time <= 724208400000 / 1000\nGROUP BY (time / 500) * 500",
           "queryType": "table",
-          "rawQueryText": "SELECT (time / $intervalS) * $intervalS  as window, avg(value)\nFROM sine_wave\nWHERE time > $__from / 1000 and time <= $__to / 1000\nGROUP BY (time / $intervalS) * $intervalS",
+          "rawQueryText": "SELECT $__unixEpochGroupSeconds(time, $intervalS) as window, avg(value)\nFROM sine_wave\nWHERE time > $__from / 1000 and time <= $__to / 1000\nGROUP BY 1\nORDER BY 1 asc",
           "refId": "A",
-          "timeColumns": ["time", "window"]
+          "timeColumns": ["window"]
         }
       ],
       "thresholds": [],
@@ -309,7 +309,6 @@
         "allValue": null,
         "current": {
           "selected": true,
-          "tags": [],
           "text": ["London", "New York", "Washington"],
           "value": ["London", "New York", "Washington"]
         },
@@ -345,5 +344,5 @@
   "timezone": "",
   "title": "Sine Wave Example",
   "uid": "U6rjzWDMz",
-  "version": 2
+  "version": 1
 }
