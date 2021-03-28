@@ -39,6 +39,9 @@ func TestEpochGroupSecondsShouldBeReplacedInTheFinalQueryForTables(t *testing.T)
 		data.NewField("window", nil, []*int64{intPointer(0), intPointer(10), intPointer(30)}),
 		data.NewField("value", nil, []*int64{intPointer(1), intPointer(2), intPointer(4)}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{
+		ExecutedQueryString: `SELECT cast(("time" / 10) as int) * 10 as window, value FROM test`,
+	}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)
@@ -79,6 +82,9 @@ func TestEpochGroupSecondsShouldBeReplacedInTheFinalQueryForTimeSeries(t *testin
 		}),
 		data.NewField("value", nil, []*int64{intPointer(1), intPointer(2), intPointer(4)}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{
+		ExecutedQueryString: `SELECT cast(("time" / 10) as int) * 10 as window, value FROM test`,
+	}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)

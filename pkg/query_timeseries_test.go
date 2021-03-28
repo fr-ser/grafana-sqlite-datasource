@@ -56,6 +56,7 @@ func TestIgnoreNonTimeSeriesQuery(t *testing.T) {
 			strPointer("one"), strPointer("two"), strPointer("three"),
 		}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)
@@ -106,6 +107,7 @@ func TestIgnoreWideTimeSeriesQuery(t *testing.T) {
 			floatPointer(21.1), floatPointer(22.2), floatPointer(23.3),
 		}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)
@@ -144,6 +146,7 @@ func TestConvertLongTimeSeriesQuery(t *testing.T) {
 		data.NewField("value", nil, []*float64{floatPointer(21.1), floatPointer(22.2)}),
 		data.NewField("name", nil, []*string{strPointer("one"), strPointer("two")}),
 	)
+	expectedInputFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
 
 	if diff := cmp.Diff(expectedInputFrame, inputFrame, cmpOption...); diff != "" {
 		t.Error("Unexpected input frame into the time series conversion")
@@ -166,6 +169,8 @@ func TestConvertLongTimeSeriesQuery(t *testing.T) {
 			[]*float64{floatPointer(21.1), nil},
 		),
 	)
+	expectedOutputFrames[0].Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
+
 	expectedOutputFrames[1] = data.NewFrame(
 		"value two",
 		data.NewField("time", nil, []time.Time{time.Unix(21, 0), time.Unix(22, 0)}),
@@ -175,6 +180,7 @@ func TestConvertLongTimeSeriesQuery(t *testing.T) {
 			[]*float64{nil, floatPointer(22.2)},
 		),
 	)
+	expectedOutputFrames[1].Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
 
 	for idx, frame := range response.Frames {
 		if diff := cmp.Diff(expectedOutputFrames[idx], frame, cmpOption...); diff != "" {

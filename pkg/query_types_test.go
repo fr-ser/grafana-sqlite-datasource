@@ -13,12 +13,13 @@ func TestCTETableQuery(t *testing.T) {
 	dbPath, cleanup := createTmpDB("SELECT 1 -- create db")
 	defer cleanup()
 
-	dataQuery := getDataQuery(queryModel{QueryText: `
+	baseQuery := `
 		WITH some_tmp_table(time, value, name) AS (
 			SELECT * FROM (VALUES (1, 1.1, 'one'), (2, 2.2, 'two'), (3, 3.3, 'three'))
 		)
 		SELECT * FROM some_tmp_table
-	`})
+	`
+	dataQuery := getDataQuery(queryModel{QueryText: baseQuery})
 
 	response := query(dataQuery, pluginConfig{Path: dbPath})
 	if response.Error != nil {
@@ -41,6 +42,7 @@ func TestCTETableQuery(t *testing.T) {
 			strPointer("one"), strPointer("two"), strPointer("three"),
 		}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: baseQuery}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)
@@ -74,6 +76,7 @@ func TestMixedTypes(t *testing.T) {
 		data.NewField("first", nil, []*float64{floatPointer(1), floatPointer(2.2)}),
 		data.NewField("second", nil, []*float64{floatPointer(1.1), floatPointer(2)}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)
@@ -112,6 +115,7 @@ func TestSimpleTableQuery(t *testing.T) {
 			strPointer("one"), strPointer("two"), strPointer("three"),
 		}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)
@@ -146,6 +150,7 @@ func TestNullValues(t *testing.T) {
 		data.NewField("value", nil, []*float64{floatPointer(1.1), nil, floatPointer(3.3)}),
 		data.NewField("name", nil, []*string{strPointer("one"), strPointer("two"), nil}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)
@@ -157,12 +162,13 @@ func TestNullValuesCTE(t *testing.T) {
 	dbPath, cleanup := createTmpDB("SELECT 1 -- create db")
 	defer cleanup()
 
-	dataQuery := getDataQuery(queryModel{QueryText: `
+	baseQuery := `
 		WITH some_tmp_table(time, value, name) AS (
 			SELECT * FROM (VALUES (NULL, 1.1, 'one'), (2, NULL, 'two'), (3, 3.3, NULL))
 		)
 		SELECT * FROM some_tmp_table
-	`})
+	`
+	dataQuery := getDataQuery(queryModel{QueryText: baseQuery})
 
 	response := query(dataQuery, pluginConfig{Path: dbPath})
 	if response.Error != nil {
@@ -181,6 +187,7 @@ func TestNullValuesCTE(t *testing.T) {
 		data.NewField("value", nil, []*float64{floatPointer(1.1), nil, floatPointer(3.3)}),
 		data.NewField("name", nil, []*string{strPointer("one"), strPointer("two"), nil}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: baseQuery}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)

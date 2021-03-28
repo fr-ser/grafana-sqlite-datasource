@@ -334,6 +334,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 	}
 
 	frame := data.NewFrame("response")
+	frame.Meta = &data.FrameMeta{ExecutedQueryString: queryConfig.FinalQuery}
 
 	// construct a regular SQL dataframe (for time series this is usually the "long format")
 	for _, column := range columns {
@@ -367,6 +368,8 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 
 	if frame.TimeSeriesSchema().Type != data.TimeSeriesTypeWide {
 		frame, err = mockableLongToWide(frame, nil)
+		frame.Meta = &data.FrameMeta{ExecutedQueryString: queryConfig.FinalQuery}
+
 		if err != nil {
 			response.Error = err
 			return response
@@ -386,6 +389,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 			frame.Fields[tsSchema.TimeIndex],
 			field,
 		)
+		partialFrame.Meta = &data.FrameMeta{ExecutedQueryString: queryConfig.FinalQuery}
 
 		response.Frames = append(response.Frames, partialFrame)
 	}

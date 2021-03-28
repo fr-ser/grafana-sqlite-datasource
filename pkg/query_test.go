@@ -67,6 +67,7 @@ func TestEmptyQuery(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame("response")
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "-- not a query"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Errorf(diff)
@@ -100,6 +101,7 @@ func TestNoResults(t *testing.T) {
 		data.NewField("value", nil, []*float64{}),
 		data.NewField("name", nil, []*string{}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test WHERE false"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)

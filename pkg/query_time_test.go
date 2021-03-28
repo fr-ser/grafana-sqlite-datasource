@@ -45,6 +45,7 @@ func TestQueryWithTimeColumn(t *testing.T) {
 			strPointer("one"), strPointer("two"), strPointer("three"),
 		}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)
@@ -86,6 +87,7 @@ func TestQueryWithTimeStringColumn(t *testing.T) {
 			timePointer(time.Unix(23, 0)),
 		}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)
@@ -124,6 +126,7 @@ func TestUnixTimestampAsString(t *testing.T) {
 			timePointer(time.Unix(23, 0)),
 		}),
 	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)
