@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -14,9 +15,22 @@ import (
 
 var mockableLongToWide = data.LongToWide
 
-// commented out as currently unused
-// const timeSeriesType = "time series"
+const timeSeriesType = "time series"
 const tableType = "table"
+
+type queryConfigStruct struct {
+	BaseQuery              string
+	TimeColumns            []string
+	QueryType              string
+	FinalQuery             string
+	ShouldFillValues       bool
+	ShouldFillWithPrevious bool
+	FillValue              float64
+}
+
+func (qc *queryConfigStruct) isTableType() bool {
+	return qc.QueryType != timeSeriesType
+}
 
 // this struct holds a full query result column (including data)
 // the main benefit is type safety
@@ -217,7 +231,7 @@ func transformRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 	return nil
 }
 
-func fetchData(dbPath string, qm queryModel) (columns []*sqlColumn, err error) {
+func fetchData(dbPath string, queryConfig queryConfigStruct) (columns []*sqlColumn, err error) {
 
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
@@ -226,9 +240,9 @@ func fetchData(dbPath string, qm queryModel) (columns []*sqlColumn, err error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query(qm.QueryText)
+	rows, err := db.Query(queryConfig.FinalQuery)
 	if err != nil {
-		log.DefaultLogger.Error("Could execute query", "query", qm.QueryText, "err", err)
+		log.DefaultLogger.Error("Could execute query", "query", queryConfig.FinalQuery, "err", err)
 		return columns, err
 	}
 	defer rows.Close()
@@ -262,7 +276,7 @@ func fetchData(dbPath string, qm queryModel) (columns []*sqlColumn, err error) {
 			columns[idx].Type = "UNKNOWN"
 		}
 
-		for _, timeColumnName := range qm.TimeColumns {
+		for _, timeColumnName := range queryConfig.TimeColumns {
 			if columns[idx].Name == timeColumnName {
 				columns[idx].Type = "TIME"
 				break
@@ -300,7 +314,20 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		return response
 	}
 
-	columns, err := fetchData(config.Path, qm)
+	queryConfig := queryConfigStruct{
+		BaseQuery:   qm.QueryText,
+		FinalQuery:  qm.QueryText,
+		TimeColumns: qm.TimeColumns,
+		QueryType:   dataQuery.QueryType,
+	}
+
+	err = applyMacros(&queryConfig)
+	if err != nil {
+		response.Error = err
+		return response
+	}
+
+	columns, err := fetchData(config.Path, queryConfig)
 	if err != nil {
 		response.Error = err
 		return response
@@ -330,8 +357,8 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		}
 	}
 
-	// default "table" case. Return whatever SQL we received
-	if dataQuery.QueryType == tableType || dataQuery.QueryType == "" {
+	// default case. Return whatever SQL we received
+	if queryConfig.isTableType() {
 		response.Frames = append(response.Frames, frame)
 
 		return response
@@ -355,7 +382,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 			continue
 		}
 		partialFrame := data.NewFrame(
-			fmt.Sprintf("%s %s", field.Name, field.Labels["name"]),
+			strings.Trim(fmt.Sprintf("%s %s", field.Name, field.Labels["name"]), " "),
 			frame.Fields[tsSchema.TimeIndex],
 			field,
 		)

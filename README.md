@@ -92,3 +92,15 @@ WITH converted AS (
 )
 SELECT datetime, value FROM converted ORDER BY datetime ASC
 ```
+
+## Macros
+
+This plugins supports plugins inspired by the built-in Grafana datasources (e.g.
+<https://grafana.com/docs/grafana/latest/datasources/postgres/#macros>).
+
+However, as each macro needs to be re-implemented from scratch only the following macros are
+supported. Other macros (that you might expect from other SQL databases) do not work
+
+| Macro example                        | Description                                                                                                 |
+|--------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| $__unixEpochGroupSeconds("time", 10) | Will be replaced by an expression usable in GROUP BY clause. For example: `cast(("time" / 10) as int) * 10` |

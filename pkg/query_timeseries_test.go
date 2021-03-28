@@ -26,7 +26,7 @@ func TestIgnoreNonTimeSeriesQuery(t *testing.T) {
 	dataQuery := getDataQuery(queryModel{
 		QueryText: "SELECT * FROM test", TimeColumns: []string{"time"},
 	})
-	dataQuery.QueryType = "table"
+	dataQuery.QueryType = tableType
 
 	response := query(dataQuery, pluginConfig{Path: dbPath})
 	if response.Error != nil {
@@ -97,7 +97,7 @@ func TestIgnoreWideTimeSeriesQuery(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"value ",
+		"value",
 		data.NewField("time", nil, []*time.Time{
 			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
 			timePointer(time.Unix(23, 0)),
