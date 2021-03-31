@@ -6,8 +6,3 @@ if ! grep -q -F "## [${latest_tag:1}]" CHANGELOG.md; then
 	echo "Error: The latest (## [${latest_tag:1}]) tag was not found in the CHANGELOG.md." 1>&2
 	exit 1
 fi
-
-if ! grep -q -F "version\": \"${latest_tag:1}\"" package.json; then
-	echo "Error: The latest (${latest_tag:1}) tag was not found in the package.json version." 1>&2
-	exit 1
-fi

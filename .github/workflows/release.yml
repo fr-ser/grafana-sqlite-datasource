@@ -3,7 +3,8 @@ name: Create Github Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v[0-9]+.[0-9]+.[0-9]'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+'
 
 jobs:
 
@@ -147,27 +148,28 @@ jobs:
             ${{ runner.OS }}-
       - name: Install dependencies
         run: yarn --frozen-lockfile
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=version::${GITHUB_REF#refs/tags/v}
+      
       - name: Build frontend
-        run: make build-frontend
+        run: |
+          npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version
+          make build-frontend
 
       - name: Get plugin metadata
         id: metadata
         run: |
-          export GRAFANA_PLUGIN_VERSION=$(cat dist/plugin.json | jq -r .info.version)
-          export GRAFANA_PLUGIN_ARTIFACT=frser-sqlite-datasource-${GRAFANA_PLUGIN_VERSION}.zip
-          export GRAFANA_PLUGIN_ARTIFACT_ARM6=frser-sqlite-datasource-arm6-${GRAFANA_PLUGIN_VERSION}.zip
-          echo "::set-output name=plugin-version::${GRAFANA_PLUGIN_VERSION}"
+          export GRAFANA_PLUGIN_ARTIFACT=frser-sqlite-datasource-${{ steps.get_version.outputs.version }}.zip
+          export GRAFANA_PLUGIN_ARTIFACT_ARM6=frser-sqlite-datasource-arm6-${{ steps.get_version.outputs.version }}.zip
           echo "::set-output name=archive::${GRAFANA_PLUGIN_ARTIFACT}"
           echo "::set-output name=archive-arm6::${GRAFANA_PLUGIN_ARTIFACT_ARM6}"
-          echo "::set-output name=github-tag::${GITHUB_REF#refs/*/}"
-
-      - name: Check package version
-        run: if [ "v${{ steps.metadata.outputs.plugin-version }}" != "${{ steps.metadata.outputs.github-tag }}" ]; then printf "\033[0;31mPlugin version doesn't match tag name\033[0m\n"; exit 1; fi
 
       - name: Check changelog
         run: |
-          if ! grep -q -F "## [${{ steps.metadata.outputs.plugin-version }}]" CHANGELOG.md; then
-            echo "Error: The latest (## [${{ steps.metadata.outputs.plugin-version }}]) tag was not found in the CHANGELOG.md." 1>&2
+          if ! grep -q -F "## [${{ steps.get_version.outputs.version }}]" CHANGELOG.md; then
+            echo "Error: The latest (## [${{ steps.get_version.outputs.version }}]) tag was not found in the CHANGELOG.md." 1>&2
             exit 1
           fi
 
@@ -207,15 +209,27 @@ jobs:
           name: plugin-darwin64
           path: ./dist/
       - name: package-and-zip
-        run: make package-and-zip
         env:
           GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
+        run: |
+          make package-and-zip
+          md5sum ${{ steps.metadata.outputs.archive }} > ${{ steps.metadata.outputs.archive }}.md5
+          md5sum ${{ steps.metadata.outputs.archive-arm6 }} > ${{ steps.metadata.outputs.archive-arm6 }}.md5
 
       - name: Read changelog
         id: changelog
         run: |
           awk '/^## / {s++} s == 1 {print}' CHANGELOG.md > release_notes.md
           echo "::set-output name=path::release_notes.md"
+
+      - name: Check prerelease
+        id: check_prerelease
+        run: |
+          if [[ ${{ github.ref }} =~ "rc" ]]; then
+            echo "::set-output name=is_prerelease::true"
+          else
+            echo "::set-output name=is_prerelease::false"
+          fi
 
       - name: Create release
         id: create_release
@@ -226,10 +240,9 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body_path: ${{ steps.changelog.outputs.path }}
-          draft: true
+          prerelease: ${{ steps.check_prerelease.outputs.is_prerelease }}
 
       - name: Add arm6 plugin to release
-        id: upload-plugin-asset-arm6
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -238,9 +251,18 @@ jobs:
           asset_path: ./${{ steps.metadata.outputs.archive-arm6 }}
           asset_name: ${{ steps.metadata.outputs.archive-arm6 }}
           asset_content_type: application/zip
+      
+      - name: Add arm6 checksum to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ steps.metadata.outputs.archive-arm6 }}.md5
+          asset_name: ${{ steps.metadata.outputs.archive-arm6 }}.md5
+          asset_content_type: text/plain
 
       - name: Add plugin to release
-        id: upload-plugin-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -249,3 +271,13 @@ jobs:
           asset_path: ./${{ steps.metadata.outputs.archive }}
           asset_name: ${{ steps.metadata.outputs.archive }}
           asset_content_type: application/zip
+
+      - name: Add checksum to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ steps.metadata.outputs.archive }}.md5
+          asset_name: ${{ steps.metadata.outputs.archive }}.md5
+          asset_content_type: text/plain
