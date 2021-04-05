@@ -243,7 +243,9 @@ func fetchData(dbPath string, queryConfig *queryConfigStruct) (columns []*sqlCol
 
 	rows, err := db.Query(queryConfig.FinalQuery)
 	if err != nil {
-		log.DefaultLogger.Error("Could execute query", "query", queryConfig.FinalQuery, "err", err)
+		log.DefaultLogger.Error(
+			"Could not execute query", "query", queryConfig.FinalQuery, "err", err,
+		)
 		return columns, err
 	}
 	defer rows.Close()
@@ -272,7 +274,11 @@ func fetchData(dbPath string, queryConfig *queryConfigStruct) (columns []*sqlCol
 			columns[idx].Type = "STRING"
 		default:
 			log.DefaultLogger.Debug(
-				"Unknown database type", "type", columnTypes[idx].DatabaseTypeName(),
+				"Unknown database type",
+				"type",
+				columnTypes[idx].DatabaseTypeName(),
+				"column",
+				columnTypes[idx].Name(),
 			)
 			columns[idx].Type = "UNKNOWN"
 		}
@@ -331,12 +337,14 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		response.Error = err
 		return response
 	}
+	log.DefaultLogger.Debug("Macros applied. Fetching data from database")
 
 	columns, err := fetchData(config.Path, &queryConfig)
 	if err != nil {
 		response.Error = err
 		return response
 	}
+	log.DefaultLogger.Debug("Fetched data from database")
 
 	frame := data.NewFrame("response")
 	frame.Meta = &data.FrameMeta{ExecutedQueryString: queryConfig.FinalQuery}
@@ -347,6 +355,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 			response.Error = err
 			return response
 		}
+		log.DefaultLogger.Debug("Filled gaps in data according to macro")
 	}
 
 	// construct a regular SQL dataframe (for time series this is usually the "long format")
@@ -387,6 +396,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 			response.Error = err
 			return response
 		}
+		log.DefaultLogger.Debug("Initial data converted into wide time-series")
 
 		// bug? if there is row with only null values "NULL" gets added as a "factor"
 		// this adds an empty string named null only field to the response. Here we remove it
@@ -405,6 +415,8 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 				}
 			}
 			frame.Fields = filledFields
+			log.DefaultLogger.Debug("Removed null field from generated time-series dataframe")
+
 		}
 	}
 
@@ -425,6 +437,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 
 		response.Frames = append(response.Frames, partialFrame)
 	}
+	log.DefaultLogger.Debug("Wide time-series converted into multiple frames")
 
 	return response
 }

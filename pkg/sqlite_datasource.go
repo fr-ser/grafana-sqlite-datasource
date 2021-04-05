@@ -55,7 +55,7 @@ type SQLiteDatasource struct {
 func (td *SQLiteDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (
 	*backend.QueryDataResponse, error,
 ) {
-	log.DefaultLogger.Debug("QueryData", "req", req)
+	log.DefaultLogger.Debug("Received request for data")
 	response := backend.NewQueryDataResponse()
 
 	config, err := getConfig(req.PluginContext.DataSourceInstanceSettings)
@@ -68,6 +68,7 @@ func (td *SQLiteDatasource) QueryData(ctx context.Context, req *backend.QueryDat
 	for _, q := range req.Queries {
 		// the response can have an error field
 		response.Responses[q.RefID] = query(q, config)
+		log.DefaultLogger.Debug("Finished query", "refID", q.RefID)
 	}
 
 	return response, nil
