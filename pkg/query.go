@@ -265,10 +265,10 @@ func fetchData(dbPath string, queryConfig *queryConfigStruct) (columns []*sqlCol
 	for idx := range columns {
 		columns[idx] = &sqlColumn{Name: columnTypes[idx].Name()}
 
-		switch columnTypes[idx].DatabaseTypeName() {
-		case "INTEGER":
+		switch strings.ToUpper(columnTypes[idx].DatabaseTypeName()) {
+		case "INTEGER", "INT":
 			columns[idx].Type = "INTEGER"
-		case "REAL", "NUMERIC":
+		case "REAL", "NUMERIC", "DOUBLE", "FLOAT":
 			columns[idx].Type = "FLOAT"
 		case "NULL", "TEXT", "BLOB":
 			columns[idx].Type = "STRING"
