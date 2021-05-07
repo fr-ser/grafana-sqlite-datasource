@@ -43,17 +43,13 @@ and manually copied to the server.
 4. To make sure the plugin was installed, check the list of installed datasources. Click the
    Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
-### ARM6 / RaspberryPi Zero W Support
+### ARMv7 / Raspberry Pi 2 Mod. B Support
 
-This plugins supports ARM6 (the version running on RaspberryPi Zero W). There is a problem, though,
-with Grafana supporting ARM7 (newer Raspberries) and ARM6 at the same time. Grafana chooses
-the correct plugin by file name. But both ARM6 and ARM7 are named
-`<plugin_dir>/frser-sqlite-datasource/gpx_sqlite-datasource_linux_arm`.
+Many programs for ARMv6 (the default version 32bit ARM version of this plugin) can run on ARMv7
+machines (the version running on Raspberry Pi 2 Mod. B).
+In case there are complications you can try out the version specifically built for ARMv7, though.
 
-Currently the ARM7 build is named like this by default, which is why the "official" plugin
-distribution does not support ARM6 devices.
-
-A plugin version specifically built for ARM6 devices can be found on the Github release page (see
+A plugin version specifically built for ARMv7 devices can be found on the Github release page (see
 manual installation above).
 
 ## Configuring the Datasource in Grafana

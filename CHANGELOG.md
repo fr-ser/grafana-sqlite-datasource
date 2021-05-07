@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.0.0-rc.1]
+
+All current Raspberry PI Zero and 1 models have an ARMv6 architecture.
+All other models (2 Mod. B v1.2, 3 and 4) have an 64Bit ARMv8 architecture.
+As only the Raspberry Pi 2 Mod. B has an ARMv7 architecture this is not used as default anymore.
+The Raspberry Pi 2 Mod. B will require a manual installation and all others will be handled
+via the Grafana CLI.
+
+### Changed
+
+- Using ARMv6 instead of ARMv7 as 32Bit ARM default
+
 ## [1.2.1]
 
 ### Added

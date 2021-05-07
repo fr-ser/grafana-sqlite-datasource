@@ -1,4 +1,4 @@
-version: "3.6"
+version: '3.6'
 
 services:
   grafana:
@@ -7,12 +7,12 @@ services:
     # environment:
     #   GF_INSTALL_PLUGINS: grafana-worldmap-panel
     volumes:
-      - "./grafana_config/data.db:/app/data.db"
-      - "./grafana_config/grafana.ini:/etc/grafana/grafana.ini"
-      - "./grafana_config/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml"
-      - "./grafana_config/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml"
-      - "./grafana_config/dashboard.json:/app/dashboards/dashboard.json"
-      - "./dist:/var/lib/grafana/plugins/frser-sqlite-datasource"
+      - './grafana_config/data.db:/app/data.db'
+      - './grafana_config/grafana.ini:/etc/grafana/grafana.ini'
+      - './grafana_config/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml'
+      - './grafana_config/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml'
+      - './grafana_config/dashboard.json:/app/dashboards/dashboard.json'
+      - './dist:/var/lib/grafana/plugins/frser-sqlite-datasource'
     ports:
       - 3000:3000
     depends_on:
@@ -24,7 +24,7 @@ services:
       - 4444:4444
       - 5900:5900
     environment:
-      VNC_NO_PASSWORD: "1"
+      VNC_NO_PASSWORD: '1'
   start-setup:
     image: dadarek/wait-for-dependencies
     depends_on:
