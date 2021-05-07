@@ -102,23 +102,23 @@ package-and-zip:
 	chmod +x ./dist/gpx_*
 	cp -R dist dist_old
 
-	mv dist/gpx_sqlite-datasource_linux_arm7 dist/gpx_sqlite-datasource_linux_arm
-	rm dist/gpx_sqlite-datasource_linux_arm6
+	mv dist/gpx_sqlite-datasource_linux_arm6 dist/gpx_sqlite-datasource_linux_arm
+	rm dist/gpx_sqlite-datasource_linux_arm7
 	yarn sign
 	mv dist frser-sqlite-datasource
 	zip frser-sqlite-datasource-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
 	rm -rf frser-sqlite-datasource
 	mv dist_old dist
 
-package-and-zip-arm6:
+package-and-zip-arm7:
 	chmod +x ./dist/gpx_*
 	cp -R dist dist_old
 
 	rm dist/gpx_*
-	cp dist_old/gpx_sqlite-datasource_linux_arm6 dist/gpx_sqlite-datasource_linux_arm
+	cp dist_old/gpx_sqlite-datasource_linux_arm7 dist/gpx_sqlite-datasource_linux_arm
 	yarn sign
 	mv dist frser-sqlite-datasource
-	zip frser-sqlite-datasource-arm6-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
+	zip frser-sqlite-datasource-arm7-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
 	rm -rf frser-sqlite-datasource
 	mv dist_old dist
 

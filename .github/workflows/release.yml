@@ -162,9 +162,9 @@ jobs:
         id: metadata
         run: |
           export GRAFANA_PLUGIN_ARTIFACT=frser-sqlite-datasource-${{ steps.get_version.outputs.version }}.zip
-          export GRAFANA_PLUGIN_ARTIFACT_ARM6=frser-sqlite-datasource-arm6-${{ steps.get_version.outputs.version }}.zip
+          export GRAFANA_PLUGIN_ARTIFACT_ARM7=frser-sqlite-datasource-arm7-${{ steps.get_version.outputs.version }}.zip
           echo "::set-output name=archive::${GRAFANA_PLUGIN_ARTIFACT}"
-          echo "::set-output name=archive-arm6::${GRAFANA_PLUGIN_ARTIFACT_ARM6}"
+          echo "::set-output name=archive-arm7::${GRAFANA_PLUGIN_ARTIFACT_ARM7}"
 
       - name: Check changelog
         run: |
@@ -173,13 +173,13 @@ jobs:
             exit 1
           fi
 
-      - name: Download arm6 binary
+      - name: Download arm7 binary
         uses: actions/download-artifact@v2
         with:
-          name: plugin-arm6
+          name: plugin-arm7
           path: ./dist/
-      - name: package-and-zip-arm6
-        run: make package-and-zip-arm6
+      - name: package-and-zip-arm7
+        run: make package-and-zip-arm7
         env:
           GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
 
@@ -188,10 +188,10 @@ jobs:
         with:
           name: plugin-linux64
           path: ./dist/
-      - name: Download arm7 binary
+      - name: Download arm6 binary
         uses: actions/download-artifact@v2
         with:
-          name: plugin-arm7
+          name: plugin-arm6
           path: ./dist/
       - name: Download arm64 binary
         uses: actions/download-artifact@v2
@@ -214,7 +214,7 @@ jobs:
         run: |
           make package-and-zip
           md5sum ${{ steps.metadata.outputs.archive }} > ${{ steps.metadata.outputs.archive }}.md5
-          md5sum ${{ steps.metadata.outputs.archive-arm6 }} > ${{ steps.metadata.outputs.archive-arm6 }}.md5
+          md5sum ${{ steps.metadata.outputs.archive-arm7 }} > ${{ steps.metadata.outputs.archive-arm7 }}.md5
 
       - name: Read changelog
         id: changelog
@@ -242,24 +242,24 @@ jobs:
           body_path: ${{ steps.changelog.outputs.path }}
           prerelease: ${{ steps.check_prerelease.outputs.is_prerelease }}
 
-      - name: Add arm6 plugin to release
+      - name: Add arm7 plugin to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ steps.metadata.outputs.archive-arm6 }}
-          asset_name: ${{ steps.metadata.outputs.archive-arm6 }}
+          asset_path: ./${{ steps.metadata.outputs.archive-arm7 }}
+          asset_name: ${{ steps.metadata.outputs.archive-arm7 }}
           asset_content_type: application/zip
       
-      - name: Add arm6 checksum to release
+      - name: Add arm7 checksum to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ steps.metadata.outputs.archive-arm6 }}.md5
-          asset_name: ${{ steps.metadata.outputs.archive-arm6 }}.md5
+          asset_path: ./${{ steps.metadata.outputs.archive-arm7 }}.md5
+          asset_name: ${{ steps.metadata.outputs.archive-arm7 }}.md5
           asset_content_type: text/plain
 
       - name: Add plugin to release
