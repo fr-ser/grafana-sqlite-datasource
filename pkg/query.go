@@ -373,9 +373,13 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 			frame.Fields = append(
 				frame.Fields, data.NewField(column.Name, nil, column.IntData),
 			)
-		default:
+		case "STRING":
 			frame.Fields = append(
 				frame.Fields, data.NewField(column.Name, nil, column.StringData),
+			)
+		default:
+			frame.Fields = append(
+				frame.Fields, data.NewField(column.Name, nil, column.FloatData),
 			)
 		}
 	}
@@ -390,12 +394,13 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 
 	if frame.TimeSeriesSchema().Type != data.TimeSeriesTypeWide {
 		frame, err = mockableLongToWide(frame, nil)
-		frame.Meta = &data.FrameMeta{ExecutedQueryString: queryConfig.FinalQuery}
-
 		if err != nil {
+			log.DefaultLogger.Error("Could not convert from long to wide time-series", "err", err)
 			response.Error = err
 			return response
 		}
+		frame.Meta = &data.FrameMeta{ExecutedQueryString: queryConfig.FinalQuery}
+
 		log.DefaultLogger.Debug("Initial data converted into wide time-series")
 
 		// bug? if there is row with only null values "NULL" gets added as a "factor"
