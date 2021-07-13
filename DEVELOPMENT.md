@@ -40,3 +40,10 @@ make bootstrap # credentials admin / admin123
 ```BASH
 make test
 ```
+
+### Quick e2e tests with Selenium
+
+First start the docker environment with `make selenium-test`. This will also run the tests.
+Regardless of the tests passing the environment will stay up and running.
+
+Now you can connect to the dockerized browser via a `VNC` client/viewer (like remmina)

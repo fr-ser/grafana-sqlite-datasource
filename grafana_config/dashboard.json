@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
-  "iteration": 1617137845700,
+  "iteration": 1623773471544,
   "links": [],
   "panels": [
     {
@@ -254,7 +254,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
+        "h": 4,
         "w": 24,
         "x": 0,
         "y": 12
@@ -276,6 +276,203 @@
       "timeShift": null,
       "title": "Aggregations",
       "type": "table"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 16
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "/^data$/",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.3.3",
+      "repeat": "cities",
+      "repeatDirection": "h",
+      "scopedVars": {
+        "cities": {
+          "selected": true,
+          "text": "London",
+          "value": "London"
+        }
+      },
+      "targets": [
+        {
+          "queryText": "\n    SELECT CAST(strftime('%s', 'now', '-1 minute') as INTEGER) as time, 4 as value\n    WHERE time >= 1234 and time < 134567\n  ",
+          "queryType": "table",
+          "rawQueryText": "SELECT '$cities' as data ",
+          "refId": "A",
+          "timeColumns": []
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "$cities",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 16
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "/^data$/",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.3.3",
+      "repeatDirection": "h",
+      "repeatIteration": 1623773471544,
+      "repeatPanelId": 8,
+      "scopedVars": {
+        "cities": {
+          "selected": true,
+          "text": "New York",
+          "value": "New York"
+        }
+      },
+      "targets": [
+        {
+          "queryText": "\n    SELECT CAST(strftime('%s', 'now', '-1 minute') as INTEGER) as time, 4 as value\n    WHERE time >= 1234 and time < 134567\n  ",
+          "queryType": "table",
+          "rawQueryText": "SELECT '$cities' as data ",
+          "refId": "A",
+          "timeColumns": []
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "$cities",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 16
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "/^data$/",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.3.3",
+      "repeatDirection": "h",
+      "repeatIteration": 1623773471544,
+      "repeatPanelId": 8,
+      "scopedVars": {
+        "cities": {
+          "selected": true,
+          "text": "Washington",
+          "value": "Washington"
+        }
+      },
+      "targets": [
+        {
+          "queryText": "\n    SELECT CAST(strftime('%s', 'now', '-1 minute') as INTEGER) as time, 4 as value\n    WHERE time >= 1234 and time < 134567\n  ",
+          "queryType": "table",
+          "rawQueryText": "SELECT '$cities' as data ",
+          "refId": "A",
+          "timeColumns": []
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "$cities",
+      "type": "stat"
     }
   ],
   "refresh": false,
@@ -309,6 +506,7 @@
         "allValue": null,
         "current": {
           "selected": true,
+          "tags": [],
           "text": ["London", "New York", "Washington"],
           "value": ["London", "New York", "Washington"]
         },
@@ -344,5 +542,5 @@
   "timezone": "",
   "title": "Sine Wave Example",
   "uid": "U6rjzWDMz",
-  "version": 1
+  "version": 2
 }

@@ -14,11 +14,9 @@ export async function login(driver) {
 }
 
 export async function getDriver() {
-  const chromeOptions = new chromeDriver.Options();
-
   return new Builder()
     .forBrowser('chrome')
-    .setChromeOptions(chromeOptions)
+    .setChromeOptions(new chromeDriver.Options())
     .usingServer(`http://${SELENIUM_URL}/wd/hub`)
     .build();
 }

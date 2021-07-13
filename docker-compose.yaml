@@ -26,7 +26,7 @@ services:
     environment:
       VNC_NO_PASSWORD: '1'
   start-setup:
-    image: dadarek/wait-for-dependencies
+    image: dadarek/wait-for-dependencies:0.2
     depends_on:
       - grafana
       - selenium

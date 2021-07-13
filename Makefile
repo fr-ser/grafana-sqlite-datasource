@@ -127,7 +127,7 @@ build: build-frontend build-backend
 selenium-test: bootstrap
 	@echo
 	docker-compose run --rm start-setup
-	npx jest --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
+	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
 	@echo
 
 frontend-test:
