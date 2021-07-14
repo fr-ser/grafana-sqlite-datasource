@@ -50,6 +50,7 @@ describe('QueryEditor', () => {
 
     expect(onRunQueryMock).toHaveBeenCalled();
     expect(onChangeMock).toHaveBeenLastCalledWith({
+      queryText: 'Some Input',
       rawQueryText: 'Some Input',
     });
   });

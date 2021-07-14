@@ -78,7 +78,7 @@ func TestEmptyQuery(t *testing.T) {
 	}
 }
 
-func TestNoResults(t *testing.T) {
+func TestNoResultsTable(t *testing.T) {
 	dbPath, cleanup := createTmpDB(`
 		CREATE TABLE test(time INTEGER, value REAL, name TEXT);
 		INSERT INTO test(time, value, name)
@@ -112,6 +112,51 @@ func TestNoResults(t *testing.T) {
 	}
 }
 
+func TestNoResultsTimeSeriesWithUnknownColumns(t *testing.T) {
+	var longToWideCalled bool
+	mockableLongToWide = func(a *data.Frame, b *data.FillMissing) (*data.Frame, error) {
+		longToWideCalled = true
+		return data.NewFrame("response"), nil
+	}
+
+	dbPath, cleanup := createTmpDB(`SELECT 1`)
+	defer cleanup()
+
+	dataQuery := getDataQuery(queryModel{
+		QueryText:   "SELECT 1 as time, 2 as value WHERE FALSE",
+		TimeColumns: []string{"time"},
+	})
+	dataQuery.QueryType = "time series"
+
+	response := query(dataQuery, pluginConfig{Path: dbPath})
+	if response.Error != nil {
+		t.Errorf("Unexpected error - %s", response.Error)
+	}
+
+	if len(response.Frames) != 1 {
+		t.Errorf(
+			"Expected one frame but got - %d: Frames %+v", len(response.Frames), response.Frames,
+		)
+	}
+
+	if longToWideCalled {
+		t.Errorf("Expected to not call 'longToWide' for wide time series queries")
+	}
+
+	expectedFrame := data.NewFrame(
+		"value",
+		data.NewField("time", nil, []*time.Time{}),
+		data.NewField("value", nil, []*float64{}),
+	)
+	expectedFrame.Meta = &data.FrameMeta{
+		ExecutedQueryString: "SELECT 1 as time, 2 as value WHERE FALSE",
+	}
+
+	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
+		t.Error(diff)
+	}
+}
+
 func TestInvalidQuery(t *testing.T) {
 	dbPath, cleanup := createTmpDB("SELECT 1 -- create db")
 	defer cleanup()
@@ -121,5 +166,36 @@ func TestInvalidQuery(t *testing.T) {
 	response := query(dataQuery, pluginConfig{Path: dbPath})
 	if response.Error == nil {
 		t.Errorf("Expected unmarshal error but got nothing. Response: %+v", response)
+	}
+}
+
+func TestReplaceToAndFromVariables(t *testing.T) {
+	dbPath, cleanup := createTmpDB(`SELECT 1`)
+	defer cleanup()
+
+	dataQuery := getDataQuery(queryModel{QueryText: "SELECT $__from AS a, $__to AS b"})
+	dataQuery.TimeRange.From = time.Unix(123, 0)
+	dataQuery.TimeRange.To = time.Unix(456, 0)
+
+	response := query(dataQuery, pluginConfig{Path: dbPath})
+	if response.Error != nil {
+		t.Errorf("Unexpected error - %s", response.Error)
+	}
+
+	if len(response.Frames) != 1 {
+		t.Errorf(
+			"Expected one frame but got - %d: Frames %+v", len(response.Frames), response.Frames,
+		)
+	}
+
+	expectedFrame := data.NewFrame(
+		"response",
+		data.NewField("a", nil, []*int64{intPointer(123000)}),
+		data.NewField("b", nil, []*int64{intPointer(456000)}),
+	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT 123000 AS a, 456000 AS b"}
+
+	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
+		t.Errorf(diff)
 	}
 }

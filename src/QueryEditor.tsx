@@ -14,6 +14,7 @@ export function QueryEditor(props: Props) {
     onChange({
       ...query,
       rawQueryText: event.target.value,
+      queryText: event.target.value,
     });
   }
 

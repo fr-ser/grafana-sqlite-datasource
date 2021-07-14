@@ -114,50 +114,6 @@ func TestIgnoreWideTimeSeriesQuery(t *testing.T) {
 	}
 }
 
-func TestAllowEmptyQueriesWithUnknownColumns(t *testing.T) {
-	var longToWideCalled bool
-	mockableLongToWide = func(a *data.Frame, b *data.FillMissing) (*data.Frame, error) {
-		longToWideCalled = true
-		return data.NewFrame("response"), nil
-	}
-
-	dbPath, cleanup := createTmpDB(`SELECT 1`)
-	defer cleanup()
-
-	dataQuery := getDataQuery(queryModel{
-		QueryText:   "SELECT 1 as time, 2 as value WHERE FALSE",
-		TimeColumns: []string{"time"},
-	})
-	dataQuery.QueryType = "time series"
-
-	response := query(dataQuery, pluginConfig{Path: dbPath})
-	if response.Error != nil {
-		t.Errorf("Unexpected error - %s", response.Error)
-	}
-
-	if len(response.Frames) != 1 {
-		t.Errorf(
-			"Expected one frame but got - %d: Frames %+v", len(response.Frames), response.Frames,
-		)
-	}
-
-	if longToWideCalled {
-		t.Errorf("Expected to not call 'longToWide' for wide time series queries")
-	}
-
-	expectedFrame := data.NewFrame(
-		"value",
-		data.NewField("time", nil, []*time.Time{}),
-		data.NewField("value", nil, []*float64{}),
-	)
-	expectedFrame.Meta = &data.FrameMeta{
-		ExecutedQueryString: "SELECT 1 as time, 2 as value WHERE FALSE",
-	}
-
-	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
-		t.Error(diff)
-	}
-}
 func TestConvertLongTimeSeriesQuery(t *testing.T) {
 	var inputFrame *data.Frame
 	mockableLongToWide = func(a *data.Frame, b *data.FillMissing) (*data.Frame, error) {

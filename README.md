@@ -114,3 +114,12 @@ and `NULL` will be used as value.
 In case multiple time columns are provided the first one is chosen as the column to determine the
 gap filling. "First" in this context means first in the SELECT statement. This column to have no
 NULL values and must be ordered ascending.
+
+## Alerting
+
+This plugins supports the Grafana alerting feature. As with the built in data sources alerting
+does not support variables as they are normally replaced in the frontend, which is not involved
+for the alerts. In order to allow time filtering this plugin supports the variables `$__from` and
+`$__to`. For more info about those variables see here:
+<https://grafana.com/docs/grafana/latest/variables/variable-types/global-variables/#__from-and-__to>.
+Formatting of those variables (e.g. `${__from:date:iso}`) is not supported for alerts, however.

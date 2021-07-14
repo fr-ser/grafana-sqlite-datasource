@@ -332,12 +332,19 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		FillValuesTimeColumnIndex: -1,
 	}
 
+	err = replaceVariables(&queryConfig, dataQuery)
+	if err != nil {
+		response.Error = err
+		return response
+	}
+	log.DefaultLogger.Debug("Variables replaced")
+
 	err = applyMacros(&queryConfig)
 	if err != nil {
 		response.Error = err
 		return response
 	}
-	log.DefaultLogger.Debug("Macros applied. Fetching data from database")
+	log.DefaultLogger.Debug("Macros applied")
 
 	columns, err := fetchData(config.Path, &queryConfig)
 	if err != nil {

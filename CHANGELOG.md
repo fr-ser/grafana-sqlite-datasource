@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.0.1-rc.1]
+
+This release fixes some long standing issues that prevented the right use of the alerting feature
+of the plugin even though it was enabled already.
+
+### Fixed
+
+- Using the `$__from` and `$__to` variables for alerting
+- Fixing a caching bug for the query (for alerting)
+
 ## [2.0.0]
 
 All current Raspberry Pi Zero and 1 models have an ARMv6 architecture.
