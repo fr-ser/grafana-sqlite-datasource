@@ -10,10 +10,10 @@ describe('configure', () => {
     driver = await getDriver();
 
     await login(driver);
-    await driver.get(`${GRAFANA_URL}/d/U6rjzWDMz/sine-wave-example`);
+    await driver.get(`${GRAFANA_URL}/d/jng4Dei7k/query-variables-and-repetition`);
     await driver.wait(
       until.elementLocated(
-        By.xpath(`//div[contains(@class, 'navbar-page-btn')]//a[text()[contains(., "Sine Wave Example")]]`)
+        By.xpath(`//div[contains(@class, 'navbar-page-btn')]//a[text()[contains(., "Query Variables and Repetition")]]`)
       ),
       5 * 1000
     );
@@ -21,15 +21,6 @@ describe('configure', () => {
 
   afterAll(async () => {
     await driver.quit();
-  });
-
-  it('shows the aggregate sine wave values', async () => {
-    await driver.wait(
-      until.elementLocated(
-        By.xpath(`//div[contains(@aria-label, 'Sine Wave With Variable')]//a[text()[contains(., "avg(value)")]]`)
-      ),
-      5 * 1000
-    );
   });
 
   it('shows a panel per variable', async () => {

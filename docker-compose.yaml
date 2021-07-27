@@ -11,7 +11,9 @@ services:
       - './grafana_config/grafana.ini:/etc/grafana/grafana.ini'
       - './grafana_config/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml'
       - './grafana_config/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml'
-      - './grafana_config/dashboard.json:/app/dashboards/dashboard.json'
+      - './grafana_config/dashboards/alert.json:/app/dashboards/alert.json'
+      - './grafana_config/dashboards/graph_and_variables.json:/app/dashboards/graph_and_variables.json'
+      - './grafana_config/dashboards/query_and_repitition.json:/app/dashboards/query_and_repitition.json'
       - './dist:/var/lib/grafana/plugins/frser-sqlite-datasource'
     ports:
       - 3000:3000

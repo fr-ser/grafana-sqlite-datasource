@@ -1,0 +1,388 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": "-- Grafana --",
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 0,
+    "id": 3,
+    "iteration": 1626602396963,
+    "links": [],
+    "panels": [
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": null,
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
+        },
+        "fill": 1,
+        "fillGradient": 0,
+        "gridPos": {
+          "h": 10,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "hiddenSeries": false,
+        "id": 6,
+        "legend": {
+          "avg": false,
+          "current": false,
+          "max": false,
+          "min": false,
+          "show": true,
+          "total": false,
+          "values": false
+        },
+        "lines": true,
+        "linewidth": 1,
+        "nullPointMode": "null as zero",
+        "options": {
+          "alertThreshold": true
+        },
+        "percentage": false,
+        "pluginVersion": "7.3.3",
+        "pointradius": 2,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "queryText": "with data(time, temperature, city) AS (VALUES\n(724125600, 10, 'London'), (724161600, 11, 'London'),\n(724161600, 20, 'New York'), (724197600, 21, 'New York'),\n(724125600, 25, 'Washington'), (724197600, 26, 'Washington')\n) SELECT * from data\nWHERE city in ('London','New York','Washington')\norder by time",
+            "queryType": "time series",
+            "rawQueryText": "with data(time, temperature, city) AS (VALUES\n(724125600, 10, 'London'), (724161600, 11, 'London'),\n(724161600, 20, 'New York'), (724197600, 21, 'New York'),\n(724125600, 25, 'Washington'), (724197600, 26, 'Washington')\n) SELECT * from data\nWHERE city in (${cities:singlequote})\norder by time",
+            "refId": "A",
+            "timeColumns": [
+              "time"
+            ]
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeRegions": [],
+        "timeShift": null,
+        "title": "Time Series With Query Variable",
+        "tooltip": {
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
+      },
+      {
+        "datasource": null,
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 8,
+          "x": 0,
+          "y": 10
+        },
+        "id": 8,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "/^data$/",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "7.3.3",
+        "repeat": "cities",
+        "repeatDirection": "h",
+        "scopedVars": {
+          "cities": {
+            "selected": true,
+            "text": "London",
+            "value": "London"
+          }
+        },
+        "targets": [
+          {
+            "queryText": "\n    SELECT CAST(strftime('%s', 'now', '-1 minute') as INTEGER) as time, 4 as value\n    WHERE time >= 1234 and time < 134567\n  ",
+            "queryType": "table",
+            "rawQueryText": "SELECT '$cities' as data ",
+            "refId": "A",
+            "timeColumns": []
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "$cities",
+        "type": "stat"
+      },
+      {
+        "datasource": null,
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 8,
+          "x": 8,
+          "y": 10
+        },
+        "id": 9,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "/^data$/",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "7.3.3",
+        "repeatDirection": "h",
+        "repeatIteration": 1626602396963,
+        "repeatPanelId": 8,
+        "scopedVars": {
+          "cities": {
+            "selected": true,
+            "text": "New York",
+            "value": "New York"
+          }
+        },
+        "targets": [
+          {
+            "queryText": "\n    SELECT CAST(strftime('%s', 'now', '-1 minute') as INTEGER) as time, 4 as value\n    WHERE time >= 1234 and time < 134567\n  ",
+            "queryType": "table",
+            "rawQueryText": "SELECT '$cities' as data ",
+            "refId": "A",
+            "timeColumns": []
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "$cities",
+        "type": "stat"
+      },
+      {
+        "datasource": null,
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 8,
+          "x": 16,
+          "y": 10
+        },
+        "id": 10,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "/^data$/",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "7.3.3",
+        "repeatDirection": "h",
+        "repeatIteration": 1626602396963,
+        "repeatPanelId": 8,
+        "scopedVars": {
+          "cities": {
+            "selected": true,
+            "text": "Washington",
+            "value": "Washington"
+          }
+        },
+        "targets": [
+          {
+            "queryText": "\n    SELECT CAST(strftime('%s', 'now', '-1 minute') as INTEGER) as time, 4 as value\n    WHERE time >= 1234 and time < 134567\n  ",
+            "queryType": "table",
+            "rawQueryText": "SELECT '$cities' as data ",
+            "refId": "A",
+            "timeColumns": []
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "$cities",
+        "type": "stat"
+      }
+    ],
+    "refresh": false,
+    "schemaVersion": 26,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+      "list": [
+        {
+          "allValue": null,
+          "current": {
+            "selected": true,
+            "text": [
+              "London",
+              "New York",
+              "Washington"
+            ],
+            "value": [
+              "London",
+              "New York",
+              "Washington"
+            ]
+          },
+          "datasource": "sqlite",
+          "definition": "SELECT * FROM (VALUES ('London'), ('New York'), ('Washington'))",
+          "error": null,
+          "hide": 0,
+          "includeAll": false,
+          "label": "Cities",
+          "multi": true,
+          "name": "cities",
+          "options": [],
+          "query": "SELECT * FROM (VALUES ('London'), ('New York'), ('Washington'))",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        }
+      ]
+    },
+    "time": {
+      "from": "1992-12-11T21:00:00.000Z",
+      "to": "1992-12-13T01:00:00.000Z"
+    },
+    "timepicker": {
+      "refresh_intervals": [
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ]
+    },
+    "timezone": "",
+    "title": "Query Variables and Repetition",
+    "uid": "jng4Dei7k",
+    "version": 2
+  }

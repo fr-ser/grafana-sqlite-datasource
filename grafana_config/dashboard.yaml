@@ -1,7 +1,7 @@
 apiVersion: 1
 
 providers:
-  - name: "Sine Wave Example"
+  - name: "Test Dashboards"
     orgId: 1
     folder: ""
     type: file
