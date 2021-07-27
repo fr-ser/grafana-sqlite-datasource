@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [2.0.1-rc.1]
+## [2.0.1]
 
 This release fixes some long standing issues that prevented the right use of the alerting feature
 of the plugin even though it was enabled already.
