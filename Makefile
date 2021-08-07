@@ -124,9 +124,13 @@ package-and-zip-arm7:
 
 build: build-frontend build-backend
 
-selenium-test: bootstrap
+selenium-test:
 	@echo
-	docker-compose run --rm start-setup
+	@docker-compose rm --force --stop -v grafana
+	GRAFANA_VERSION=7.3.3 docker-compose run --rm start-setup
+	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
+	@echo
+	GRAFANA_VERSION=8.1.0 docker-compose run --rm start-setup
 	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
 	@echo
 
@@ -141,5 +145,7 @@ backend-test:
 sign:
 	yarn sign
 
-test: backend-test build-frontend build-backend sign selenium-test
+build-and-sign: build sign
+
+test: backend-test build-and-signbuild-frontend build-backend sign selenium-test
 	docker-compose down --remove-orphans --volumes --timeout=2

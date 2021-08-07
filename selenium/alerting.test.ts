@@ -2,7 +2,7 @@ const { By, until } = require('selenium-webdriver');
 
 import { getDriver, login, GRAFANA_URL } from './helpers';
 
-describe('configure', () => {
+describe('alerting', () => {
   jest.setTimeout(30000);
   let driver;
 

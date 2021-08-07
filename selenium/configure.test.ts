@@ -29,7 +29,7 @@ describe('configure', () => {
       .findElement(By.css("input[placeholder='(absolute) path to the SQLite database']"))
       .sendKeys('/app/data.db');
 
-    await driver.findElement(By.xpath(`//button[text()[contains(., "Save & Test")]]`)).click();
+    await driver.findElement(By.xpath(`//*[text()[contains(translate(., "TS", "ts"), "save & test")]]`)).click();
 
     await driver.wait(until.elementLocated(By.xpath(`//*[text()[contains(., "Data source is working")]]`)), 5 * 1000);
   });

@@ -2,7 +2,7 @@ const { By, until } = require('selenium-webdriver');
 
 import { getDriver, login, GRAFANA_URL } from './helpers';
 
-describe('configure', () => {
+describe('query variables and repetition', () => {
   jest.setTimeout(30000);
   let driver;
 
@@ -13,7 +13,7 @@ describe('configure', () => {
     await driver.get(`${GRAFANA_URL}/d/jng4Dei7k/query-variables-and-repetition`);
     await driver.wait(
       until.elementLocated(
-        By.xpath(`//div[contains(@class, 'navbar-page-btn')]//a[text()[contains(., "Query Variables and Repetition")]]`)
+        By.xpath(`//a[text()[contains(., "Query Variables and Repetition")]]`)
       ),
       5 * 1000
     );

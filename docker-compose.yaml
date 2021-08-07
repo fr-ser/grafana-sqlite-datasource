@@ -2,7 +2,7 @@ version: '3.6'
 
 services:
   grafana:
-    image: grafana/grafana:7.3.3
+    image: grafana/grafana:${GRAFANA_VERSION:-8.1.0}
     # uncomment to install a comma separated list of plugins
     # environment:
     #   GF_INSTALL_PLUGINS: grafana-worldmap-panel

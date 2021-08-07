@@ -23,6 +23,7 @@ export class DataSource extends DataSourceWithBackend<SQLiteQuery, MyDataSourceO
     const response = await this.query({
       targets: [
         {
+          refId: 'metricFindQuery',
           rawQueryText: query,
           queryText: query,
           timeColumns: [],
@@ -35,13 +36,11 @@ export class DataSource extends DataSourceWithBackend<SQLiteQuery, MyDataSourceO
     }
 
     const data = response.data[0] as DataFrame;
-
     if (data.fields.length !== 1) {
       throw new Error(
         `Received more than one (${data.fields.length}) fields: ${data.fields.map(x => x.name).join(',')}`
       );
     }
-
     return data.fields[0].values.toArray().map(text => ({ text }));
   }
 }
