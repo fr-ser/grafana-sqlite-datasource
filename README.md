@@ -17,7 +17,7 @@ Any contribution is welcome. Some information regarding the local setup can be f
 The most up to date (but also most generic) information can always be found here:
 [Grafana Website - Plugin Installation](https://grafana.com/docs/grafana/latest/plugins/installation/#install-grafana-plugins)
 
-### Installing the Plugin on an Existing Grafana With the CLI
+### Installing the Official and Released Plugin on an Existing Grafana With the CLI
 
 Grafana comes with a command line tool that can be used to install plugins.
 
@@ -27,7 +27,23 @@ Grafana comes with a command line tool that can be used to install plugins.
 4. To make sure the plugin was installed, check the list of installed datasources. Click the
    Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
-### Installing the Plugin Manually on an Existing Grafana (Most up to Date)
+### Installing the newest Plugin Version on an Existing Grafana With the CLI
+
+Grafana comes with a command line tool that can be used to install plugins.
+
+1. Run this command:
+
+   ```sh
+   # replace the $VERSION part in the URL below with the desired version (e.g. 2.0.2)
+   grafana-cli --pluginUrl https://github.com/fr-ser/grafana-sqlite-datasource/releases/download/v$VERSION/frser-sqlite-datasource-$VERSION.zip plugins install frser-sqlite-datasource
+   ```
+
+2. Restart the Grafana server.
+3. Login in with a user that has admin rights. This is needed to create datasources.
+4. To make sure the plugin was installed, check the list of installed datasources. Click the
+   Plugins item in the main menu. Both core datasources and installed datasources will appear.
+
+### Installing the Plugin Manually on an Existing Grafana
 
 If you need a version that is not released (yet) on the Grafana homepage or if the server where
 Grafana is installed has no access to the Grafana.com server, then the plugin can be downloaded
