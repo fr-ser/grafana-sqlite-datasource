@@ -30,8 +30,12 @@ describe('alerting', () => {
         .findElement(By.xpath(`//button//span[text()[contains(., "Test rule")]]`))
         .findElement(By.xpath('./..'))
         .click();
-      await driver.findElement(
-        By.xpath(`//div[contains(@class, 'json-formatter-row')]//span[text()[contains(., "no_data")]]`)
+
+      await driver.wait(
+        until.elementLocated(
+          By.xpath(`//div[contains(@class, 'json-formatter-row')]//span[text()[contains(., "no_data")]]`)
+        ),
+        5 * 1000
       );
       await driver.findElement(
         By.xpath(`//div[contains(@class, 'json-formatter-row')]//span[text()[contains(., "false = false")]]`)
@@ -48,8 +52,12 @@ describe('alerting', () => {
         .findElement(By.xpath(`//button//span[text()[contains(., "Test rule")]]`))
         .findElement(By.xpath('./..'))
         .click();
-      await driver.findElement(
-        By.xpath(`//div[contains(@class, 'json-formatter-row')]//span[text()[contains(., "pending")]]`)
+
+      await driver.wait(
+        until.elementLocated(
+          By.xpath(`//div[contains(@class, 'json-formatter-row')]//span[text()[contains(., "pending")]]`)
+        ),
+        5 * 1000
       );
       await driver.findElement(
         By.xpath(`//div[contains(@class, 'json-formatter-row')]//span[text()[contains(., "true = true")]]`)
