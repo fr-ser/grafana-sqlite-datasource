@@ -147,5 +147,5 @@ sign:
 
 build-and-sign: build sign
 
-test: backend-test build-and-signbuild-frontend build-backend sign selenium-test
+test: backend-test build-and-sign selenium-test
 	docker-compose down --remove-orphans --volumes --timeout=2

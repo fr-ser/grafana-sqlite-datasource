@@ -1,4 +1,4 @@
-const { By, Builder, error} = require('selenium-webdriver');
+const { By, Builder, error } = require('selenium-webdriver');
 const chromeDriver = require('selenium-webdriver/chrome');
 
 export const GRAFANA_URL = process.env.GRAFANA_URL || 'http://grafana:3000';
@@ -12,11 +12,11 @@ export async function login(driver) {
   await driver.findElement(By.css("button[aria-label='Login button']")).click();
   await driver.wait(async () => {
     try {
-      await driver.findElement(By.css("button[aria-label='Login button']"))
+      await driver.findElement(By.css("button[aria-label='Login button']"));
     } catch (err) {
-      if (err instanceof error.NoSuchElementError) return true
+      if (err instanceof error.NoSuchElementError) return true;
     }
-    return false
+    return false;
   }, 2 * 1000);
 }
 
@@ -26,4 +26,28 @@ export async function getDriver() {
     .setChromeOptions(new chromeDriver.Options())
     .usingServer(`http://${SELENIUM_URL}/wd/hub`)
     .build();
+}
+
+export function saveTestState(testStatus: { ok: boolean }, testFn: () => Promise<void>) {
+  return async function() {
+    try {
+      await testFn();
+      testStatus.ok = true;
+    } catch (err) {
+      testStatus.ok = false;
+      throw err;
+    }
+  };
+}
+
+export async function logHTMLOnFailure(testStatus: { ok: boolean }, driver: any) {
+  if (testStatus.ok) return;
+
+  let errorText: string;
+  try {
+    errorText = await driver.findElement(By.css('html')).getAttribute('innerHTML');
+  } catch (error) {
+    errorText = error.toString();
+  }
+  console.warn(errorText);
 }
