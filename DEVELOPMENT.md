@@ -57,5 +57,5 @@ Steps 4 and 5 are for publishing the release to Grafana repository.
 2. Tag the commit with a Semver tag, e.g. v2.2.3-rc.1
 3. Push the changes including the tag
 4. Get the md5 hash of the release from the Github Action or from the release page (text file)
-5. Create a pull request to include the plugin in the official Grafana page (updates documentation
-   and the plugin code)
+5. Within the Grafana Cloud account a request for a plugin update can be started:
+   <https://grafana.com/orgs/frser/plugins>
