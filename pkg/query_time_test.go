@@ -13,7 +13,7 @@ func TestQueryWithTimeColumn(t *testing.T) {
 	dbPath, cleanup := createTmpDB(`
 		CREATE TABLE test(time INTEGER, value REAL, name TEXT);
 		INSERT INTO test(time, value, name)
-		VALUES (21, 21.1, 'one'), (22.3, 22.2, 'two'), (23, 23.3, 'three');
+		VALUES (21.0, 21.1, 'one'), (22.3, 22.2, 'two'), (23, 23.3, 'three');
 	`)
 	defer cleanup()
 
@@ -35,7 +35,8 @@ func TestQueryWithTimeColumn(t *testing.T) {
 	expectedFrame := data.NewFrame(
 		"response",
 		data.NewField("time", nil, []*time.Time{
-			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
+			timePointer(time.Unix(21, 0)),
+			timePointer(time.Unix(22, 300000000)),
 			timePointer(time.Unix(23, 0)),
 		}),
 		data.NewField("value", nil, []*float64{
@@ -56,7 +57,8 @@ func TestQueryWithTimeStringColumn(t *testing.T) {
 	dbPath, cleanup := createTmpDB(`
 		CREATE TABLE test(time INTEGER, time_string TEXT);
 		INSERT INTO test(time, time_string)
-		VALUES	(21, '1970-01-01T00:00:21Z'), (22.3, '1970-01-01T00:00:22Z'),
+		VALUES	(21, '1970-01-01T00:00:21Z'),
+				(22.3, '1970-01-01T00:00:22.300Z'),
 				(23, '1970-01-01T00:00:23Z');
 	`)
 	defer cleanup()
@@ -79,11 +81,13 @@ func TestQueryWithTimeStringColumn(t *testing.T) {
 	expectedFrame := data.NewFrame(
 		"response",
 		data.NewField("time", nil, []*time.Time{
-			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
+			timePointer(time.Unix(21, 0)),
+			timePointer(time.Unix(22, 300000000)),
 			timePointer(time.Unix(23, 0)),
 		}),
 		data.NewField("time_string", nil, []*time.Time{
-			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
+			timePointer(time.Unix(21, 0)),
+			timePointer(time.Unix(22, 300000000)),
 			timePointer(time.Unix(23, 0)),
 		}),
 	)
@@ -122,7 +126,8 @@ func TestUnixTimestampAsString(t *testing.T) {
 	expectedFrame := data.NewFrame(
 		"response",
 		data.NewField("time", nil, []*time.Time{
-			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
+			timePointer(time.Unix(21, 0)),
+			timePointer(time.Unix(22, 300000000)),
 			timePointer(time.Unix(23, 0)),
 		}),
 	)

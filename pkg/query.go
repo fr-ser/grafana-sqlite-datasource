@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -130,14 +131,16 @@ func addTransformedRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 			if valueType == "INTEGER" {
 				value = time.Unix(intV, 0)
 			} else if valueType == "FLOAT" {
-				value = time.Unix(int64(floatV), 0)
+				seconds, milliseconds := math.Modf(floatV)
+				value = time.Unix(int64(seconds), int64(milliseconds*1000000000))
 			} else if valueType != "NULL" {
 				val := fmt.Sprintf("%v", values[i])
 				value, err = time.Parse(time.RFC3339, val)
 				if err != nil {
 					// try parsing the string as a number
 					if f, err := strconv.ParseFloat(val, 64); err == nil {
-						value = time.Unix(int64(f), 0)
+						seconds, milliseconds := math.Modf(f)
+						value = time.Unix(int64(seconds), int64(milliseconds*1000000000))
 					} else {
 						log.DefaultLogger.Warn(
 							"Could not parse (RFC3339) value to timestamp", "value", val,

@@ -19,7 +19,7 @@ func TestIgnoreNonTimeSeriesQuery(t *testing.T) {
 	dbPath, cleanup := createTmpDB(`
 		CREATE TABLE test(time INTEGER, value REAL, name TEXT);
 		INSERT INTO test(time, value, name)
-		VALUES (21, 21.1, 'one'), (22.3, 22.2, 'two'), (23, 23.3, 'three');
+		VALUES (21, 21.1, 'one'), (22.0, 22.2, 'two'), (23, 23.3, 'three');
 	`)
 	defer cleanup()
 
@@ -46,7 +46,8 @@ func TestIgnoreNonTimeSeriesQuery(t *testing.T) {
 	expectedFrame := data.NewFrame(
 		"response",
 		data.NewField("time", nil, []*time.Time{
-			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
+			timePointer(time.Unix(21, 0)),
+			timePointer(time.Unix(22, 0)),
 			timePointer(time.Unix(23, 0)),
 		}),
 		data.NewField("value", nil, []*float64{
@@ -73,7 +74,7 @@ func TestIgnoreWideTimeSeriesQuery(t *testing.T) {
 	dbPath, cleanup := createTmpDB(`
 		CREATE TABLE test(time INTEGER, value REAL);
 		INSERT INTO test(time, value)
-		VALUES (21, 21.1), (22.3, 22.2), (23, 23.3);
+		VALUES (21, 21.1), (22.0, 22.2), (23, 23.3);
 	`)
 	defer cleanup()
 
@@ -100,7 +101,8 @@ func TestIgnoreWideTimeSeriesQuery(t *testing.T) {
 	expectedFrame := data.NewFrame(
 		"value",
 		data.NewField("time", nil, []*time.Time{
-			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
+			timePointer(time.Unix(21, 0)),
+			timePointer(time.Unix(22, 0)),
 			timePointer(time.Unix(23, 0)),
 		}),
 		data.NewField("value", nil, []*float64{
