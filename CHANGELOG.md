@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.1.1]
+
+This release adds support for sub second precision for unix time.
+
+### Added
+
+- When using numeric values for a timestamp in SQLite (unix timestamp)
+  the plugin now supports precision below the second (at nanosecond precision)
+
 ## [2.1.0]
 
 This release adds the JSON extension to the compiled SQLite code.

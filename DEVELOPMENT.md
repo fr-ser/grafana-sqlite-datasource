@@ -20,7 +20,7 @@ found at:
 
 ### (First Time) Installation
 
-```BASH
+```sh
 # installing packages
 make install
 # optional: using git hooks
@@ -29,7 +29,7 @@ git config core.hooksPath githooks
 
 ### Start up Grafana
 
-```BASH
+```sh
 make build # this build the frontend and backend
 make sign # sign the plugin or allow not signed plugins in the config
 make bootstrap # credentials admin / admin123
@@ -37,7 +37,7 @@ make bootstrap # credentials admin / admin123
 
 ## Testing
 
-```BASH
+```sh
 make test
 ```
 
@@ -47,3 +47,15 @@ First start the docker environment with `make selenium-test`. This will also run
 Regardless of the tests passing the environment will stay up and running.
 
 Now you can connect to the dockerized browser via a `VNC` client/viewer (like remmina)
+
+## Release process
+
+After step 3 Github Actions should take over and create a new release.
+Steps 4 and 5 are for publishing the release to Grafana repository.
+
+1. Update the Changelog
+2. Tag the commit with a Semver tag, e.g. v2.2.3-rc.1
+3. Push the changes including the tag
+4. Get the md5 hash of the release from the Github Action or from the release page (text file)
+5. Create a pull request to include the plugin in the official Grafana page (updates documentation
+   and the plugin code)
