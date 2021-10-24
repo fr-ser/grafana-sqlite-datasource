@@ -5,19 +5,16 @@
 [![Test Branch](https://github.com/fr-ser/grafana-sqlite-datasource/workflows/Test%20Branch/badge.svg)](https://github.com/fr-ser/grafana-sqlite-datasource/actions)
 [![Test Release](https://github.com/fr-ser/grafana-sqlite-datasource/workflows/Test%20Release/badge.svg)](https://github.com/fr-ser/grafana-sqlite-datasource/actions)
 
-This is a Grafana backend plugin to allow using a SQLite database as a data source.
-
-## Development and Contributing
-
-Any contribution is welcome. Some information regarding the local setup can be found in the
-[DEVELOPMENT.md file](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/DEVELOPMENT.md).
+This is a Grafana backend plugin to allow using an SQLite database as a data source.
+The SQLite database needs to be accessible to the filesystem of the device where Grafana itself
+is running.
 
 ## Plugin Installation
 
 The most up to date (but also most generic) information can always be found here:
 [Grafana Website - Plugin Installation](https://grafana.com/docs/grafana/latest/plugins/installation/#install-grafana-plugins)
 
-### Installing the Official and Released Plugin on an Existing Grafana With the CLI
+### Recommended: Installing the Official and Released Plugin on an Existing Grafana With the CLI
 
 Grafana comes with a command line tool that can be used to install plugins.
 
@@ -27,9 +24,10 @@ Grafana comes with a command line tool that can be used to install plugins.
 4. To make sure the plugin was installed, check the list of installed datasources. Click the
    Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
-### Installing the newest Plugin Version on an Existing Grafana With the CLI
+### Latest Version: Installing the newest Plugin Version on an Existing Grafana With the CLI
 
-Grafana comes with a command line tool that can be used to install plugins.
+The grafana-cli can also install plugins from a non-standard URL. This way even plugin versions,
+that are not (yet) released to the official Grafana repository can be installed.
 
 1. Run this command:
 
@@ -38,16 +36,11 @@ Grafana comes with a command line tool that can be used to install plugins.
    grafana-cli --pluginUrl https://github.com/fr-ser/grafana-sqlite-datasource/releases/download/v$VERSION/frser-sqlite-datasource-$VERSION.zip plugins install frser-sqlite-datasource
    ```
 
-2. Restart the Grafana server.
-3. Login in with a user that has admin rights. This is needed to create datasources.
-4. To make sure the plugin was installed, check the list of installed datasources. Click the
-   Plugins item in the main menu. Both core datasources and installed datasources will appear.
+2. See the recommended installation above (from the restart step)
 
-### Installing the Plugin Manually on an Existing Grafana
+### Manual: Installing the Plugin Manually on an Existing Grafana
 
-If you need a version that is not released (yet) on the Grafana homepage or if the server where
-Grafana is installed has no access to the Grafana.com server, then the plugin can be downloaded
-and manually copied to the server.
+In case the grafana-cli does not work for whatever reason plugins can also be installed manually.
 
 1. Get the zip file from [Latest release on Github](https://github.com/fr-ser/grafana-sqlite-datasource/releases/latest)
 2. Extract the zip file into the data/plugins subdirectory for Grafana:
@@ -55,18 +48,7 @@ and manually copied to the server.
 
    Finding the plugin directory can sometimes be a challenge as this is platform and settings
    dependent. A common location for this on Linux devices is `/var/lib/grafana/plugins/`
-3. Restart the Grafana server
-4. To make sure the plugin was installed, check the list of installed datasources. Click the
-   Plugins item in the main menu. Both core datasources and installed datasources will appear.
-
-### ARMv7 / Raspberry Pi 2 Mod. B Support
-
-Many programs for ARMv6 (the default 32bit ARM version of this plugin) can run on ARMv7 machines
-(the version running on Raspberry Pi 2 Mod. B).
-In case there are complications you can try out the version specifically built for ARMv7, though.
-
-A plugin version specifically built for ARMv7 devices can be found on the Github release page (see
-manual installation above).
+3. See the recommended installation above (from the restart step)
 
 ## Configuring the Datasource in Grafana
 
@@ -78,10 +60,10 @@ The only required configuration is the path to the SQLite database (local path o
 
 ## Support for Time Formatted Columns
 
-SQLite has no native "time" format. It actually relies on strings and numbers. Since especially
-for time series Grafana expects an actual time type, however, the plugin provides a way to infer
-a real timestamp. This can be set in the query editor by providing the name of the column, which
-should be reformatted to a timestamp.
+SQLite has no native "time" format. It relies on strings and numbers for time and dates. Since
+especially for time series Grafana expects an actual time type, however, the plugin provides a way
+to infer a real timestamp. This can be set in the query editor by providing the name of the column,
+which should be reformatted to a timestamp.
 
 The plugin supports two different inputs that can be converted to a "time" depending on the type
 of the value in the column, that should be formatted as "time":
@@ -107,10 +89,10 @@ SELECT datetime, value FROM converted ORDER BY datetime ASC
 
 ## Macros
 
-This plugins supports plugins inspired by the built-in Grafana datasources (e.g.
+This plugins supports macros inspired by the built-in Grafana datasources (e.g.
 <https://grafana.com/docs/grafana/latest/datasources/postgres/#macros>).
 
-However, as each macro needs to be re-implemented from scratch only the following macros are
+However, as each macro needs to be re-implemented from scratch, only the following macros are
 supported. Other macros (that you might expect from other SQL databases) do not work
 
 ### $__unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds)
@@ -124,18 +106,32 @@ Will be replaced by an expression usable in GROUP BY clause. For example:
 
 Example: `$__unixEpochGroupSeconds(timestamp, 10, NULL)`
 
-Same as above but with a fill parameter so missing points in that series will be added by grafana
+Same as above but with a fill parameter so missing points in that series will be added for Grafana
 and `NULL` will be used as value.
 
 In case multiple time columns are provided the first one is chosen as the column to determine the
-gap filling. "First" in this context means first in the SELECT statement. This column to have no
-NULL values and must be ordered ascending.
+gap filling. "First" in this context means first in the SELECT statement. This column needs to have
+no NULL values and must sorted in ascending order.
 
 ## Alerting
 
-This plugins supports the Grafana alerting feature. As with the built in data sources alerting
+This plugins supports the Grafana alerting feature. Similar to the built in data sources alerting
 does not support variables as they are normally replaced in the frontend, which is not involved
 for the alerts. In order to allow time filtering this plugin supports the variables `$__from` and
-`$__to`. For more info about those variables see here:
+`$__to`. For more information about those variables see here:
 <https://grafana.com/docs/grafana/latest/variables/variable-types/global-variables/#__from-and-__to>.
 Formatting of those variables (e.g. `${__from:date:iso}`) is not supported for alerts, however.
+
+### ARMv7 / Raspberry Pi 2 Mod. B Support
+
+Many programs for ARMv6 (the default 32bit ARM version of this plugin) can run on ARMv7 machines
+(the version running on Raspberry Pi 2 Mod. B).
+In case there are complications you can try out the version specifically built for ARMv7, though.
+
+A plugin version specifically built for ARMv7 devices can be found on the Github release page (see
+manual installation above).
+
+## Development and Contributing
+
+Any contribution is welcome. Some information regarding the local setup can be found in the
+[DEVELOPMENT.md file](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/DEVELOPMENT.md).
