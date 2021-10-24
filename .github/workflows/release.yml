@@ -218,10 +218,15 @@ jobs:
           md5sum ${{ steps.metadata.outputs.archive }}
           md5sum ${{ steps.metadata.outputs.archive-arm7 }} > ${{ steps.metadata.outputs.archive-arm7 }}.md5
 
-      - name: Read changelog
-        id: changelog
+      - name: Set release notes
+        id: set_release_notes
         run: |
-          awk '/^## / {s++} s == 1 {print}' CHANGELOG.md > release_notes.md
+          sed 's/$VERSION/${{ steps.get_version.outputs.version }}/g' release_template.md > release_notes.md
+
+          awk '/^## / {s++} s == 1 {print}' CHANGELOG.md > changelog_extract.md
+          # skip the first two lines
+          tail -n +3 "$FILE" >> release_notes.md
+
           echo "::set-output name=path::release_notes.md"
 
       - name: Check prerelease
@@ -241,7 +246,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          body_path: ${{ steps.changelog.outputs.path }}
+          body_path: ${{ steps.set_release_notes.outputs.path }}
           prerelease: ${{ steps.check_prerelease.outputs.is_prerelease }}
 
       - name: Add arm7 plugin to release
