@@ -1,0 +1,538 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+'
+
+jobs:
+
+  test-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: Run tests
+        run: make backend-test
+
+  test-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 12.18.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.18.x
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: test frontend
+        run: make frontend-test
+
+  build-plugin-go:
+    if: ${{ startsWith( github.ref, 'refs/heads/' ) }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build linux version
+        run: make build-backend
+      - name: Upload linux binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-executable
+          path: ./dist/gpx_sqlite-datasource_linux_amd64
+
+  test-selenium-local:
+    if: ${{ startsWith( github.ref, 'refs/heads/' ) }}
+    runs-on: ubuntu-latest
+    needs:
+      - test-backend
+      - test-frontend
+      - build-plugin-go
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Use Node.js 12.18.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.18.x
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Build frontend
+        run: make build-frontend
+      - name: Download linux binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-executable
+          path: ./dist/
+      - name: sign plugin
+        env:
+          GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
+        run: chmod +x ./dist/gpx_* && yarn sign
+      - name: Run Selenium Tests
+        run: make selenium-test
+      - name: Debug Logs
+        if: ${{ failure() }}
+        run: docker-compose logs grafana
+
+  build-arm6:
+    if: ${{ startsWith( github.ref, 'refs/tags/' ) }}
+    runs-on: ubuntu-latest
+    needs:
+      - test-backend
+      - test-frontend
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: build backend plugin
+        run: make build-backend-cross-linux-arm6
+      - name: Upload dist folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-arm6
+          path: ./dist/
+
+  build-arm7:
+    if: ${{ startsWith( github.ref, 'refs/tags/' ) }}
+    runs-on: ubuntu-latest
+    needs:
+      - test-backend
+      - test-frontend
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: build backend plugin
+        run: make build-backend-cross-linux-arm7
+      - name: Upload dist folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-arm7
+          path: ./dist/
+
+  build-arm64:
+    if: ${{ startsWith( github.ref, 'refs/tags/' ) }}
+    runs-on: ubuntu-latest
+    needs:
+      - test-backend
+      - test-frontend
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: build backend plugin
+        run: make build-backend-cross-linux-arm64
+      - name: Upload dist folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-arm64
+          path: ./dist/
+
+  build-linux64:
+    if: ${{ startsWith( github.ref, 'refs/tags/' ) }}
+    runs-on: ubuntu-latest
+    needs:
+      - test-backend
+      - test-frontend
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build linux version
+        run: make build-backend
+      - name: Upload linux binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-linux64
+          path: ./dist/
+
+  build-windows64:
+    if: ${{ startsWith( github.ref, 'refs/tags/' ) }}
+    runs-on: windows-latest
+    needs:
+      - test-backend
+      - test-frontend
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build windows version
+        run: make build-backend
+      - name: Upload windows binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-windows64
+          path: ./dist/
+
+  build-darwin64:
+    if: ${{ startsWith( github.ref, 'refs/tags/' ) }}
+    runs-on: macos-latest
+    needs:
+      - test-backend
+      - test-frontend
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install go dependencies
+        run: make install-go
+      - name: build darwin version
+        run: make build-backend
+      - name: Upload darwin binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-darwin64
+          path: ./dist/
+
+  create-artifacts:
+    runs-on: ubuntu-latest
+    needs:
+      - build-arm6
+      - build-arm7
+      - build-arm64
+      - build-linux64
+      - build-windows64
+      - build-darwin64
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get metadata about the plugin
+        id: metadata
+        run: |
+          export PLUGIN_VERSION=${GITHUB_REF#refs/tags/v}
+          export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
+          export PLUGIN_ARTIFACT_ARM7=frser-sqlite-datasource-arm7-${PLUGIN_VERSION}.zip
+          echo "::set-output name=version::${PLUGIN_VERSION}"
+          echo "::set-output name=archive::${PLUGIN_ARTIFACT}"
+          echo "::set-output name=archive-arm7::${PLUGIN_ARTIFACT_ARM7}"
+
+      - name: Use Node.js 12.18.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.18.x
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build frontend
+        run: |
+          npm version ${{ steps.metadata.outputs.version }} --no-git-tag-version
+          make build-frontend
+
+      - name: Download arm7 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-arm7
+          path: ./dist/
+      - name: package-and-zip-arm7
+        run: |
+          make package-and-zip-arm7
+          md5sum ${{ steps.metadata.outputs.archive-arm7 }}
+        env:
+          GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
+      - name: Upload plugin package arm7
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-package-arm7
+          path: ${{ steps.metadata.outputs.archive-arm7 }}
+
+      - name: Download linux64 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-linux64
+          path: ./dist/
+      - name: Download arm6 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-arm6
+          path: ./dist/
+      - name: Download arm64 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-arm64
+          path: ./dist/
+      - name: Download windows64 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-windows64
+          path: ./dist/
+      - name: Download darwin64 binary
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-darwin64
+          path: ./dist/
+      - name: package-and-zip
+        env:
+          GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
+        run: |
+          make package-and-zip
+      - name: Upload plugin package
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin-package
+          path: ${{ steps.metadata.outputs.archive }}
+
+  # testing on macos is currently not done as docker is not available on the macos runner
+  test-selenium-release-linux:
+    runs-on: ubuntu-latest
+    needs:
+      - create-artifacts
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Get metadata about the plugin
+        id: metadata
+        run: |
+          export PLUGIN_VERSION=${GITHUB_REF#refs/tags/v}
+          export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
+          export PLUGIN_ARTIFACT_ARM7=frser-sqlite-datasource-arm7-${PLUGIN_VERSION}.zip
+          echo "::set-output name=version::${PLUGIN_VERSION}"
+          echo "::set-output name=archive::${PLUGIN_ARTIFACT}"
+          echo "::set-output name=archive-arm7::${PLUGIN_ARTIFACT_ARM7}"
+      
+      - name: Download plugin package
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-package
+          path: ./
+      - name: unzip plugin
+        run: unzip ${{ steps.metadata.outputs.archive }} && mv frser-sqlite-datasource dist
+      
+      - name: Use Node.js 12.18.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.18.x
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Run Selenium Tests
+        run: make selenium-test
+      - name: Debug Logs
+        if: ${{ failure() }}
+        run: docker-compose logs grafana
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs:
+      - test-selenium-release-linux
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get metadata about the plugin
+        id: metadata
+        run: |
+          export PLUGIN_VERSION=${GITHUB_REF#refs/tags/v}
+          export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
+          export PLUGIN_ARTIFACT_ARM7=frser-sqlite-datasource-arm7-${PLUGIN_VERSION}.zip
+          echo "::set-output name=version::${PLUGIN_VERSION}"
+          echo "::set-output name=archive::${PLUGIN_ARTIFACT}"
+          echo "::set-output name=archive-arm7::${PLUGIN_ARTIFACT_ARM7}"
+
+      - name: Check changelog
+        run: |
+          if ! grep -q -F "## [${{ steps.metadata.outputs.version }}]" CHANGELOG.md; then
+            echo "Error: The latest (## [${{ steps.metadata.outputs.version }}]) tag was not found in the CHANGELOG.md." 1>&2
+            exit 1
+          fi
+
+      - name: Download plugin package
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-package
+          path: ./
+      - name: Download plugin package
+        uses: actions/download-artifact@v2
+        with:
+          name: plugin-package-arm7
+          path: ./
+      - name: create md5 hashes
+        run: |
+          md5sum ${{ steps.metadata.outputs.archive }} > ${{ steps.metadata.outputs.archive }}.md5
+          md5sum ${{ steps.metadata.outputs.archive-arm7 }} > ${{ steps.metadata.outputs.archive-arm7 }}.md5
+
+      - name: Set release notes
+        id: set_release_notes
+        run: |
+          sed 's/$VERSION/${{ steps.metadata.outputs.version }}/g' release_template.md > release_notes.md
+
+          awk '/^## / {s++} s == 1 {print}' CHANGELOG.md > changelog_extract.md
+          # skip the first two lines
+          tail -n +3 changelog_extract.md >> release_notes.md
+
+          echo "::set-output name=path::release_notes.md"
+
+      - name: Check prerelease
+        id: check_prerelease
+        run: |
+          if [[ ${{ github.ref }} =~ "rc" ]]; then
+            echo "::set-output name=is_prerelease::true"
+          else
+            echo "::set-output name=is_prerelease::false"
+          fi
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body_path: ${{ steps.set_release_notes.outputs.path }}
+          prerelease: ${{ steps.check_prerelease.outputs.is_prerelease }}
+
+      - name: Add arm7 plugin to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ steps.metadata.outputs.archive-arm7 }}
+          asset_name: ${{ steps.metadata.outputs.archive-arm7 }}
+          asset_content_type: application/zip
+
+      - name: Add arm7 checksum to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ steps.metadata.outputs.archive-arm7 }}.md5
+          asset_name: ${{ steps.metadata.outputs.archive-arm7 }}.md5
+          asset_content_type: text/plain
+
+      - name: Add plugin to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ steps.metadata.outputs.archive }}
+          asset_name: ${{ steps.metadata.outputs.archive }}
+          asset_content_type: application/zip
+
+      - name: Add checksum to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ steps.metadata.outputs.archive }}.md5
+          asset_name: ${{ steps.metadata.outputs.archive }}.md5
+          asset_content_type: text/plain

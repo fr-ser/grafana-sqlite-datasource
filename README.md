@@ -2,8 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![stability-stable](https://img.shields.io/badge/stability-stable-green.svg)
-[![Test Branch](https://github.com/fr-ser/grafana-sqlite-datasource/workflows/Test%20Branch/badge.svg)](https://github.com/fr-ser/grafana-sqlite-datasource/actions)
-[![Test Release](https://github.com/fr-ser/grafana-sqlite-datasource/workflows/Test%20Release/badge.svg)](https://github.com/fr-ser/grafana-sqlite-datasource/actions)
+[![CI](https://github.com/fr-ser/grafana-sqlite-datasource/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/fr-ser/grafana-sqlite-datasource/actions/workflows/ci_cd.yml)
 
 This is a Grafana backend plugin to allow using an SQLite database as a data source.
 The SQLite database needs to be accessible to the filesystem of the device where Grafana itself

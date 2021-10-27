@@ -39,35 +39,35 @@ else
 endif
 
 build-backend-cross-win64:
-	@docker build -t cross-build ./build
+	docker build -t cross-build ./build
 
-	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
+	docker run -t -v "$${PWD}":/usr/src/app -w /usr/src/app \
 		-e CGO_ENABLED=1 -e GOOS=windows -e GOARCH=amd64 -e  CC=x86_64-w64-mingw32-gcc \
 		cross-build \
-		go build -o dist/gpx_sqlite-datasource_windows_amd64.exe \
+		go build -x -o dist/gpx_sqlite-datasource_windows_amd64.exe \
 		-ldflags '-w -s -extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
 
 build-backend-cross-linux64:
-	@docker build -t cross-build ./build
+	docker build -t cross-build ./build
 
-	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
+	docker run -t -v "$${PWD}":/usr/src/app -w /usr/src/app \
 		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=amd64 \
 		cross-build \
-		go build -o dist/gpx_sqlite-datasource_linux_amd64 \
+		go build -x -o dist/gpx_sqlite-datasource_linux_amd64 \
 		-ldflags '-w -s -extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
 
 build-backend-cross-linux-arm6:
-	@docker build -t cross-build ./build
+	docker build -t cross-build ./build
 
-	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
+	docker run -t -v "$${PWD}":/usr/src/app -w /usr/src/app \
 		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm \
 		-e CC=/opt/rpi-tools/arm-bcm2708/arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc \
 		cross-build \
-		go build -o dist/gpx_sqlite-datasource_linux_arm6 \
+		go build -x -o dist/gpx_sqlite-datasource_linux_arm6 \
 		-ldflags '-w -s -extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
@@ -75,11 +75,11 @@ build-backend-cross-linux-arm6:
 build-backend-cross-linux-arm7:
 	docker build -t cross-build ./build
 
-	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
+	docker run -t -v "$${PWD}":/usr/src/app -w /usr/src/app \
 		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm \
 		-e CC=arm-linux-gnueabihf-gcc \
 		cross-build \
-		go build -o dist/gpx_sqlite-datasource_linux_arm7 \
+		go build -x -o dist/gpx_sqlite-datasource_linux_arm7 \
 		-ldflags '-w -s -extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
@@ -87,10 +87,10 @@ build-backend-cross-linux-arm7:
 build-backend-cross-linux-arm64:
 	docker build -t cross-build ./build
 
-	docker run -v "$${PWD}":/usr/src/app -w /usr/src/app \
+	docker run -t -v "$${PWD}":/usr/src/app -w /usr/src/app \
 		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm64 -e CC=aarch64-linux-gnu-gcc \
 		cross-build \
-		go build -o dist/gpx_sqlite-datasource_linux_arm64 \
+		go build -x -o dist/gpx_sqlite-datasource_linux_arm64 \
 		-ldflags '-w -s -extldflags "-static"' \
 		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
