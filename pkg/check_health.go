@@ -32,7 +32,8 @@ func checkIsDB(path string) (bool, error) {
 		if sqliteErr.Code == sqlite3.ErrNotADB {
 			return false, nil
 		}
-	} else if err != nil {
+	}
+	if err != nil {
 		return false, err
 	}
 
@@ -72,7 +73,7 @@ func (td *SQLiteDatasource) CheckHealth(ctx context.Context, req *backend.CheckH
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
 			Message: fmt.Sprintf("error checking db: %s", err),
-		}, err
+		}, nil
 	} else if !isDB {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
