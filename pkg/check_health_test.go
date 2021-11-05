@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"testing"
 
@@ -16,7 +17,7 @@ import (
 var ctx = context.Background()
 
 func getReqWithPath(path string) *backend.CheckHealthRequest {
-	jsonConfig := fmt.Sprintf(`{"path": "%s"}`, path)
+	jsonConfig := fmt.Sprintf(`{"pathPrefix":"file:", "path": "%s"}`, path)
 
 	return &backend.CheckHealthRequest{
 		PluginContext: backend.PluginContext{
@@ -51,8 +52,12 @@ func TestCheckHealthShouldPassForADB(t *testing.T) {
 }
 
 func TestCheckHealthShouldFailIfNoFileExists(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "test-check-db")
+	defer os.RemoveAll(dir)
+	notExistingDbPath := filepath.Join(dir, "my.db")
+
 	ds := SQLiteDatasource{}
-	result, err := ds.CheckHealth(ctx, getReqWithPath("hello"))
+	result, err := ds.CheckHealth(ctx, getReqWithPath(notExistingDbPath))
 	if err != nil {
 		t.Errorf("Unexpected error - %s", err)
 	}
@@ -60,8 +65,13 @@ func TestCheckHealthShouldFailIfNoFileExists(t *testing.T) {
 	if result.Status != backend.HealthStatusError {
 		t.Errorf("Expected HealthStatusError, but got - %s", result.Status)
 	}
-	if result.Message != "No file found at: 'hello'" {
+	if !strings.Contains(result.Message, "no such file or directory") {
 		t.Errorf("Unexpected error message: %s", result.Message)
+	}
+
+	_, err = os.Stat(notExistingDbPath)
+	if !os.IsNotExist(err) {
+		t.Errorf("File was created during check")
 	}
 }
 

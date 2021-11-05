@@ -4,24 +4,26 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
+	"strings"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/mattn/go-sqlite3"
 )
 
-func checkDbExists(path string) (bool, error) {
-	info, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false, nil
-	} else if err != nil {
-		return false, err
+func checkDB(pathPrefix string, path string, options string) (bool, error) {
+	// to avoid creating a file during this check if it did not exist we try to append the
+	// read only mode. We do not overwrite an existing mode setting, however.
+	// if the pathPrefix is not "file:", this readonly mode setting has no effect
+	var finalOptions string
+	if options == "" {
+		finalOptions = "mode=ro"
+	} else if !strings.Contains(options, "mode") {
+		finalOptions = finalOptions + "&mode=ro"
+	} else {
+		finalOptions = options
 	}
-	return !info.IsDir(), nil
-}
 
-func checkIsDB(path string) (bool, error) {
-	db, err := sql.Open("sqlite3", path)
+	db, err := sql.Open("sqlite3", pathPrefix+path+"?"+finalOptions)
 	if err != nil {
 		return false, err
 	}
@@ -55,20 +57,7 @@ func (td *SQLiteDatasource) CheckHealth(ctx context.Context, req *backend.CheckH
 		}, nil
 	}
 
-	dbExists, err := checkDbExists(config.Path)
-	if err != nil {
-		return &backend.CheckHealthResult{
-			Status:  backend.HealthStatusError,
-			Message: fmt.Sprintf("error checking existence: %s", err),
-		}, nil
-	} else if !dbExists {
-		return &backend.CheckHealthResult{
-			Status:  backend.HealthStatusError,
-			Message: fmt.Sprintf("No file found at: '%s'", config.Path),
-		}, nil
-	}
-
-	isDB, err := checkIsDB(config.Path)
+	isDB, err := checkDB(config.PathPrefix, config.Path, config.PathOptions)
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,

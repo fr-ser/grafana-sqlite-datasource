@@ -19,8 +19,12 @@ export const defaultQuery: Partial<SQLiteQuery> = {
 };
 
 /**
- * These are options configured for each DataSource instance
+ * These are options configured for each DataSource instance.
+ * The values are optional because by default Grafana provides an empty
+ * object (e.g. when adding a new data source)
  */
 export interface MyDataSourceOptions extends DataSourceJsonData {
   path?: string;
+  pathPrefix?: string;
+  pathOptions?: string;
 }

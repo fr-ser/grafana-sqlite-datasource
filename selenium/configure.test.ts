@@ -29,13 +29,8 @@ describe('configure', () => {
       await driver.wait(until.elementLocated(By.css('div.add-data-source-category')), 5 * 1000);
       await driver.findElement(By.css("div.add-data-source-item[aria-label='Data source plugin item SQLite']")).click();
 
-      await driver.wait(
-        until.elementLocated(By.css("input[placeholder='(absolute) path to the SQLite database']")),
-        5 * 1000
-      );
-      await driver
-        .findElement(By.css("input[placeholder='(absolute) path to the SQLite database']"))
-        .sendKeys('/app/data.db');
+      await driver.wait(until.elementLocated(By.css("input[placeholder='/path/to/the/database.db']")), 5 * 1000);
+      await driver.findElement(By.css("input[placeholder='/path/to/the/database.db']")).sendKeys('/app/data.db');
 
       await driver.findElement(By.xpath(`//*[text()[contains(translate(., "TS", "ts"), "save & test")]]`)).click();
 

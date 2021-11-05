@@ -27,7 +27,9 @@ func newDatasource() datasource.ServeOpts {
 }
 
 type pluginConfig struct {
-	Path string
+	Path        string
+	PathOptions string
+	PathPrefix  string
 }
 
 func getConfig(settings *backend.DataSourceInstanceSettings) (pluginConfig, error) {
@@ -49,7 +51,7 @@ type SQLiteDatasource struct {
 }
 
 // QueryData handles multiple queries and returns multiple responses.
-// req contains the queries []DataQuery (where each query contains RefID as a unique identifer).
+// req contains the queries []DataQuery (where each query contains RefID as a unique identifier).
 // The QueryDataResponse contains a map of RefID to the response for each query, and each response
 // contains Frames ([]*Frame).
 func (td *SQLiteDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (

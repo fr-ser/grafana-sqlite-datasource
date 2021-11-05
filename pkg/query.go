@@ -235,9 +235,9 @@ func addTransformedRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 	return nil
 }
 
-func fetchData(dbPath string, queryConfig *queryConfigStruct) (columns []*sqlColumn, err error) {
+func fetchData(dbPathPrefix string, dbPath string, dbPathOptions string, queryConfig *queryConfigStruct) (columns []*sqlColumn, err error) {
 
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite3", dbPathPrefix+dbPath+"?"+dbPathOptions)
 	if err != nil {
 		log.DefaultLogger.Error("Could not open database", "err", err)
 		return columns, err
@@ -349,7 +349,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 	}
 	log.DefaultLogger.Debug("Macros applied")
 
-	columns, err := fetchData(config.Path, &queryConfig)
+	columns, err := fetchData(config.PathPrefix, config.Path, config.PathOptions, &queryConfig)
 	if err != nil {
 		response.Error = err
 		return response
