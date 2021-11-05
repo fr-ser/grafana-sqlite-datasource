@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.2.0-rc.1]
+
+The plugin now supports adding a Path Prefix and Options to the SQLite connection string.
+
+### Added
+
+- Ability to provide a prefix and options in the connection string. For examples see here:
+  <https://github.com/mattn/go-sqlite3#connection-string>
+
+### Changed
+
+- slightly changed the Plugin Health Check (when adding the data source) to provide better error
+  messages.
+
 ## [2.1.1]
 
 This release adds support for sub second precision for unix time.
