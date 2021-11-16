@@ -104,7 +104,7 @@ func addTransformedRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 		case nil:
 			valueType = "NULL"
 		default:
-			log.DefaultLogger.Warn(
+			log.DefaultLogger.Debug(
 				"Scanned row value type was unexpected",
 				"value", values[i], "type", fmt.Sprintf("%T", values[i]),
 				"column", column.Name,
@@ -168,7 +168,7 @@ func addTransformedRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 			} else {
 				value, err = strconv.ParseInt(string(stringV), 10, 64)
 				if err != nil {
-					log.DefaultLogger.Warn("Could not convert value to int", "value", stringV)
+					log.DefaultLogger.Debug("Could not convert value to int", "value", stringV)
 					setNull = true
 				}
 			}
@@ -192,7 +192,7 @@ func addTransformedRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 				value, err = strconv.ParseFloat(string(stringV), 64)
 
 				if err != nil {
-					log.DefaultLogger.Warn("Could not convert value to float", "value", stringV)
+					log.DefaultLogger.Debug("Could not convert value to float", "value", stringV)
 					setNull = true
 				}
 			}
