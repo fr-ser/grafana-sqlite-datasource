@@ -67,8 +67,9 @@ which should be reformatted to a timestamp.
 The plugin supports two different inputs that can be converted to a "time" depending on the type
 of the value in the column, that should be formatted as "time":
 
-1. **A number input**: It is assumed to be a unix timestamp / unix epoch and will be converted to
-   an integer before converting it to a timestamp.
+1. **A number input**: It is assumed to be a unix timestamp / unix epoch. This represents time in
+   the number of **seconds** (make sure your timestamp is not in milliseconds). More information is
+   here: <https://en.wikipedia.org/wiki/Unix_time>
 
 2. **A string input**: The value is expected to be formatted in accordance with **RFC3339**,
    e.g. `"2006-01-02T15:04:05Z07:00"`. Edge cases might occur and the parsing library used is the
