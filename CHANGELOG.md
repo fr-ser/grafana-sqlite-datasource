@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.2.1]
+
+### Added
+
+- An additional option `securePathOptions` has been added in case the user wants to protect some
+  options (typically credentials). For examples see here:
+  <https://github.com/mattn/go-sqlite3#connection-string>
+
 ## [2.2.0]
 
 The plugin now supports adding a Path Prefix and Options to the SQLite connection string.

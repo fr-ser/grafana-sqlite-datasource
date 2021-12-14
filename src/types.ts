@@ -28,3 +28,6 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
   pathPrefix?: string;
   pathOptions?: string;
 }
+export interface MySecureJsonData {
+  securePathOptions?: string;
+}

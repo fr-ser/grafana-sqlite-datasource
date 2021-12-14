@@ -38,6 +38,15 @@ func getConfig(settings *backend.DataSourceInstanceSettings) (pluginConfig, erro
 	if err != nil {
 		return config, err
 	}
+
+	if securePathOptions, exists := settings.DecryptedSecureJSONData["securePathOptions"]; exists {
+		if config.PathOptions == "" {
+			config.PathOptions = securePathOptions
+		} else {
+			config.PathOptions = config.PathOptions + "&" + securePathOptions
+		}
+	}
+
 	return config, nil
 }
 

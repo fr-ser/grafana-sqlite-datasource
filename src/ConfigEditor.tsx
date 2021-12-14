@@ -1,11 +1,12 @@
 import React, { ChangeEvent, PureComponent } from 'react';
 import { LegacyForms } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { MyDataSourceOptions } from './types';
+
+import { MyDataSourceOptions, MySecureJsonData } from './types';
 
 const { FormField } = LegacyForms;
 
-interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions> {}
+interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions, MySecureJsonData> {}
 
 interface State {}
 
@@ -18,6 +19,7 @@ export class ConfigEditor extends PureComponent<Props, State> {
     };
     onOptionsChange({ ...options, jsonData });
   };
+
   onPathOptionsChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { onOptionsChange, options } = this.props;
     const jsonData = {
@@ -25,6 +27,16 @@ export class ConfigEditor extends PureComponent<Props, State> {
       pathOptions: event.target.value,
     };
     onOptionsChange({ ...options, jsonData });
+  };
+
+  onSecurePathOptionsChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onOptionsChange, options } = this.props;
+    onOptionsChange({
+      ...options,
+      secureJsonData: {
+        securePathOptions: event.target.value,
+      },
+    });
   };
 
   onPathChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +50,7 @@ export class ConfigEditor extends PureComponent<Props, State> {
 
   render() {
     const { options } = this.props;
-    const { jsonData } = options;
+    const { jsonData, secureJsonFields, secureJsonData } = options;
     if (jsonData.pathPrefix === undefined) {
       jsonData.pathPrefix = 'file:';
     }
@@ -76,13 +88,27 @@ export class ConfigEditor extends PureComponent<Props, State> {
             label="Path Options"
             tooltip={
               'This string is appended to the path (after adding a "?") when opening the ' +
-              'database. A typical example is "mode=ro" (without the quotes) for readonly mode'
+              'database. A typical example is "mode=ro" (without the quotes) for readonly mode.'
             }
             labelWidth={10}
             inputWidth={20}
             onChange={this.onPathOptionsChange}
             value={jsonData.pathOptions || ''}
             placeholder="mode=ro&_ignore_check_constraints=1"
+          />
+        </div>
+        <div className="gf-form">
+          <FormField
+            label="Secure Path Options"
+            tooltip={
+              'This is combined with the regular path options. Typical for the secure options ' +
+              'are credentials (options starting with _auth).'
+            }
+            labelWidth={10}
+            inputWidth={20}
+            placeholder={secureJsonFields?.securePathOptions ? 'configured' : ''}
+            value={secureJsonData?.securePathOptions ?? ''}
+            onChange={this.onSecurePathOptionsChange}
           />
         </div>
       </div>
