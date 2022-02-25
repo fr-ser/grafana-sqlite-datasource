@@ -1,6 +1,24 @@
 UNAME_OS := $(shell uname -s)
 UNAME_ARC := $(shell uname -m)
 
+os_suffix :=
+static_linking := -ldflags '-extldflags "-static"'
+ifeq ($(UNAME_OS), Linux)
+os_name := linux
+else ifeq ($(UNAME_OS), Darwin)
+os_name := darwin
+# to get it working the below arguments are removed (no static linking)
+static_linking :=
+else
+os_name := windows
+os_suffix := .exe
+endif
+ifeq ($(UNAME_ARC), arm64)
+arc_name := arm64
+else
+arc_name := amd64
+endif
+
 help:
 	@grep -B1 -E "^[a-zA-Z0-9_-]+\:([^\=]|$$)" Makefile \
 		| grep -v -- -- \
@@ -30,26 +48,10 @@ teardown:
 
 #: Build the backend for the local architecture
 build-backend:
-ifeq ($(UNAME_OS), Linux)
 	CGO_ENABLED=1 go build \
-		-o dist/gpx_sqlite-datasource_linux_amd64 \
-		-ldflags '-extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
+		-o dist/gpx_sqlite-datasource_$(os_name)_$(arc_name)$(os_suffix) \
+		$(static_linking) -tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
-else ifeq ($(UNAME_OS), Darwin)
-	# to get it working the below arguments are removed (no static linking):
-	# -ldflags '-extldflags "-static"'
-	CGO_ENABLED=1 go build \
-		-o dist/gpx_sqlite-datasource_darwin_amd64 \
-		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
-		./pkg
-else
-	CGO_ENABLED=1 go build \
-		-o dist/gpx_sqlite-datasource_windows_amd64.exe \
-		-ldflags '-extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
-		./pkg
-endif
 
 build-backend-cross-win64:
 	docker build -t cross-build ./build
