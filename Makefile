@@ -1,21 +1,34 @@
 UNAME_OS := $(shell uname -s)
 UNAME_ARC := $(shell uname -m)
 
+help:
+	@grep -B1 -E "^[a-zA-Z0-9_-]+\:([^\=]|$$)" Makefile \
+		| grep -v -- -- \
+		| sed 'N;s/\n/###/' \
+		| sed -n 's/^#: \(.*\)###\(.*\):.*/\2:###\1/p' \
+		| column -t  -s '###'
+
+#: Install go dependencies
 install-go:
 	go mod download
 
+#: Install Javascript dependencies
 install-yarn:
 	yarn install
 
+#: Install all dependencies
 install: install-go install-yarn
 
+#: Teardown and start a local Grafana instance
 bootstrap: teardown
 	docker-compose up -d grafana
 	@echo "Go to http://localhost:3000/"
 
+#: Teardown the docker resources
 teardown:
 	docker-compose down --remove-orphans --volumes --timeout=2
 
+#: Build the backend for the local architecture
 build-backend:
 ifeq ($(UNAME_OS), Linux)
 	CGO_ENABLED=1 go build \
@@ -95,9 +108,11 @@ build-backend-cross-linux-arm64:
 		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
 		./pkg
 
+#: Build the frontend
 build-frontend:
 	yarn build
 
+#: Package up the build artifacts and zip them in a file
 package-and-zip:
 	chmod +x ./dist/gpx_*
 	cp -R dist dist_old
@@ -110,6 +125,7 @@ package-and-zip:
 	rm -rf frser-sqlite-datasource
 	mv dist_old dist
 
+#: Package up the build artifacts for an ARM 7 architecture and zip them in a file
 package-and-zip-arm7:
 	chmod +x ./dist/gpx_*
 	cp -R dist dist_old
@@ -122,10 +138,13 @@ package-and-zip-arm7:
 	rm -rf frser-sqlite-datasource
 	mv dist_old dist
 
+#: Build the frontend and backend
 build: build-frontend build-backend
 
+#: Run the end-to-end tests with Selenium
 selenium-test:
 	@echo
+	@echo "Make sure the plugin is built and signed for the architecture of the docker tests"
 	@docker-compose rm --force --stop -v grafana
 	GRAFANA_VERSION=7.3.3 docker-compose run --rm start-setup
 	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
@@ -134,18 +153,23 @@ selenium-test:
 	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
 	@echo
 
+#: Run the frontend tests
 frontend-test:
 	yarn test
 
+#: Run the backend tests
 backend-test:
 	@echo
 	go test --tags="sqlite_omit_load_extension sqlite_json" ./pkg/...
 	@echo
 
+#: Sign the build artifacts with the private Grafana organization key
 sign:
 	yarn sign
 
+#: Build all artifacts for the local architecture and sign them with the private Grafana organization key
 build-and-sign: build sign
 
+#: Run all tests (frontend, backend, end-to-end)
 test: backend-test build-and-sign selenium-test
 	docker-compose down --remove-orphans --volumes --timeout=2
