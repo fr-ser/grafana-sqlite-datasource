@@ -11,12 +11,16 @@ found at:
 
 ## Getting started
 
+This project uses the `Makefile` as the main script tool for development tasks. Run `make help` to
+get an overview of the available commands.
+
 ### Requirements
 
 - nodejs
 - yarn
 - go
 - docker and docker-compose
+- make
 
 ### (First Time) Installation
 

@@ -176,15 +176,6 @@ systemctl daemon-reload
 systemctl restart grafana-server
 ```
 
-## ARMv7 / Raspberry Pi 2 Mod. B Support
-
-Many programs for ARMv6 (the default 32bit ARM version of this plugin) can run on ARMv7 machines
-(the version running on Raspberry Pi 2 Mod. B).
-In case there are complications you can try out the version specifically built for ARMv7, though.
-
-A plugin version specifically built for ARMv7 devices can be found on the Github release page (see
-manual installation above).
-
 ## Development and Contributing
 
 Any contribution is welcome. Some information regarding the local setup can be found in the

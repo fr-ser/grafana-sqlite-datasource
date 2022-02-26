@@ -7,7 +7,8 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 
 	// register sqlite driver
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
+
 )
 
 func main() {

@@ -1,130 +1,103 @@
 UNAME_OS := $(shell uname -s)
 UNAME_ARC := $(shell uname -m)
 
+os_suffix := .exe
+arc_name := amd64
+os_name := windows
+
+ifeq ($(UNAME_OS), Linux)
+os_name := linux
+os_suffix :=
+else ifeq ($(UNAME_OS), Darwin)
+os_name := darwin
+os_suffix :=
+endif
+
+ifeq ($(UNAME_ARC), arm64)
+arc_name := arm64
+endif
+
+help:
+	@grep -B1 -E "^[a-zA-Z0-9_-]+\:([^\=]|$$)" Makefile \
+		| grep -v -- -- \
+		| sed 'N;s/\n/###/' \
+		| sed -n 's/^#: \(.*\)###\(.*\):.*/\2:###\1/p' \
+		| column -t  -s '###'
+
+#: Install go dependencies
 install-go:
 	go mod download
 
+#: Install Javascript dependencies
 install-yarn:
 	yarn install
 
+#: Install all dependencies
 install: install-go install-yarn
 
+#: Teardown and start a local Grafana instance
 bootstrap: teardown
 	docker-compose up -d grafana
 	@echo "Go to http://localhost:3000/"
 
+#: Teardown the docker resources
 teardown:
 	docker-compose down --remove-orphans --volumes --timeout=2
 
-build-backend:
-ifeq ($(UNAME_OS), Linux)
-	CGO_ENABLED=1 go build \
-		-o dist/gpx_sqlite-datasource_linux_amd64 \
-		-ldflags '-extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
-		./pkg
-else ifeq ($(UNAME_OS), Darwin)
-	# to get it working the below arguments are removed (no static linking):
-	# -ldflags '-extldflags "-static"'
-	CGO_ENABLED=1 go build \
-		-o dist/gpx_sqlite-datasource_darwin_amd64 \
-		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
-		./pkg
-else
-	CGO_ENABLED=1 go build \
-		-o dist/gpx_sqlite-datasource_windows_amd64.exe \
-		-ldflags '-extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
-		./pkg
-endif
+#: Build the backend for the local architecture
+build-backend-local:
+	go build -o dist/gpx_sqlite-datasource_$(os_name)_$(arc_name)$(os_suffix) ./pkg
 
-build-backend-cross-win64:
-	docker build -t cross-build ./build
+#: Build the backend for the docker architecture
+build-backend-docker: build-backend-cross-linux-amd64
 
-	docker run -t -v "$${PWD}":/usr/src/app -w /usr/src/app \
-		-e CGO_ENABLED=1 -e GOOS=windows -e GOARCH=amd64 -e  CC=x86_64-w64-mingw32-gcc \
-		cross-build \
-		go build -x -o dist/gpx_sqlite-datasource_windows_amd64.exe \
-		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
-		./pkg
+#: Build the backend for all supported environments
+build-backend-all: build-backend-cross-win-amd64 build-backend-cross-linux-amd64 build-backend-cross-linux-arm build-backend-cross-linux-arm64 build-backend-cross-freebsd-amd64 build-backend-cross-darwin-amd64 build-backend-cross-darwin-arm64
 
-build-backend-cross-linux64:
-	docker build -t cross-build ./build
+build-backend-cross-win-amd64:
+	GOOS=windows GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_windows_amd64.exe ./pkg
 
-	docker run -t -v "$${PWD}":/usr/src/app -w /usr/src/app \
-		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=amd64 \
-		cross-build \
-		go build -x -o dist/gpx_sqlite-datasource_linux_amd64 \
-		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
-		./pkg
+build-backend-cross-linux-amd64:
+	GOOS=linux GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_linux_amd64 ./pkg
 
-build-backend-cross-linux-arm6:
-	docker build -t cross-build ./build
-
-	docker run -t -v "$${PWD}":/usr/src/app -w /usr/src/app \
-		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm \
-		-e CC=/opt/rpi-tools/arm-bcm2708/arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc \
-		cross-build \
-		go build -x -o dist/gpx_sqlite-datasource_linux_arm6 \
-		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
-		./pkg
-
-build-backend-cross-linux-arm7:
-	docker build -t cross-build ./build
-
-	docker run -t -v "$${PWD}":/usr/src/app -w /usr/src/app \
-		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm \
-		-e CC=arm-linux-gnueabihf-gcc \
-		cross-build \
-		go build -x -o dist/gpx_sqlite-datasource_linux_arm7 \
-		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
-		./pkg
+build-backend-cross-linux-arm:
+	GOOS=linux GOARCH=arm go build -o dist/gpx_sqlite-datasource_linux_arm ./pkg
 
 build-backend-cross-linux-arm64:
-	docker build -t cross-build ./build
+	GOOS=linux GOARCH=arm64 go build -o dist/gpx_sqlite-datasource_linux_arm64 ./pkg
 
-	docker run -t -v "$${PWD}":/usr/src/app -w /usr/src/app \
-		-e CGO_ENABLED=1 -e GOOS=linux -e GOARCH=arm64 -e CC=aarch64-linux-gnu-gcc \
-		cross-build \
-		go build -x -o dist/gpx_sqlite-datasource_linux_arm64 \
-		-ldflags '-w -s -extldflags "-static"' \
-		-tags osusergo,netgo,sqlite_omit_load_extension,sqlite_json \
-		./pkg
+build-backend-cross-freebsd-amd64:
+	GOOS=freebsd GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_freebsd_amd64 ./pkg
 
+build-backend-cross-darwin-amd64:
+	GOOS=darwin GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_darwin_amd64 ./pkg
+
+build-backend-cross-darwin-arm64:
+	GOOS=darwin GOARCH=arm64 go build -o dist/gpx_sqlite-datasource_darwin_arm64 ./pkg
+
+#: Build the frontend
 build-frontend:
 	yarn build
 
+#: Package up the build artifacts and zip them in a file
 package-and-zip:
 	chmod +x ./dist/gpx_*
 	cp -R dist dist_old
 
-	mv dist/gpx_sqlite-datasource_linux_arm6 dist/gpx_sqlite-datasource_linux_arm
-	rm dist/gpx_sqlite-datasource_linux_arm7
 	yarn sign
 	mv dist frser-sqlite-datasource
 	zip frser-sqlite-datasource-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
 	rm -rf frser-sqlite-datasource
 	mv dist_old dist
 
-package-and-zip-arm7:
-	chmod +x ./dist/gpx_*
-	cp -R dist dist_old
+#: Build the frontend and backend for the local and test environment
+build: build-frontend build-backend-local build-backend-docker
 
-	rm dist/gpx_*
-	cp dist_old/gpx_sqlite-datasource_linux_arm7 dist/gpx_sqlite-datasource_linux_arm
-	yarn sign
-	mv dist frser-sqlite-datasource
-	zip frser-sqlite-datasource-arm7-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
-	rm -rf frser-sqlite-datasource
-	mv dist_old dist
+#: Run the end-to-end tests with Selenium after building the backend for docker
+selenium-test: build-backend-docker selenium-test-no-build
 
-build: build-frontend build-backend
-
-selenium-test:
+#: Run the end-to-end tests with Selenium without building the backend for docker. This can be helpful if the packages have already been build and signed
+selenium-test-no-build:
 	@echo
 	@docker-compose rm --force --stop -v grafana
 	GRAFANA_VERSION=7.3.3 docker-compose run --rm start-setup
@@ -134,18 +107,23 @@ selenium-test:
 	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
 	@echo
 
+#: Run the frontend tests
 frontend-test:
 	yarn test
 
+#: Run the backend tests
 backend-test:
 	@echo
-	go test --tags="sqlite_omit_load_extension sqlite_json" ./pkg/...
+	go test -count 1 ./pkg/...
 	@echo
 
+#: Sign the build artifacts with the private Grafana organization key
 sign:
 	yarn sign
 
+#: Build all artifacts for the local architecture and sign them with the private Grafana organization key
 build-and-sign: build sign
 
-test: backend-test build-and-sign selenium-test
-	docker-compose down --remove-orphans --volumes --timeout=2
+#: Run all tests (frontend, backend, end-to-end)
+test: backend-test frontend-test selenium-test
+	make teardown

@@ -30,7 +30,10 @@ describe('query variables and repetition', () => {
   it(
     'shows a panel per variable',
     saveTestState(testStatus, async () => {
-      let cityPanels = await driver.findElements(By.xpath(`//div[contains(@aria-label, 'container title $cities')]`));
+      const v7_3_panel_aria_label = `//div[contains(@aria-label, 'container title $cities')]`;
+      const v8_1_panel_aria_label = `//section[contains(@aria-label, '$cities panel')]`;
+
+      let cityPanels = await driver.findElements(By.xpath(`(${v7_3_panel_aria_label} | ${v8_1_panel_aria_label})`));
       expect(cityPanels).toHaveLength(3);
 
       await driver
@@ -46,7 +49,7 @@ describe('query variables and repetition', () => {
         .click();
       await driver.findElement(By.xpath(`//div[contains(@class, 'refresh-picker')]//button`)).click();
 
-      cityPanels = await driver.findElements(By.xpath(`//div[contains(@aria-label, 'container title $cities')]`));
+      cityPanels = await driver.findElements(By.xpath(`(${v7_3_panel_aria_label} | ${v8_1_panel_aria_label})`));
       expect(cityPanels).toHaveLength(2);
     })
   );

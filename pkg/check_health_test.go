@@ -33,7 +33,7 @@ func TestCheckHealthShouldPassForADB(t *testing.T) {
 	defer os.RemoveAll(dir)
 	dbPath := filepath.Join(dir, "my.db")
 
-	db, _ := sql.Open("sqlite3", dbPath)
+	db, _ := sql.Open("sqlite", dbPath)
 	db.Exec("CREATE TABLE test(id int);")
 	db.Close()
 
@@ -65,7 +65,7 @@ func TestCheckHealthShouldFailIfNoFileExists(t *testing.T) {
 	if result.Status != backend.HealthStatusError {
 		t.Errorf("Expected HealthStatusError, but got - %s", result.Status)
 	}
-	if !strings.Contains(result.Message, "no such file or directory") {
+	if !strings.Contains(result.Message, "no file exists at the file path") {
 		t.Errorf("Unexpected error message: %s", result.Message)
 	}
 
@@ -90,7 +90,7 @@ func TestCheckHealthShouldFailOnTextFile(t *testing.T) {
 	if result.Status != backend.HealthStatusError {
 		t.Errorf("Expected HealthStatusError, but got - %s", result.Status)
 	}
-	if result.Message != "The file at the provided location is not a valid SQLite database" {
+	if !strings.Contains(result.Message, "file is not a database") {
 		t.Errorf("Unexpected error message: %s", result.Message)
 	}
 }

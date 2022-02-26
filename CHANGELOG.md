@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [3.0.0-rc.1]
+
+This release moved to a new underlying SQLite library: <https://pkg.go.dev/modernc.org/sqlite>. This should have no big
+changes to regular queries but can have effects on more subtle configurations (e.g. path options). Fore more information
+see the `Changed` section below.
+
+This library has no dependency on CGO, which allows much easier cross-compilation for other systems. This way the
+plugin has a much simpler build process now and also supports more platforms (see information below under `Added`)
+
+### Added
+
+- Added new platforms to the release: Darwin (MacOS) for ARM (Apple Silicon) and FreeBSD for AMD64
+
+### Changed
+
+- Changed the underlying SQLite library to: <https://pkg.go.dev/modernc.org/sqlite>. While the general SQLite features
+  and especially queries should remain unchanged by this, path options need to be checked for compatibility with the
+  new library now. Please refer to the link above for more information on the options.
+
+### Removed
+
+- No separate release is created anymore for ARM v7. ARM v6 should suffice for all devices. If that
+  is not the case for your device, please open a new issue.
+
 ## [2.2.1]
 
 ### Added
