@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [3.0.0-rc.1]
+## [3.0.0]
 
 This release moved to a new underlying SQLite library: <https://pkg.go.dev/modernc.org/sqlite>. This should have no big
 changes to regular queries but can have effects on more subtle configurations (e.g. path options). Fore more information
