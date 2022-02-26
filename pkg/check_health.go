@@ -3,43 +3,36 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
-	"strings"
+	"os"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/mattn/go-sqlite3"
 )
 
-func checkDB(pathPrefix string, path string, options string) (bool, error) {
-	// to avoid creating a file during this check if it did not exist we try to append the
-	// read only mode. We do not overwrite an existing mode setting, however.
-	// if the pathPrefix is not "file:", this readonly mode setting has no effect
-	var finalOptions string
-	if options == "" {
-		finalOptions = "mode=ro"
-	} else if !strings.Contains(options, "mode") {
-		finalOptions = finalOptions + "&mode=ro"
-	} else {
-		finalOptions = options
+func checkDB(pathPrefix string, path string, options string) error {
+	if pathPrefix == "file:" || pathPrefix == "" {
+		_, err := os.Stat(path)
+		if errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("no file exists at the file path")
+		} else if err != nil {
+			return err
+		}
 	}
 
-	db, err := sql.Open("sqlite3", pathPrefix+path+"?"+finalOptions)
+	db, err := sql.Open("sqlite", pathPrefix+path+"?"+options)
 	if err != nil {
-		return false, err
+		return err
 	}
 	defer db.Close()
 
-	_, err = db.Exec("pragma schema_version;")
-	if sqliteErr, ok := err.(sqlite3.Error); ok {
-		if sqliteErr.Code == sqlite3.ErrNotADB {
-			return false, nil
-		}
-	}
+	sth, err := db.Exec("pragma schema_version;")
 	if err != nil {
-		return false, err
+		return err
 	}
+	fmt.Println(sth)
 
-	return true, nil
+	return nil
 }
 
 // CheckHealth handles health checks sent from Grafana to the plugin.
@@ -57,16 +50,11 @@ func (td *SQLiteDatasource) CheckHealth(ctx context.Context, req *backend.CheckH
 		}, nil
 	}
 
-	isDB, err := checkDB(config.PathPrefix, config.Path, config.PathOptions)
+	err = checkDB(config.PathPrefix, config.Path, config.PathOptions)
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
 			Message: fmt.Sprintf("error checking db: %s", err),
-		}, nil
-	} else if !isDB {
-		return &backend.CheckHealthResult{
-			Status:  backend.HealthStatusError,
-			Message: "The file at the provided location is not a valid SQLite database",
 		}, nil
 	}
 

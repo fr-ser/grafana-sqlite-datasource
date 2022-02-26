@@ -20,7 +20,7 @@ var cmpOption = data.FrameTestCompareOptions()
 func createTmpDB(seedSQL string) (dbPath string, cleanup func()) {
 	dir, _ := ioutil.TempDir("", "test-check-db")
 	dbPath = filepath.Join(dir, "data.db")
-	db, _ := sql.Open("sqlite3", dbPath)
+	db, _ := sql.Open("sqlite", dbPath)
 	db.Exec(seedSQL)
 	db.Close()
 	cleanup = func() { os.RemoveAll(dir) }

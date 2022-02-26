@@ -235,9 +235,10 @@ func addTransformedRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 	return nil
 }
 
-func fetchData(dbPathPrefix string, dbPath string, dbPathOptions string, queryConfig *queryConfigStruct) (columns []*sqlColumn, err error) {
-
-	db, err := sql.Open("sqlite3", dbPathPrefix+dbPath+"?"+dbPathOptions)
+func fetchData(
+	dbPathPrefix string, dbPath string, dbPathOptions string, queryConfig *queryConfigStruct,
+) (columns []*sqlColumn, err error) {
+	db, err := sql.Open("sqlite", dbPathPrefix+dbPath+"?"+dbPathOptions)
 	if err != nil {
 		log.DefaultLogger.Error("Could not open database", "err", err)
 		return columns, err
@@ -251,13 +252,17 @@ func fetchData(dbPathPrefix string, dbPath string, dbPathOptions string, queryCo
 		)
 		return columns, err
 	}
-	defer rows.Close()
 
 	columnTypes, err := rows.ColumnTypes()
-	if err != nil {
+	if err != nil && err.Error() == "sql: no Rows available" {
+		return make([]*sqlColumn, 0), nil
+	} else if err != nil {
 		log.DefaultLogger.Error("Could not get column types", "err", err)
 		return columns, err
 	}
+	// closing on an empty set "sql: no Rows available" causes a panic
+	defer rows.Close()
+
 	columnCount := len(columnTypes)
 	columns = make([]*sqlColumn, columnCount)
 
