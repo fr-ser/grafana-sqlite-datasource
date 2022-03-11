@@ -19,9 +19,8 @@ Grafana comes with a command line tool that can be used to install plugins.
 
 1. Run this command: `grafana-cli plugins install frser-sqlite-datasource`
 2. Restart the Grafana server.
-3. Login in with a user that has admin rights. This is needed to create datasources.
-4. To make sure the plugin was installed, check the list of installed datasources. Click the
-   Plugins item in the main menu. Both core datasources and installed datasources will appear.
+3. To make sure the plugin was installed, check the list of installed data sources. Click the
+   Plugins item in the main menu. Both core data sources and installed data sources will appear.
 
 ### Latest Version: Installing the newest Plugin Version on an Existing Grafana With the CLI
 
@@ -51,7 +50,7 @@ In case the grafana-cli does not work for whatever reason plugins can also be in
 
 ## Configuring the Datasource in Grafana
 
-The only required configuration is the path to the SQLite database (local path on the Grafana Server)
+The only required configuration is the path to the SQLite database (local path on the Grafana Server).
 
 1. Add an SQLite datasource.
 2. Set the path to the database (the grafana process needs to find the SQLite database under this path).
@@ -89,11 +88,12 @@ SELECT datetime, value FROM converted ORDER BY datetime ASC
 
 ## Macros
 
-This plugins supports macros inspired by the built-in Grafana datasources (e.g.
+This plugins supports macros inspired by the built-in Grafana data sources (e.g.
 <https://grafana.com/docs/grafana/latest/datasources/postgres/#macros>).
 
 However, as each macro needs to be re-implemented from scratch, only the following macros are
-supported. Other macros (that you might expect from other SQL databases) do not work
+supported. Other macros (that you might expect from other SQL databases) are not supported by the
+plugin (yet).
 
 ### $__unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds)
 
@@ -106,16 +106,16 @@ Will be replaced by an expression usable in GROUP BY clause. For example:
 
 Example: `$__unixEpochGroupSeconds(timestamp, 10, NULL)`
 
-Same as above but with a fill parameter so missing points in that series will be added for Grafana
-and `NULL` will be used as value.
+This is the same as the above example but with a fill parameter so missing points in that series
+will be added for Grafana and `NULL` will be used as value.
 
 In case multiple time columns are provided the first one is chosen as the column to determine the
 gap filling. "First" in this context means first in the SELECT statement. This column needs to have
-no NULL values and must sorted in ascending order.
+no NULL values and must be sorted in ascending order.
 
 ## Alerting
 
-This plugins supports the Grafana alerting feature. Similar to the built in data sources alerting
+The plugins supports the Grafana alerting feature. Similar to the built in data sources alerting
 does not support variables as they are normally replaced in the frontend, which is not involved
 for the alerts. In order to allow time filtering this plugin supports the variables `$__from` and
 `$__to`. For more information about those variables see here:
