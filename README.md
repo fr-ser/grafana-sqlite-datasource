@@ -180,3 +180,11 @@ systemctl restart grafana-server
 
 Any contribution is welcome. Some information regarding the local setup can be found in the
 [DEVELOPMENT.md file](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/DEVELOPMENT.md).
+
+## Supporting the Project
+
+This project was developed for free as an open source project. And it will stay that way.
+
+If you like using this plugin, however, and would like to support the development go check out
+the [Github sponsorship page](https://github.com/sponsors/fr-ser). This allows sponsoring the
+project with monthly or one-time contributions.
