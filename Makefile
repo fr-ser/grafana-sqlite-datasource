@@ -25,15 +25,15 @@ help:
 		| column -t  -s '###'
 
 #: Install go dependencies
-install-go:
+install-go-dependencies:
 	go mod download
 
 #: Install Javascript dependencies
-install-yarn:
+install-js-dependencies:
 	yarn install
 
 #: Install all dependencies
-install: install-go install-yarn
+install-dependencies: install-go-dependencies install-js-dependencies
 
 #: Teardown and start a local Grafana instance
 bootstrap: teardown
@@ -96,7 +96,7 @@ build: build-frontend build-backend-local build-backend-docker
 #: Run the end-to-end tests with Selenium after building the backend for docker
 selenium-test: build-backend-docker selenium-test-no-build
 
-#: Run the end-to-end tests with Selenium without building the backend for docker. This can be helpful if the packages have already been build and signed
+#: Run the end-to-end tests with Selenium without building the backend for docker. This can be helpful if the packages have already been built and signed
 selenium-test-no-build:
 	@echo
 	@docker-compose rm --force --stop -v grafana
