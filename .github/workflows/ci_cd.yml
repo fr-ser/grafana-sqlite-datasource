@@ -26,7 +26,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Install go dependencies
-        run: make install-go
+        run: make install-go-dependencies
       - name: Run tests
         run: make backend-test
 
@@ -68,7 +68,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Install go dependencies
-        run: make install-go
+        run: make install-go-dependencies
       - name: build all versions
         run: make build-backend-all
       - name: Upload linux binaries
