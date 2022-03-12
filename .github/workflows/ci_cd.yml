@@ -250,11 +250,6 @@ jobs:
         with:
           name: plugin-package
           path: ./
-      - name: Lint plugin
-        run: |
-          git clone https://github.com/grafana/plugin-validator
-          cd ./plugin-validator/pkg/cmd/plugincheck
-          go run . ../../../../${{ steps.metadata.outputs.archive }}
       - name: create md5 hash
         run: |
           md5sum ${{ steps.metadata.outputs.archive }} > ${{ steps.metadata.outputs.archive }}.md5
@@ -276,6 +271,13 @@ jobs:
           else
             echo "::set-output name=is_prerelease::false"
           fi
+      - name: Lint plugin
+        # the rc part of the version is rejected by the plugin validator
+        if: ${{ !steps.check_prerelease.outputs.is_prerelease }}
+        run: |
+          git clone https://github.com/grafana/plugin-validator
+          cd ./plugin-validator/pkg/cmd/plugincheck
+          go run . ../../../../${{ steps.metadata.outputs.archive }}
       - name: Create release
         id: create_release
         uses: actions/create-release@v1

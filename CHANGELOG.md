@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [3.0.1]
+
+This release should show no feature changes.
+Some underlying packages have been updated, which should improve stability and security but not have any other
+noticeable impact.
+
+### Changed
+
+- Fixed some typos in the readme
+- Removed the upper Grafana version constraint for the plugin
+- Update grafana plugin sdk for the backend
+- Updated grafana buildkit and test tool versions for the frontend
+
 ## [3.0.0]
 
 This release moved to a new underlying SQLite library: <https://pkg.go.dev/modernc.org/sqlite>. This should have no big
