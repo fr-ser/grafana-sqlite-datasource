@@ -46,8 +46,7 @@ export function QueryEditor(props: Props) {
     { label: 'Table', value: 'table' },
     { label: 'Time series', value: 'time series' },
   ];
-  const selectedOption = options.find(options => options.value === query.queryType) || options[0];
-
+  const selectedOption = options.find((options) => options.value === query.queryType) || options[0];
   return (
     <>
       <div className="gf-form max-width-8" role="query-type-container">
@@ -61,7 +60,6 @@ export function QueryEditor(props: Props) {
       </div>
       <div className="gf-form">
         <TextArea
-          css={null}
           style={{ height: 100 }}
           role="query-editor-input"
           value={rawQueryText}
@@ -81,9 +79,9 @@ export function QueryEditor(props: Props) {
       </div>
       {showHelp && (
         <Alert title="Time formatted columns" severity="info">
-          Columns with these names, will be formatted as time. This is required as SQLite has no native "time" format,
-          but mostly strings and numbers. See:{' '}
-          <a href="https://www.sqlite.org/datatype3.html" target="_blank">
+          Columns with these names, will be formatted as time. This is required as SQLite has no native &quot;time&quot;
+          format, but mostly strings and numbers. See:{' '}
+          <a href="https://www.sqlite.org/datatype3.html" target="_blank" rel="noreferrer">
             SQLite3 Data Types Documentation
           </a>
           <br />
@@ -91,6 +89,7 @@ export function QueryEditor(props: Props) {
           <a
             href="https://github.com/fr-ser/grafana-sqlite-datasource#support-for-time-formatted-columns"
             target="_blank"
+            rel="noreferrer"
           >
             Plugin documentation
           </a>

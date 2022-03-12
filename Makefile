@@ -79,7 +79,7 @@ build-backend-cross-darwin-arm64:
 
 #: Build the frontend
 build-frontend:
-	yarn build
+	yarn build --skipTest --skipLint
 
 #: Package up the build artifacts and zip them in a file
 package-and-zip:
@@ -109,9 +109,14 @@ selenium-test-no-build:
 	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
 	@echo
 
+#: Run the frontend tests without linting and building the code
+frontend-test-fast:
+	yarn test
+
 #: Run the frontend tests
 frontend-test:
-	yarn test
+	# build is run as this is the only way to include linting
+	yarn build
 
 #: Run the backend tests
 backend-test:
@@ -128,5 +133,10 @@ sign:
 build-and-sign: build sign
 
 #: Run all tests (frontend, backend, end-to-end)
-test: backend-test frontend-test selenium-test
+test: 
+	# clear the dist directory in case a previous version of the plugin was signed
+	rm -rf dist
+	make backend-test
+	make frontend-test
+	make selenium-test
 	make teardown

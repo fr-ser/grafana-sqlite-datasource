@@ -31,16 +31,18 @@ export class DataSource extends DataSourceWithBackend<SQLiteQuery, MyDataSourceO
       ],
     } as any).toPromise();
 
-    if (response.error) {
+    if (response === undefined) {
+      throw new Error('Received no response at all');
+    } else if (response.error) {
       throw new Error(response.error.message);
     }
 
     const data = response.data[0] as DataFrame;
     if (data.fields.length !== 1) {
       throw new Error(
-        `Received more than one (${data.fields.length}) fields: ${data.fields.map(x => x.name).join(',')}`
+        `Received more than one (${data.fields.length}) fields: ${data.fields.map((x) => x.name).join(',')}`
       );
     }
-    return data.fields[0].values.toArray().map(text => ({ text }));
+    return data.fields[0].values.toArray().map((text) => ({ text }));
   }
 }

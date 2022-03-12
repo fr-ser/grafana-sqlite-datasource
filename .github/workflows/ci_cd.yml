@@ -35,10 +35,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 12.22.x
+      - name: Use Node.js 16.14.x
         uses: actions/setup-node@v1
         with:
-          node-version: 12.22.x
+          node-version: 16.14.x
       - name: Cache Node.js modules
         uses: actions/cache@v2
         with:
@@ -92,10 +92,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Use Node.js 12.22.x
+      - name: Use Node.js 16.14.x
         uses: actions/setup-node@v1
         with:
-          node-version: 12.22.x
+          node-version: 16.14.x
       - name: Cache Node.js modules
         uses: actions/cache@v2
         with:
@@ -136,10 +136,10 @@ jobs:
           export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
           echo "::set-output name=version::${PLUGIN_VERSION}"
           echo "::set-output name=archive::${PLUGIN_ARTIFACT}"
-      - name: Use Node.js 12.22.x
+      - name: Use Node.js 16.14.x
         uses: actions/setup-node@v1
         with:
-          node-version: 12.22.x
+          node-version: 16.14.x
       - name: Cache Node.js modules
         uses: actions/cache@v2
         with:
@@ -200,10 +200,10 @@ jobs:
         run: | 
           sed -i 's/allow_loading_unsigned_plugins = true//g' grafana_config/grafana.ini
           sed -i 's/app_mode = development/app_mode = production/g' grafana_config/grafana.ini          
-      - name: Use Node.js 12.22.x
+      - name: Use Node.js 16.14.x
         uses: actions/setup-node@v1
         with:
-          node-version: 12.22.x
+          node-version: 16.14.x
       - name: Cache Node.js modules
         uses: actions/cache@v2
         with:
@@ -215,6 +215,8 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Run Selenium Tests
+        env:
+          VERBOSE_TEST_OUTPUT: 1
         run: make selenium-test-no-build
       - name: Debug Logs
         if: ${{ failure() }}

@@ -65,7 +65,7 @@ describe('DataSource', () => {
         await ds.metricFindQuery("SELECT 'my-query'", { variable: { datasource: 'sqlite' } });
         fail('did not receive an error');
       } catch (error) {
-        const errorMessage = error.toString();
+        const errorMessage = (error as Error).toString();
         expect(errorMessage).toContain('Received more than one (2) fields');
       }
     });
@@ -81,7 +81,7 @@ describe('DataSource', () => {
         await ds.metricFindQuery("SELECT 'my-query'", { variable: { datasource: 'sqlite' } });
         fail('did not receive an error');
       } catch (error) {
-        const errorMessage = error.toString();
+        const errorMessage = (error as Error).toString();
         expect(errorMessage).toContain('test error');
       }
     });

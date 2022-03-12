@@ -55,26 +55,34 @@ describe('QueryEditor', () => {
     });
   });
 
-  it('allows setting time columns', async () => {
-    const { findByRole, findByText } = render(queryEditor);
+  it('allows adding time columns', async () => {
+    const { findByRole } = render(queryEditor);
 
     const selector = await findByRole('time-column-selector');
     const selectorInput = selector.querySelector('input') as HTMLInputElement;
-    const addButton = await findByText('Add', { selector: 'button span' });
 
     await act(async () => {
-      // add a column
       await userEvent.type(selectorInput, 'test_column', { delay: 1 });
-      userEvent.click(addButton);
+      userEvent.keyboard('{enter}');
+    });
 
-      // remove a default column
+    expect(onRunQueryMock).toHaveBeenCalled();
+    expect(onChangeMock).toHaveBeenLastCalledWith({
+      timeColumns: ['time', 'ts', 'test_column'],
+    });
+  });
+
+  it('allows removing time columns', async () => {
+    const { findByText } = render(queryEditor);
+
+    await act(async () => {
       const timeTag = await findByText('time', { selector: 'div>span' });
       userEvent.click(timeTag.parentElement!.querySelector('svg') as SVGElement);
     });
 
     expect(onRunQueryMock).toHaveBeenCalled();
     expect(onChangeMock).toHaveBeenLastCalledWith({
-      timeColumns: ['ts', 'test_column'],
+      timeColumns: ['ts'],
     });
   });
 });

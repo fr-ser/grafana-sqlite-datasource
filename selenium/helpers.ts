@@ -29,7 +29,7 @@ export async function getDriver() {
 }
 
 export function saveTestState(testStatus: { ok: boolean }, testFn: () => Promise<void>) {
-  return async function() {
+  return async function () {
     try {
       await testFn();
       testStatus.ok = true;
@@ -41,7 +41,7 @@ export function saveTestState(testStatus: { ok: boolean }, testFn: () => Promise
 }
 
 export async function logHTMLOnFailure(testStatus: { ok: boolean }, driver: any) {
-  if (testStatus.ok) return;
+  if (testStatus.ok || process.env.VERBOSE_TEST_OUTPUT !== '1') return;
 
   let errorText: string;
   try {
