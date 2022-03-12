@@ -1,4 +1,4 @@
-package main
+package plugin
 
 import (
 	"context"
@@ -39,18 +39,10 @@ func checkDB(pathPrefix string, path string, options string) error {
 // The main use case for these health checks is the test button on the
 // datasource configuration page which allows users to verify that
 // a datasource is working as expected.
-func (td *SQLiteDatasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (
+func (ds *sqliteDatasource) CheckHealth(ctx context.Context, _ *backend.CheckHealthRequest) (
 	*backend.CheckHealthResult, error,
 ) {
-	config, err := getConfig(req.PluginContext.DataSourceInstanceSettings)
-	if err != nil {
-		return &backend.CheckHealthResult{
-			Status:  backend.HealthStatusError,
-			Message: fmt.Sprintf("error getting config: %s", err),
-		}, nil
-	}
-
-	err = checkDB(config.PathPrefix, config.Path, config.PathOptions)
+	err := checkDB(ds.pluginConfig.PathPrefix, ds.pluginConfig.Path, ds.pluginConfig.PathOptions)
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,

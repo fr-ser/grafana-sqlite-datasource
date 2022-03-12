@@ -27,6 +27,8 @@ help:
 #: Install go dependencies
 install-go-dependencies:
 	go mod download
+	@echo Installing tools from tools.go
+	@cat tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -tI % go install %
 
 #: Install Javascript dependencies
 install-js-dependencies:
@@ -113,9 +115,10 @@ frontend-test:
 
 #: Run the backend tests
 backend-test:
+	gotestsum --format testname -- -count=1 -cover ./pkg/...
 	@echo
-	go test -count 1 ./pkg/...
-	@echo
+	@echo "Linting Checks:"
+	@golangci-lint run ./pkg/... && echo "Linting passed!\n"
 
 #: Sign the build artifacts with the private Grafana organization key
 sign:

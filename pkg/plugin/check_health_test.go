@@ -1,9 +1,8 @@
-package main
+package plugin
 
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -16,29 +15,17 @@ import (
 
 var ctx = context.Background()
 
-func getReqWithPath(path string) *backend.CheckHealthRequest {
-	jsonConfig := fmt.Sprintf(`{"pathPrefix":"file:", "path": "%s"}`, path)
-
-	return &backend.CheckHealthRequest{
-		PluginContext: backend.PluginContext{
-			DataSourceInstanceSettings: &backend.DataSourceInstanceSettings{
-				JSONData: []byte(jsonConfig),
-			},
-		},
-	}
-}
-
 func TestCheckHealthShouldPassForADB(t *testing.T) {
 	dir, _ := ioutil.TempDir("", "test-check-db")
 	defer os.RemoveAll(dir)
 	dbPath := filepath.Join(dir, "my.db")
 
 	db, _ := sql.Open("sqlite", dbPath)
-	db.Exec("CREATE TABLE test(id int);")
+	_, _ = db.Exec("CREATE TABLE test(id int);")
 	db.Close()
 
-	ds := SQLiteDatasource{}
-	result, err := ds.CheckHealth(ctx, getReqWithPath(dbPath))
+	ds := sqliteDatasource{pluginConfig{Path: dbPath, PathPrefix: "file:"}}
+	result, err := ds.CheckHealth(ctx, nil)
 	if err != nil {
 		t.Errorf("Unexpected error - %s", err)
 	}
@@ -56,8 +43,8 @@ func TestCheckHealthShouldFailIfNoFileExists(t *testing.T) {
 	defer os.RemoveAll(dir)
 	notExistingDbPath := filepath.Join(dir, "my.db")
 
-	ds := SQLiteDatasource{}
-	result, err := ds.CheckHealth(ctx, getReqWithPath(notExistingDbPath))
+	ds := sqliteDatasource{pluginConfig{Path: notExistingDbPath, PathPrefix: "file:"}}
+	result, err := ds.CheckHealth(ctx, nil)
 	if err != nil {
 		t.Errorf("Unexpected error - %s", err)
 	}
@@ -77,12 +64,12 @@ func TestCheckHealthShouldFailIfNoFileExists(t *testing.T) {
 
 func TestCheckHealthShouldFailOnTextFile(t *testing.T) {
 	f, _ := ioutil.TempFile("", "test-check-db")
-	defer syscall.Unlink(f.Name())
-	f.WriteString("not a sqlite db")
+	defer func() { _ = syscall.Unlink(f.Name()) }()
+	_, _ = f.WriteString("not a sqlite db")
 	f.Close()
 
-	ds := SQLiteDatasource{}
-	result, err := ds.CheckHealth(ctx, getReqWithPath(f.Name()))
+	ds := sqliteDatasource{pluginConfig{Path: f.Name(), PathPrefix: "file:"}}
+	result, err := ds.CheckHealth(ctx, nil)
 	if err != nil {
 		t.Errorf("Unexpected error - %s", err)
 	}
@@ -97,10 +84,10 @@ func TestCheckHealthShouldFailOnTextFile(t *testing.T) {
 
 func TestCheckHealthShouldPassForAnEmptyFile(t *testing.T) {
 	f, _ := ioutil.TempFile("", "test-check-db")
-	defer syscall.Unlink(f.Name())
+	defer func() { _ = syscall.Unlink(f.Name()) }()
 
-	ds := SQLiteDatasource{}
-	result, err := ds.CheckHealth(ctx, getReqWithPath(f.Name()))
+	ds := sqliteDatasource{pluginConfig{Path: f.Name(), PathPrefix: "file:"}}
+	result, err := ds.CheckHealth(ctx, nil)
 	if err != nil {
 		t.Errorf("Unexpected error - %s", err)
 	}

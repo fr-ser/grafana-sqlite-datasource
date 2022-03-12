@@ -1,4 +1,4 @@
-package main
+package plugin
 
 import (
 	"testing"
@@ -148,7 +148,9 @@ func TestConvertLongTimeSeriesQuery(t *testing.T) {
 		data.NewField("value", nil, []*float64{floatPointer(21.1), floatPointer(22.2)}),
 		data.NewField("name", nil, []*string{strPointer("one"), strPointer("two")}),
 	)
-	expectedInputFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
+	expectedInputFrame.Meta = &data.FrameMeta{
+		Type: data.FrameTypeTimeSeriesWide, ExecutedQueryString: "SELECT * FROM test",
+	}
 
 	if diff := cmp.Diff(expectedInputFrame, inputFrame, cmpOption...); diff != "" {
 		t.Error("Unexpected input frame into the time series conversion")

@@ -1,4 +1,4 @@
-package main
+package plugin
 
 import (
 	"fmt"
@@ -282,9 +282,9 @@ func TestEpochGroupSecondsWithMultiFrameTimeseriesAndGaps(t *testing.T) {
 		data.NewField("name", nil, []*string{strPointer("one"), nil, strPointer("two")}),
 		data.NewField("value", nil, []*float64{floatPointer(11.1), nil, floatPointer(22.2)}),
 	)
+	// we use the response as we do not care about the value (tested elsewhere)
 	expectedInputFrame.Meta = &data.FrameMeta{
-		// we use the response as we do not care about the value (tested elsewhere)
-		ExecutedQueryString: response.Frames[0].Meta.ExecutedQueryString,
+		ExecutedQueryString: response.Frames[0].Meta.ExecutedQueryString, Type: data.FrameTypeTimeSeriesWide,
 	}
 
 	if diff := cmp.Diff(expectedInputFrame, inputFrame, cmpOption...); diff != "" {
@@ -310,10 +310,8 @@ func TestEpochGroupSecondsWithMultiFrameTimeseriesAndGaps(t *testing.T) {
 			[]*float64{floatPointer(11.1), nil, nil},
 		),
 	)
-	expectedOutputFrames[0].Meta = &data.FrameMeta{
-		// we use the response as we do not care about the value (tested elsewhere)
-		ExecutedQueryString: response.Frames[0].Meta.ExecutedQueryString,
-	}
+	// we use the response as we do not care about the value (tested elsewhere)
+	expectedOutputFrames[0].Meta = response.Frames[0].Meta
 
 	expectedOutputFrames[1] = data.NewFrame(
 		"value two",
@@ -326,10 +324,8 @@ func TestEpochGroupSecondsWithMultiFrameTimeseriesAndGaps(t *testing.T) {
 			[]*float64{nil, nil, floatPointer(22.2)},
 		),
 	)
-	expectedOutputFrames[1].Meta = &data.FrameMeta{
-		// we use the response as we do not care about the value (tested elsewhere)
-		ExecutedQueryString: response.Frames[0].Meta.ExecutedQueryString,
-	}
+	// we use the response as we do not care about the value (tested elsewhere)
+	expectedOutputFrames[1].Meta = response.Frames[1].Meta
 
 	for idx, frame := range response.Frames {
 		if diff := cmp.Diff(expectedOutputFrames[idx], frame, cmpOption...); diff != "" {

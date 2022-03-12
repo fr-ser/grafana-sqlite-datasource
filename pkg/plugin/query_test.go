@@ -1,4 +1,4 @@
-package main
+package plugin
 
 import (
 	"database/sql"
@@ -21,7 +21,7 @@ func createTmpDB(seedSQL string) (dbPath string, cleanup func()) {
 	dir, _ := ioutil.TempDir("", "test-check-db")
 	dbPath = filepath.Join(dir, "data.db")
 	db, _ := sql.Open("sqlite", dbPath)
-	db.Exec(seedSQL)
+	_, _ = db.Exec(seedSQL)
 	db.Close()
 	cleanup = func() { os.RemoveAll(dir) }
 
