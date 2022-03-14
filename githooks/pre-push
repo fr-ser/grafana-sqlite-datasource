@@ -1,8 +1,17 @@
 #!/bin/bash
 
+if [ "$(uname)" == "Darwin" ]; then
+    extended_sed="sed -E"      
+else
+	extended_sed="sed -r"
+fi
+
 latest_tag=$(git describe --tags --abbrev=0)
 
-if ! grep -q -F "## [${latest_tag:1}]" CHANGELOG.md; then
-	echo "Error: The latest (## [${latest_tag:1}]) tag was not found in the CHANGELOG.md." 1>&2
+latest_tag_without_rc=$(echo $latest_tag | ${extended_sed} s/-rc\.[0-9]+//)
+
+if ! grep -q -F "## [${latest_tag_without_rc:1}]" CHANGELOG.md; then
+	echo "Error: The (## [${latest_tag_without_rc:1}]) tag was not found in the CHANGELOG.md."
+	echo "Latest tag: ${latest_tag}" 1>&2
 	exit 1
 fi

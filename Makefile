@@ -24,6 +24,10 @@ help:
 		| sed -n 's/^#: \(.*\)###\(.*\):.*/\2:###\1/p' \
 		| column -t  -s '###'
 
+#: Add git hooks of the project
+add-git-hook:
+	ln -s ../../githooks/pre-push .git/hooks/pre-push
+
 #: Install go dependencies
 install-go-dependencies:
 	go mod download

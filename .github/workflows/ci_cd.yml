@@ -238,8 +238,11 @@ jobs:
           echo "::set-output name=archive::${PLUGIN_ARTIFACT}"
       - name: Check changelog
         run: |
-          if ! grep -q -F "## [${{ steps.metadata.outputs.version }}]" CHANGELOG.md; then
-            echo "Error: The latest (## [${{ steps.metadata.outputs.version }}]) tag was not found in the CHANGELOG.md." 1>&2
+          latest_tag_without_rc=$(echo ${{ steps.metadata.outputs.version }} | sed -r s/-rc\.[0-9]+//)
+
+          if ! grep -q -F "## [${latest_tag_without_rc}]" CHANGELOG.md; then
+            echo "Error: The (## [${latest_tag_without_rc}]) tag was not found in the CHANGELOG.md."
+            echo "Latest tag: ${{ steps.metadata.outputs.version }}" 1>&2
             exit 1
           fi
       - name: Download plugin package
