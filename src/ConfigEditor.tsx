@@ -60,7 +60,7 @@ export class ConfigEditor extends PureComponent<Props, State> {
         <div className="gf-form">
           <FormField
             label="Path"
-            tooltip="(absolute) path to the SQLite database"
+            tooltip="(absolute) path to the SQLite database file"
             labelWidth={10}
             inputWidth={20}
             onChange={this.onPathChange}
@@ -72,7 +72,7 @@ export class ConfigEditor extends PureComponent<Props, State> {
           <FormField
             label="Path Prefix"
             tooltip={
-              'This string is prefixed before the path in the connection string. </br>' +
+              'This string is prefixed before the path in the connection string. ' +
               'Unless you know what you are doing this should be "file:" (without the quotes). ' +
               'Not using "file:" can cause the Path Options to not take effect.'
             }

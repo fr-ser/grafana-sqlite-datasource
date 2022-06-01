@@ -38,7 +38,7 @@ func TestCheckHealthShouldPassForADB(t *testing.T) {
 	}
 }
 
-func TestCheckHealthShouldFailIfNoFileExists(t *testing.T) {
+func TestCheckHealthShouldFailForANotExistingFile(t *testing.T) {
 	dir, _ := ioutil.TempDir("", "test-check-db")
 	defer os.RemoveAll(dir)
 	notExistingDbPath := filepath.Join(dir, "my.db")
@@ -59,6 +59,25 @@ func TestCheckHealthShouldFailIfNoFileExists(t *testing.T) {
 	_, err = os.Stat(notExistingDbPath)
 	if !os.IsNotExist(err) {
 		t.Errorf("File was created during check")
+	}
+}
+
+func TestCheckHealthShouldFailForAFolder(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "test-check-db")
+	defer os.RemoveAll(dir)
+
+	ds := sqliteDatasource{pluginConfig{Path: dir, PathPrefix: "file:"}}
+	result, err := ds.CheckHealth(ctx, nil)
+	if err != nil {
+		t.Errorf("Unexpected error - %s", err)
+	}
+
+	if result.Status != backend.HealthStatusError {
+		t.Errorf("Expected HealthStatusError, but got - %s", result.Status)
+	}
+
+	if !strings.Contains(result.Message, "the provided path is a directory instead of a file") {
+		t.Errorf("Unexpected error message: %s", result.Message)
 	}
 }
 

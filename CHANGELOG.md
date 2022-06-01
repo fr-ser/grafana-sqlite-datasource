@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Changed
+
+- improved error message for database checks on folder paths
+
 I would like to thank the sponsors of this project
 
 - one-time: [@nikolaialex](https://github.com/nikolaialex)
