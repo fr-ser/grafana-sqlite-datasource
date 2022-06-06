@@ -3,10 +3,6 @@
   "description": "SQLite as a (Backend) Datasource",
   "version": "0.0.0-replaced-in-ci-cd",
   "scripts": {
-    "build": "grafana-toolkit plugin:build",
-    "test": "grafana-toolkit plugin:test",
-    "dev": "grafana-toolkit plugin:dev",
-    "watch": "grafana-toolkit plugin:dev --watch",
     "sign": "grafana-toolkit plugin:sign",
     "start": "yarn watch"
   },

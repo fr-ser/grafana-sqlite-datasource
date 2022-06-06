@@ -42,9 +42,15 @@ install-js-dependencies:
 install-dependencies: install-go-dependencies install-js-dependencies
 
 #: Teardown and start a local Grafana instance
-bootstrap: teardown
+start: teardown
 	docker-compose up -d grafana
 	@echo "Go to http://localhost:3000/"
+
+#: Start a local Grafana instance and the frontend in watch mode
+start-dev:
+	docker-compose up -d grafana
+	@echo "Go to http://localhost:3000/"
+	npx grafana-toolkit plugin:dev --watch
 
 #: Teardown the docker resources
 teardown:
@@ -83,14 +89,14 @@ build-backend-cross-darwin-arm64:
 
 #: Build the frontend
 build-frontend:
-	yarn build --skipTest --skipLint
+	npx grafana-toolkit plugin:build --skipTest --skipLint
 
 #: Package up the build artifacts and zip them in a file
 package-and-zip:
 	chmod +x ./dist/gpx_*
 	cp -R dist dist_old
 
-	yarn sign
+	npx grafana-toolkit plugin:sign
 	mv dist frser-sqlite-datasource
 	zip frser-sqlite-datasource-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
 	rm -rf frser-sqlite-datasource
@@ -115,12 +121,12 @@ selenium-test-no-build:
 
 #: Run the frontend tests without linting and building the code
 frontend-test-fast:
-	yarn test
+	grafana-toolkit plugin:test
 
 #: Run the frontend tests
 frontend-test:
 	# build is run as this is the only way to include linting
-	yarn build
+	npx grafana-toolkit plugin:build
 
 #: Run the backend tests
 backend-test:
@@ -131,7 +137,7 @@ backend-test:
 
 #: Sign the build artifacts with the private Grafana organization key
 sign:
-	yarn sign
+	npx grafana-toolkit plugin:sign
 
 #: Build all artifacts for the local architecture and sign them with the private Grafana organization key
 build-and-sign: build sign
