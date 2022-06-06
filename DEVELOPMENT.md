@@ -35,8 +35,7 @@ git config core.hooksPath githooks
 
 ```sh
 make build # this build the frontend and backend
-make sign # sign the plugin or allow not signed plugins in the config
-make bootstrap # credentials admin / admin123
+make start # credentials admin / admin123
 ```
 
 ## Testing
