@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ### Changed
 
 - improved error message for database checks on folder paths
+- Using a different component as the SQL editor
 
 I would like to thank the sponsors of this project
 
