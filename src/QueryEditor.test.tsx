@@ -1,8 +1,18 @@
 import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react';
+import * as ui from '@grafana/ui';
 import userEvent from '@testing-library/user-event';
 
 import { QueryEditor } from './QueryEditor';
+
+// based on examples from the grafana repo
+// https://github.com/grafana/grafana/blob/467e375fe6c3de0309a69664b32301e22c0f5f7e/public/app/plugins/datasource/cloudwatch/components/MetricsQueryEditor/MetricsQueryEditor.test.tsx#L18
+jest.mock('@grafana/ui', () => ({
+  ...jest.requireActual<typeof ui>('@grafana/ui'),
+  CodeEditor: function CodeEditor({ value }: { value: string }) {
+    return <pre>{value}</pre>;
+  },
+}));
 
 describe('QueryEditor', () => {
   let onChangeMock: jest.Mock;
@@ -30,28 +40,6 @@ describe('QueryEditor', () => {
     expect(onRunQueryMock).toHaveBeenCalled();
     expect(onChangeMock).toHaveBeenLastCalledWith({
       queryType: 'time series',
-    });
-  });
-
-  it('allows editing the rawQuery', async () => {
-    const { findByRole } = render(queryEditor);
-
-    const queryInput = await findByRole('query-editor-input');
-
-    await act(async () => {
-      fireEvent.click(queryInput);
-
-      fireEvent.change(queryInput, {
-        target: { value: 'Some Input' },
-      });
-
-      fireEvent.blur(queryInput);
-    });
-
-    expect(onRunQueryMock).toHaveBeenCalled();
-    expect(onChangeMock).toHaveBeenLastCalledWith({
-      queryText: 'Some Input',
-      rawQueryText: 'Some Input',
     });
   });
 

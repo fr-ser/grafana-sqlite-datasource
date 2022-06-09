@@ -1,21 +1,34 @@
-import { TextArea, TagsInput, Icon, Alert, InlineFormLabel, Select } from '@grafana/ui';
+import { TagsInput, Icon, Alert, InlineFormLabel, Select, CodeEditor } from '@grafana/ui';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import defaults from 'lodash/defaults';
-import React, { ChangeEvent, useState } from 'react';
+import React, { useState } from 'react';
 
 import { DataSource } from './DataSource';
 import { defaultQuery, MyDataSourceOptions, SQLiteQuery } from './types';
 
 type Props = QueryEditorProps<DataSource, SQLiteQuery, MyDataSourceOptions>;
 
+function calculcateHeight(queryText: string): number {
+  const minHeight = 200;
+  const maxHeight = 500;
+
+  // assume 20 px per row
+  let desiredHeight = queryText.split('\n').length * 20;
+
+  // return the value in a range between the min and max height
+  return Math.min(maxHeight, Math.max(minHeight, desiredHeight));
+}
+
 export function QueryEditor(props: Props) {
-  function onQueryTextChange(event: ChangeEvent<HTMLTextAreaElement>) {
+  function onQueryTextChange(value: string) {
     const { onChange, query } = props;
     onChange({
       ...query,
-      rawQueryText: event.target.value,
-      queryText: event.target.value,
+      rawQueryText: value,
+      queryText: value,
     });
+
+    props.onRunQuery();
   }
 
   function onQueryTypeChange(value: SelectableValue<string>) {
@@ -58,15 +71,14 @@ export function QueryEditor(props: Props) {
           value={selectedOption}
         />
       </div>
-      <div className="gf-form">
-        <TextArea
-          style={{ height: 100 }}
-          role="query-editor-input"
-          value={rawQueryText}
-          onBlur={() => props.onRunQuery()}
-          onChange={onQueryTextChange}
-        />
-      </div>
+      <CodeEditor
+        height={calculcateHeight(rawQueryText)}
+        value={rawQueryText}
+        onBlur={onQueryTextChange}
+        onSave={onQueryTextChange}
+        language="sql"
+        showMiniMap={false}
+      />
       <div className="gf-form">
         <div style={{ display: 'flex', flexDirection: 'column', marginRight: 15 }} role="time-column-selector">
           <InlineFormLabel>
