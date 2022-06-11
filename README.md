@@ -95,6 +95,12 @@ However, as each macro needs to be re-implemented from scratch, only the followi
 supported. Other macros (that you might expect from other SQL databases) are not supported by the
 plugin (yet).
 
+Since `$__filterDate` is not supported, common way to apply date range to query is to use `$__from` and `$__to` global variables to filter on column storing timestamp as integer.
+
+```sql
+SELECT * FROM products WHERE created_at BETWEEN ${__from:date:seconds} AND ${__to:date:seconds};
+```
+
 ### $__unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds)
 
 Example: `$__unixEpochGroupSeconds("time", 10)`
