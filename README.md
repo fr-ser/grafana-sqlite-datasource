@@ -8,53 +8,28 @@ This is a Grafana backend plugin to allow using an SQLite database as a data sou
 The SQLite database needs to be accessible to the filesystem of the device where Grafana itself
 is running.
 
+Table of contents:
+
+- [Plugin Installation](#plugin-installation)
+- [Support for Time Formatted Columns](#support-for-time-formatted-columns)
+- [Macros](#macros)
+- [Alerting](#alerting)
+- [Common Problems / FAQ](#common-problems---faq)
+- [Development and Contributing](#development-and-contributing)
+- [Supporting the Project](#supporting-the-project)
+- [Further Documentation and Links](#further-documentation-and-links)
+
 ## Plugin Installation
 
-The most up to date (but also most generic) information can always be found here:
-[Grafana Website - Plugin Installation](https://grafana.com/docs/grafana/latest/plugins/installation/#install-grafana-plugins)
-
-### Recommended: Installing the Official and Released Plugin on an Existing Grafana With the CLI
-
-Grafana comes with a command line tool that can be used to install plugins.
+The recommended way to install the plugin for most users is to use the grafana CLI:
 
 1. Run this command: `grafana-cli plugins install frser-sqlite-datasource`
 2. Restart the Grafana server.
 3. To make sure the plugin was installed, check the list of installed data sources. Click the
    Plugins item in the main menu. Both core data sources and installed data sources will appear.
 
-### Latest Version: Installing the newest Plugin Version on an Existing Grafana With the CLI
-
-The grafana-cli can also install plugins from a non-standard URL. This way even plugin versions,
-that are not (yet) released to the official Grafana repository can be installed.
-
-1. Run this command:
-
-   ```sh
-   # replace the $VERSION part in the URL below with the desired version (e.g. 2.0.2)
-   grafana-cli --pluginUrl https://github.com/fr-ser/grafana-sqlite-datasource/releases/download/v$VERSION/frser-sqlite-datasource-$VERSION.zip plugins install frser-sqlite-datasource
-   ```
-
-2. See the recommended installation above (from the restart step)
-
-### Manual: Installing the Plugin Manually on an Existing Grafana
-
-In case the grafana-cli does not work for whatever reason plugins can also be installed manually.
-
-1. Get the zip file from [Latest release on Github](https://github.com/fr-ser/grafana-sqlite-datasource/releases/latest)
-2. Extract the zip file into the data/plugins subdirectory for Grafana:
-   `unzip <the_download_zip_file> -d <plugin_dir>/`
-
-   Finding the plugin directory can sometimes be a challenge as this is platform and settings
-   dependent. A common location for this on Linux devices is `/var/lib/grafana/plugins/`
-3. See the recommended installation above (from the restart step)
-
-## Configuring the Datasource in Grafana
-
-The only required configuration is the path to the SQLite database (local path on the Grafana Server).
-
-1. Add an SQLite datasource.
-2. Set the path to the database (the grafana process needs to find the SQLite database under this path).
-3. Save the datasource and use it.
+For other installation options (e.g. to install versions not yet releases in the Grafana registry but in Github) see
+[./docs/installation.md](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/docs/installation.md).
 
 ## Support for Time Formatted Columns
 
@@ -124,57 +99,23 @@ Formatting of those variables (e.g. `${__from:date:iso}`) is not supported for a
 
 ## Common Problems / FAQ
 
-The following section describes common issues encountered while using the plugin.
+This is a list of common questions or problems. For the answers and more details see
+[./docs/faq.md](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/docs/faq.md).
 
-### I have a "file not found" error for my database
+- [I have a "file not found" error for my database](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/docs/faq.md#i-have-a-file-not-found-error-for-my-database)
+- [I have a "permission denied" error for my database](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/docs/faq.md#i-have-a-permission-denied-error-for-my-database)
 
-The first choice should be to make sure, that the path is correct. It is also good practice to
-use absolute paths (e.g. `/app/state/data.db`) instead of relative paths (`state/data.db`).
+## Query examples
 
-In case the path is correct but the database is in the `/var` directory on a linux system there
-might also be a systemd issue. This is typically observed with Grafana versions starting with
-v8.2.0. When Grafana is run via systemd (the typical default installation on Linux systems) the
-`/var` directory is not available to Grafana (and therefore also not to the plugin).
+Some examples to help getting started with SQL and SQLite can be found in
+[./docs/examples.md](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/docs/examples.md).
 
-In order to change this behavior you need to do the following:
+These examples include things like:
 
-```txt
-# edit (override) the grafana systemd configuration
-systemctl edit grafana-server
-
-# add the following lines
-[Service]
-PrivateTmp=false
-
-# reload the systemd config and restart the app
-systemctl daemon-reload
-systemctl restart grafana-server
-```
-
-### I have a "permission denied" error for my database
-
-Make sure, that you have access to the file and all the folders in the path of the file.
-Read access is enough for the plugin.
-
-In case the permissions are correct but database is in the `/home` directory on a linux system
-there might also be a systemd issue. This is typically observed with Grafana versions starting with
-v8.2.0. When Grafana is run via systemd (the typical default installation on Linux systems) the
-`/home` directory is not available to Grafana (and therefore also not to the plugin).
-
-In order to change this behavior you need to do the following:
-
-```txt
-# edit (override) the grafana systemd configuration
-systemctl edit grafana-server
-
-# add the following lines
-[Service]
-ProtectHome=false
-
-# reload the systemd config and restart the app
-systemctl daemon-reload
-systemctl restart grafana-server
-```
+- filtering by the time specified in the Grafana UI
+- creating a time series mindful of gaps
+- converting dates to timestamps
+- ...
 
 ## Development and Contributing
 
@@ -188,3 +129,10 @@ This project was developed for free as an open source project. And it will stay 
 If you like using this plugin, however, and would like to support the development go check out
 the [Github sponsorship page](https://github.com/sponsors/fr-ser). This allows sponsoring the
 project with monthly or one-time contributions.
+
+## Further Documentation and Links
+
+- A changelog of the plugin can be found in the [CHANGELOG.md](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/CHANGELOG.md).
+- More documentation about the plugin can be found under [the docs section in Github](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/docs).
+- The plugin in the Grafana registry can be found [here](https://grafana.com/grafana/plugins/frser-sqlite-datasource/).
+- Questions or bugs about the plugin can be found and reported [in Github](https://github.com/fr-ser/grafana-sqlite-datasource/issues?q=) or in the [Grafana community](https://community.grafana.com/search?q=sqlite%20order%3Alatest).
