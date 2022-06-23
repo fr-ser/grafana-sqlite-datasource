@@ -8,7 +8,7 @@ import { defaultQuery, MyDataSourceOptions, SQLiteQuery } from './types';
 
 type Props = QueryEditorProps<DataSource, SQLiteQuery, MyDataSourceOptions>;
 
-function calculcateHeight(queryText: string): number {
+function calculateHeight(queryText: string): number {
   const minHeight = 200;
   const maxHeight = 500;
 
@@ -72,7 +72,7 @@ export function QueryEditor(props: Props) {
         />
       </div>
       <CodeEditor
-        height={calculcateHeight(rawQueryText)}
+        height={calculateHeight(rawQueryText)}
         value={rawQueryText}
         onBlur={onQueryTextChange}
         onSave={onQueryTextChange}
