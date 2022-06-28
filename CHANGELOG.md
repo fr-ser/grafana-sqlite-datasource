@@ -6,12 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
-## [3.1.0] - 2022-06-22
+## [3.1.0] - 2022-07-09
 
 ### Changed
 
-- improved error message for database checks on folder paths
 - Using a different component as the SQL editor
+- Updated Readme and added more docs (e.g. example queries)
+- improved error message for database checks on folder paths
 
 I would like to thank the sponsors of this project
 

@@ -1,7 +1,7 @@
-import { TagsInput, Icon, Alert, InlineFormLabel, Select, CodeEditor } from '@grafana/ui';
+import { TextArea, TagsInput, Icon, Alert, InlineFormLabel, Select, CodeEditor, Switch } from '@grafana/ui';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import defaults from 'lodash/defaults';
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 
 import { DataSource } from './DataSource';
 import { defaultQuery, MyDataSourceOptions, SQLiteQuery } from './types';
@@ -54,39 +54,68 @@ export function QueryEditor(props: Props) {
   const query = defaults(props.query, defaultQuery);
   const { rawQueryText, timeColumns } = query;
   const [showHelp, setShowHelp] = useState(false);
+  const [useLegacyEditor, setUseLegacyEditor] = useState(false);
 
   const options: Array<SelectableValue<string>> = [
     { label: 'Table', value: 'table' },
     { label: 'Time series', value: 'time series' },
   ];
   const selectedOption = options.find((options) => options.value === query.queryType) || options[0];
+
   return (
     <>
-      <div className="gf-form max-width-8" role="query-type-container">
-        <Select
-          allowCustomValue={false}
-          isSearchable={false}
-          onChange={onQueryTypeChange}
-          options={options}
-          value={selectedOption}
+      {useLegacyEditor ? (
+        <div className="gf-form">
+          <TextArea
+            style={{ height: 100 }}
+            role="query-editor-input"
+            value={rawQueryText}
+            onBlur={() => props.onRunQuery()}
+            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onQueryTextChange(event.target.value)}
+          />
+        </div>
+      ) : (
+        <CodeEditor
+          height={calculateHeight(rawQueryText)}
+          value={rawQueryText}
+          onBlur={onQueryTextChange}
+          onSave={onQueryTextChange}
+          language="sql"
+          showMiniMap={false}
         />
-      </div>
-      <CodeEditor
-        height={calculateHeight(rawQueryText)}
-        value={rawQueryText}
-        onBlur={onQueryTextChange}
-        onSave={onQueryTextChange}
-        language="sql"
-        showMiniMap={false}
-      />
-      <div className="gf-form">
-        <div style={{ display: 'flex', flexDirection: 'column', marginRight: 15 }} role="time-column-selector">
+      )}
+      <div className="gf-form-inline">
+        <div className="gf-form" role="query-type-container" style={{ marginRight: 15 }}>
           <InlineFormLabel>
-            <div style={{ whiteSpace: 'nowrap' }} onClick={() => setShowHelp(!showHelp)}>
-              Time formatted columns <Icon name={showHelp ? 'angle-down' : 'angle-right'} />
-            </div>
+            <div style={{ whiteSpace: 'nowrap' }}>Format as:</div>
           </InlineFormLabel>
-          <TagsInput onChange={(tags: string[]) => onUpdateColumnTypes('timeColumns', tags)} tags={timeColumns} />
+          <Select
+            allowCustomValue={false}
+            isSearchable={false}
+            onChange={onQueryTypeChange}
+            options={options}
+            value={selectedOption}
+          />
+        </div>
+        <div className="gf-form">
+          <div style={{ display: 'flex', flexDirection: 'row', marginRight: 15 }} role="time-column-selector">
+            <InlineFormLabel>
+              <div style={{ whiteSpace: 'nowrap' }} onClick={() => setShowHelp(!showHelp)}>
+                Time formatted columns <Icon name={showHelp ? 'angle-down' : 'angle-right'} />
+              </div>
+            </InlineFormLabel>
+            <TagsInput onChange={(tags: string[]) => onUpdateColumnTypes('timeColumns', tags)} tags={timeColumns} />
+          </div>
+          <div className="gf-form" style={{ alignItems: 'center' }}>
+            <InlineFormLabel>
+              <div style={{ whiteSpace: 'nowrap' }}>Use legacy code editor:</div>
+            </InlineFormLabel>
+            <Switch
+              role="use-legacy-editor-switch"
+              value={useLegacyEditor}
+              onChange={() => setUseLegacyEditor(!useLegacyEditor)}
+            />
+          </div>
         </div>
       </div>
       {showHelp && (
