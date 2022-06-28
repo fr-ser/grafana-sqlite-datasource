@@ -2,10 +2,6 @@
   "name": "frser-sqlite-datasource",
   "description": "SQLite as a (Backend) Datasource",
   "version": "0.0.0-replaced-in-ci-cd",
-  "scripts": {
-    "sign": "grafana-toolkit plugin:sign",
-    "start": "yarn watch"
-  },
   "author": "Sergej Herbert",
   "license": "Apache-2.0",
   "repository": "https://github.com/fr-ser/grafana-sqlite-datasource.git",
