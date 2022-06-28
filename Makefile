@@ -91,6 +91,10 @@ build-backend-cross-darwin-arm64:
 build-frontend:
 	npx grafana-toolkit plugin:build --skipTest --skipLint
 
+#: Build the frontend and watch for changes
+build-frontend-watch:
+	npx grafana-toolkit plugin:dev --watch
+
 #: Package up the build artifacts and zip them in a file
 package-and-zip:
 	chmod +x ./dist/gpx_*
