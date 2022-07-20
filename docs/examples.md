@@ -2,21 +2,24 @@
 
 This file contains some typical examples for queries to get started.
 
-## Properly interpolating filter variables in dashboards
+## Interpolating filter variables
 
-To set up variables by which users can easily filter dashboards, go into the dashboard settings, and click the "variables" option.  You can populate this with queries, for example:
+To set up variables by which users can easily filter dashboards, go into the dashboard settings, and click the "variables" option.
+You can populate this with queries, for example:
 
 ```sql
 SELECT name FROM students ORDER BY name ASC;
 ```
 
-Supposing the name of the variable created with the above query was 'students', you can then easily interpolate this value with an IN clause in your dashboard's query:
+Supposing the name of the variable created with the above query was `students`, you can then easily interpolate this value with an `IN` clause in your dashboard's query:
 
 ```sql
-SELECT unix_timestamp,present FROM class_arrival_times WHERE student IN (${students:singlequote}) AND unix_timestamp >= $__from / 1000 AND unix_timestamp < $__to / 1000
+SELECT unix_timestamp, present FROM class_arrival_times
+WHERE student IN (${students:singlequote})
 ```
 
-To learn more about advanced variable interpolation to facilitate your queries, see [here](https://grafana.com/docs/grafana/latest/variables/advanced-variable-format-options/).
+To learn more about advanced variable interpolation to facilitate your queries, see
+[here](https://grafana.com/docs/grafana/latest/variables/advanced-variable-format-options/).
 
 ## Filter by time
 
