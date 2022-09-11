@@ -29,7 +29,7 @@ func TestJsonSupport(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("value", nil, []*int64{intPointer(4)}),
 	)
 	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: baseQuery}

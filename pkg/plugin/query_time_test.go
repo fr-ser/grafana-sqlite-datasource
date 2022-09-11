@@ -33,7 +33,7 @@ func TestQueryWithTimeColumn(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("time", nil, []*time.Time{
 			timePointer(time.Unix(21, 0)),
 			timePointer(time.Unix(22, 300000000)),
@@ -79,7 +79,7 @@ func TestQueryWithTimeStringColumn(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("time", nil, []*time.Time{
 			timePointer(time.Unix(21, 0)),
 			timePointer(time.Unix(22, 300000000)),
@@ -124,7 +124,7 @@ func TestUnixTimestampAsString(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("time", nil, []*time.Time{
 			timePointer(time.Unix(21, 0)),
 			timePointer(time.Unix(22, 300000000)),

@@ -13,7 +13,7 @@ func TestIgnoreNonTimeSeriesQuery(t *testing.T) {
 	var longToWideCalled bool
 	mockableLongToWide = func(a *data.Frame, b *data.FillMissing) (*data.Frame, error) {
 		longToWideCalled = true
-		return data.NewFrame("response"), nil
+		return data.NewFrame(""), nil
 	}
 
 	dbPath, cleanup := createTmpDB(`
@@ -44,7 +44,7 @@ func TestIgnoreNonTimeSeriesQuery(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("time", nil, []*time.Time{
 			timePointer(time.Unix(21, 0)),
 			timePointer(time.Unix(22, 0)),
@@ -68,7 +68,7 @@ func TestIgnoreWideTimeSeriesQuery(t *testing.T) {
 	var longToWideCalled bool
 	mockableLongToWide = func(a *data.Frame, b *data.FillMissing) (*data.Frame, error) {
 		longToWideCalled = true
-		return data.NewFrame("response"), nil
+		return data.NewFrame(""), nil
 	}
 
 	dbPath, cleanup := createTmpDB(`
@@ -99,7 +99,7 @@ func TestIgnoreWideTimeSeriesQuery(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"value",
+		"",
 		data.NewField("time", nil, []*time.Time{
 			timePointer(time.Unix(21, 0)),
 			timePointer(time.Unix(22, 0)),
@@ -141,7 +141,7 @@ func TestConvertLongTimeSeriesQuery(t *testing.T) {
 	}
 
 	expectedInputFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("time", nil, []*time.Time{
 			timePointer(time.Unix(21, 0)), timePointer(time.Unix(22, 0)),
 		}),
@@ -165,7 +165,7 @@ func TestConvertLongTimeSeriesQuery(t *testing.T) {
 
 	expectedOutputFrames := make([]*data.Frame, 2)
 	expectedOutputFrames[0] = data.NewFrame(
-		"value one",
+		"",
 		data.NewField("time", nil, []time.Time{time.Unix(21, 0), time.Unix(22, 0)}),
 		data.NewField(
 			"value",
@@ -176,7 +176,7 @@ func TestConvertLongTimeSeriesQuery(t *testing.T) {
 	expectedOutputFrames[0].Meta = &data.FrameMeta{ExecutedQueryString: "SELECT * FROM test"}
 
 	expectedOutputFrames[1] = data.NewFrame(
-		"value two",
+		"",
 		data.NewField("time", nil, []time.Time{time.Unix(21, 0), time.Unix(22, 0)}),
 		data.NewField(
 			"value",

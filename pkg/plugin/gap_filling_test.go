@@ -36,7 +36,7 @@ func TestEpochGroupSecondsShouldBeReplacedInTheFinalQueryForTables(t *testing.T)
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("window", nil, []*int64{intPointer(0), intPointer(10), intPointer(30)}),
 		data.NewField("value", nil, []*int64{intPointer(1), intPointer(2), intPointer(4)}),
 	)
@@ -75,7 +75,7 @@ func TestEpochGroupSecondsShouldFillInNullValuesForTables(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField(
 			"window", nil, []*time.Time{
 				unixTimePointer(0),
@@ -121,7 +121,7 @@ func TestEpochGroupSecondsShouldFillInNullValuesForTimeSeriesWithDoubleGaps(t *t
 	}
 
 	expectedFrame := data.NewFrame(
-		"value",
+		"",
 		data.NewField(
 			"window",
 			nil,
@@ -178,7 +178,7 @@ func TestEpochGroupSecondsShouldFillInNullValuesWithMultipleTimeColumns(t *testi
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("window", nil, []*time.Time{
 			unixTimePointer(0),
 			unixTimePointer(10),
@@ -229,7 +229,7 @@ func TestEpochGroupSecondsShouldBeReplacedInTheFinalQueryForTimeSeries(t *testin
 	}
 
 	expectedFrame := data.NewFrame(
-		"value",
+		"",
 		data.NewField("window", nil, []*time.Time{
 			timePointer(time.Unix(0, 0)),
 			timePointer(time.Unix(10, 0)),
@@ -275,7 +275,7 @@ func TestEpochGroupSecondsWithMultiFrameTimeseriesAndGaps(t *testing.T) {
 	}
 
 	expectedInputFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("window", nil, []*time.Time{
 			unixTimePointer(10), unixTimePointer(20), unixTimePointer(30),
 		}),
@@ -300,7 +300,7 @@ func TestEpochGroupSecondsWithMultiFrameTimeseriesAndGaps(t *testing.T) {
 
 	expectedOutputFrames := make([]*data.Frame, 2)
 	expectedOutputFrames[0] = data.NewFrame(
-		"value one",
+		"",
 		data.NewField("window", nil, []time.Time{
 			time.Unix(10, 0), time.Unix(20, 0), time.Unix(30, 0)},
 		),
@@ -314,7 +314,7 @@ func TestEpochGroupSecondsWithMultiFrameTimeseriesAndGaps(t *testing.T) {
 	expectedOutputFrames[0].Meta = response.Frames[0].Meta
 
 	expectedOutputFrames[1] = data.NewFrame(
-		"value two",
+		"",
 		data.NewField("window", nil, []time.Time{
 			time.Unix(10, 0), time.Unix(20, 0), time.Unix(30, 0)},
 		),

@@ -70,7 +70,7 @@ func TestEmptyQuery(t *testing.T) {
 		)
 	}
 
-	expectedFrame := data.NewFrame("response")
+	expectedFrame := data.NewFrame("")
 	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "-- not a query"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
@@ -100,7 +100,7 @@ func TestNoResultsTable(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("time", nil, []*int64{}),
 		data.NewField("value", nil, []*float64{}),
 		data.NewField("name", nil, []*string{}),
@@ -116,7 +116,7 @@ func TestNoResultsTimeSeriesWithUnknownColumns(t *testing.T) {
 	var longToWideCalled bool
 	mockableLongToWide = func(a *data.Frame, b *data.FillMissing) (*data.Frame, error) {
 		longToWideCalled = true
-		return data.NewFrame("response"), nil
+		return data.NewFrame(""), nil
 	}
 
 	dbPath, cleanup := createTmpDB(`SELECT 1`)
@@ -144,7 +144,7 @@ func TestNoResultsTimeSeriesWithUnknownColumns(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"value",
+		"",
 		data.NewField("time", nil, []*time.Time{}),
 		data.NewField("value", nil, []*float64{}),
 	)
@@ -189,7 +189,7 @@ func TestReplaceToAndFromVariables(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("a", nil, []*int64{intPointer(123000)}),
 		data.NewField("b", nil, []*int64{intPointer(456000)}),
 	)
