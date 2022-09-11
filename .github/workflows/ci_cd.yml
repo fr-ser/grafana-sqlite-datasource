@@ -258,7 +258,7 @@ jobs:
         run: |
           sed 's/$VERSION/${{ steps.metadata.outputs.version }}/g' release_template.md > release_notes.md
 
-          awk '/^## / {s++} s == 1 {print}' CHANGELOG.md > changelog_extract.md
+          awk '/^## / {s++} s == 2 {print}' CHANGELOG.md > changelog_extract.md
           # skip the first two lines
           tail -n +3 changelog_extract.md >> release_notes.md
 
