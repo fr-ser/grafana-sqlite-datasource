@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [3.1.1] - 2022-09-11
+
+### Changed
+
+- removed the "name" metadata from data frames
+
 ## [3.1.0] - 2022-07-09
 
 ### Changed

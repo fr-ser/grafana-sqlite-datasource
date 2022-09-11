@@ -361,7 +361,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 	}
 	log.DefaultLogger.Debug("Fetched data from database")
 
-	frame := data.NewFrame("response")
+	frame := data.NewFrame("")
 	frame.Meta = &data.FrameMeta{ExecutedQueryString: queryConfig.FinalQuery}
 
 	if queryConfig.ShouldFillValues {
@@ -448,8 +448,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 		if idx == tsSchema.TimeIndex {
 			continue
 		}
-		partialFrame := data.NewFrame(
-			strings.Trim(fmt.Sprintf("%s %s", field.Name, field.Labels["name"]), " "),
+		partialFrame := data.NewFrame("",
 			frame.Fields[tsSchema.TimeIndex],
 			field,
 		)

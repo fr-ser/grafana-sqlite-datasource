@@ -33,7 +33,7 @@ func TestCTETableQuery(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("time", nil, []*int64{intPointer(1), intPointer(2), intPointer(3)}),
 		data.NewField("value", nil, []*float64{
 			floatPointer(1.1), floatPointer(2.2), floatPointer(3.3),
@@ -72,7 +72,7 @@ func TestMixedTypes(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("first", nil, []*float64{floatPointer(1), floatPointer(2.2)}),
 		data.NewField("second", nil, []*float64{floatPointer(1.1), floatPointer(2)}),
 	)
@@ -106,7 +106,7 @@ func TestSimpleTableQuery(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("time", nil, []*int64{intPointer(1), intPointer(2), intPointer(3)}),
 		data.NewField("value", nil, []*float64{
 			floatPointer(1.1), floatPointer(2.2), floatPointer(3.3),
@@ -145,7 +145,7 @@ func TestNullValues(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("time", nil, []*int64{nil, intPointer(2), intPointer(3)}),
 		data.NewField("value", nil, []*float64{floatPointer(1.1), nil, floatPointer(3.3)}),
 		data.NewField("name", nil, []*string{strPointer("one"), strPointer("two"), nil}),
@@ -182,7 +182,7 @@ func TestNullValuesCTE(t *testing.T) {
 	}
 
 	expectedFrame := data.NewFrame(
-		"response",
+		"",
 		data.NewField("time", nil, []*int64{nil, intPointer(2), intPointer(3)}),
 		data.NewField("value", nil, []*float64{floatPointer(1.1), nil, floatPointer(3.3)}),
 		data.NewField("name", nil, []*string{strPointer("one"), strPointer("two"), nil}),
