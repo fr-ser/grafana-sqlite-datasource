@@ -14,7 +14,7 @@ Table of contents:
 - [Support for Time Formatted Columns](#support-for-time-formatted-columns)
 - [Macros](#macros)
 - [Alerting](#alerting)
-- [Common Problems / FAQ](#common-problems---faq)
+- [Common Problems - FAQ](#common-problems---faq)
 - [Development and Contributing](#development-and-contributing)
 - [Supporting the Project](#supporting-the-project)
 - [Further Documentation and Links](#further-documentation-and-links)
@@ -97,7 +97,7 @@ for the alerts. In order to allow time filtering this plugin supports the variab
 <https://grafana.com/docs/grafana/latest/variables/variable-types/global-variables/#__from-and-__to>.
 Formatting of those variables (e.g. `${__from:date:iso}`) is not supported for alerts, however.
 
-## Common Problems / FAQ
+## Common Problems - FAQ
 
 This is a list of common questions or problems. For the answers and more details see
 [./docs/faq.md](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/docs/faq.md).
