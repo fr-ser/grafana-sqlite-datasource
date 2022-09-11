@@ -104,6 +104,7 @@ This is a list of common questions or problems. For the answers and more details
 
 - [I have a "file not found" error for my database](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/docs/faq.md#i-have-a-file-not-found-error-for-my-database)
 - [I have a "permission denied" error for my database](https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/docs/faq.md#i-have-a-permission-denied-error-for-my-database)
+- ...
 
 ## Query examples
 

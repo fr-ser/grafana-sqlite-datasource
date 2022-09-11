@@ -51,3 +51,12 @@ ProtectHome=false
 systemctl daemon-reload
 systemctl restart grafana-server
 ```
+
+## The legend of my time series appears twice / is doubled
+
+Sometimes (especially when displaying multiple lines in a time series chart) the legend (the information below the chart) can show the name of the column twice.
+The legend can read "value value" or "temperature temperature".
+
+This can be controlled through the field display name configuration.
+There a hardcoded value can be set but the value can also be based on the "labels" of the search.
+Some more information about setting the display name via labels can be found in the [Grafana documentation](https://grafana.com/docs/grafana/latest/panels/configure-standard-options/#display-name).
