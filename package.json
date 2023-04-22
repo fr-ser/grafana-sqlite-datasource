@@ -16,10 +16,10 @@
     "@testing-library/user-event": "^13.0.0",
     "@types/jest": "^27.0.0",
     "@types/lodash": "latest",
-    "@types/selenium-webdriver": "^4.0.9",
-    "chromedriver": "^84.0.0",
+    "@types/selenium-webdriver": "^4.1.0",
+    "chromedriver": "^112.0.0",
     "jest-environment-jsdom-sixteen": "^2.0.0",
-    "selenium-webdriver": "^4.0.0-alpha.7"
+    "selenium-webdriver": "4.0.X"
   },
   "engines": {
     "node": ">=14"
@@ -29,5 +29,6 @@
   },
   "jest": {
     "testEnvironment": "jest-environment-jsdom-sixteen"
-  }
+  },
+  "dependencies": {}
 }

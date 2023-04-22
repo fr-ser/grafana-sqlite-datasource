@@ -61,7 +61,8 @@ build-backend-local:
 	go build -o dist/gpx_sqlite-datasource_$(os_name)_$(arc_name)$(os_suffix) ./pkg
 
 #: Build the backend for the docker architecture
-build-backend-docker: build-backend-cross-linux-amd64
+build-backend-docker:
+	GOOS=linux GOARCH=$(arc_name) go build -o dist/gpx_sqlite-datasource_linux_$(arc_name) ./pkg
 
 #: Build the backend for all supported environments
 build-backend-all: build-backend-cross-win-amd64 build-backend-cross-linux-amd64 build-backend-cross-linux-arm build-backend-cross-linux-arm64 build-backend-cross-freebsd-amd64 build-backend-cross-darwin-amd64 build-backend-cross-darwin-arm64

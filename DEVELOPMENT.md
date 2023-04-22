@@ -49,7 +49,22 @@ make test
 First start the docker environment with `make selenium-test`. This will also run the tests.
 Regardless of the tests passing the environment will stay up and running.
 
-Now you can connect to the dockerized browser via a `VNC` client/viewer (like remmina)
+Now you can connect to the dockerized browser via a `VNC` client/viewer.
+
+The VNC password is `secret`.
+
+**Note - Macos M1/AMD support:** The selenium image does not support arm architectures yet.
+
+In order to run the tests on an ARM architecture please change the docker image of selenium by using this environment variable:
+`SELENIUM_IMAGE=seleniarm/standalone-chromium:112.0`.
+
+You can find more information here: <https://github.com/SeleniumHQ/docker-selenium#experimental-mult-arch-aarch64armhfamd64-images>
+
+#### VNC Viewer
+
+On linux distributions you can use remmina as a VNC viewer.
+
+On MacOs you can use the preinstalled "screen sharing" application as a VNC viewer.
 
 ## Release process
 

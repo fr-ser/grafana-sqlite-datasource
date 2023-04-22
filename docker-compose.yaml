@@ -20,13 +20,11 @@ services:
     depends_on:
       - postgres
   selenium:
-    image: selenium/standalone-chrome:84.0
+    image: ${SELENIUM_IMAGE:-selenium/standalone-chrome:112.0}
     shm_size: 2gb
     ports:
       - 4444:4444
-      - 5900:5900
-    environment:
-      VNC_NO_PASSWORD: '1'
+      - 5900:5900 # this is the VNC port. the password is "secret"
   start-setup:
     image: dadarek/wait-for-dependencies:0.2
     depends_on:
