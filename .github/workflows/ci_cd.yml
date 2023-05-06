@@ -271,7 +271,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Release ${{ github.ref }}
+          name: Release ${{ steps.metadata.outputs.version }}
           body_path: ${{ steps.set_release_notes.outputs.path }}
           prerelease: ${{ steps.check_prerelease.outputs.is_prerelease }}
           files: |
