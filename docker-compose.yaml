@@ -3,8 +3,9 @@ version: '3.6'
 services:
   grafana:
     image: grafana/grafana:${GRAFANA_VERSION:-8.1.0}
+    environment:
+      TZ: Europe/Berlin
     # uncomment to install a comma separated list of plugins
-    # environment:
     #   GF_INSTALL_PLUGINS: grafana-worldmap-panel
     volumes:
       - './grafana_config/data.db:/app/data.db'
