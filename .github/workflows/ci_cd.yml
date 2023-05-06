@@ -14,17 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
         with:
           go-version: 1.17
-      - uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: Install go dependencies
         run: make install-go-dependencies
       - name: Run tests
@@ -34,13 +28,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js 16.14.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16.14.x
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: '**/node_modules'
           key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
@@ -56,23 +50,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
         with:
           go-version: 1.17
-      - uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: Install go dependencies
         run: make install-go-dependencies
       - name: build all versions
         run: make build-backend-all
       - name: Upload linux binaries
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: plugin-executables
           path: ./dist/
@@ -86,18 +74,18 @@ jobs:
       - build-plugin-backend
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Use Node.js 16.14.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16.14.x
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: '**/node_modules'
           key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
@@ -107,13 +95,13 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Download plugin backend
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: plugin-executables
           path: ./dist/
       - name: Build frontend
         run: make build-frontend
-      - name: fixe file permissions
+      - name: fix file permissions
         run: chmod +x ./dist/gpx_*
       - name: Run Selenium Tests
         run: make selenium-test-no-build
@@ -128,20 +116,20 @@ jobs:
       - build-plugin-backend
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Get metadata about the plugin
         id: metadata
         run: |
           export PLUGIN_VERSION=${GITHUB_REF#refs/tags/v}
           export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
-          echo "::set-output name=version::${PLUGIN_VERSION}"
-          echo "::set-output name=archive::${PLUGIN_ARTIFACT}"
+          echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
+          echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
       - name: Use Node.js 16.14.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16.14.x
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: '**/node_modules'
           key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
@@ -151,7 +139,7 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Download plugin backend
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: plugin-executables
           path: ./dist/
@@ -164,7 +152,7 @@ jobs:
           GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
         run: make package-and-zip
       - name: Upload plugin package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: plugin-package
           path: ${{ steps.metadata.outputs.archive }}
@@ -176,9 +164,9 @@ jobs:
       - create-artifacts
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -187,10 +175,10 @@ jobs:
         run: |
           export PLUGIN_VERSION=${GITHUB_REF#refs/tags/v}
           export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
-          echo "::set-output name=version::${PLUGIN_VERSION}"
-          echo "::set-output name=archive::${PLUGIN_ARTIFACT}"
+          echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
+          echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
       - name: Download plugin package
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: plugin-package
           path: ./
@@ -201,11 +189,11 @@ jobs:
           sed -i 's/allow_loading_unsigned_plugins = true//g' grafana_config/grafana.ini
           sed -i 's/app_mode = development/app_mode = production/g' grafana_config/grafana.ini          
       - name: Use Node.js 16.14.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16.14.x
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: '**/node_modules'
           key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
@@ -228,14 +216,14 @@ jobs:
       - test-selenium-release-linux
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Get metadata about the plugin
         id: metadata
         run: |
           export PLUGIN_VERSION=${GITHUB_REF#refs/tags/v}
           export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
-          echo "::set-output name=version::${PLUGIN_VERSION}"
-          echo "::set-output name=archive::${PLUGIN_ARTIFACT}"
+          echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
+          echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
       - name: Check changelog
         run: |
           latest_tag_without_rc=$(echo ${{ steps.metadata.outputs.version }} | sed -r s/-rc\.[0-9]+//)
@@ -246,7 +234,7 @@ jobs:
             exit 1
           fi
       - name: Download plugin package
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: plugin-package
           path: ./
@@ -262,14 +250,14 @@ jobs:
           # skip the first two lines
           tail -n +3 changelog_extract.md >> release_notes.md
 
-          echo "::set-output name=path::release_notes.md"
+          echo "path=release_notes.md" >> $GITHUB_OUTPUT
       - name: Check prerelease
         id: check_prerelease
         run: |
           if [[ ${{ github.ref }} =~ "rc" ]]; then
-            echo "::set-output name=is_prerelease::true"
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=is_prerelease::false"
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
           fi
       - name: Lint plugin
         # the rc part of the version is rejected by the plugin validator
@@ -280,29 +268,12 @@ jobs:
           go run . ../../../../${{ steps.metadata.outputs.archive }}
       - name: Create release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Release ${{ github.ref }}
           body_path: ${{ steps.set_release_notes.outputs.path }}
           prerelease: ${{ steps.check_prerelease.outputs.is_prerelease }}
-      - name: Add plugin to release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ steps.metadata.outputs.archive }}
-          asset_name: ${{ steps.metadata.outputs.archive }}
-          asset_content_type: application/zip
-      - name: Add checksum to release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ steps.metadata.outputs.archive }}.md5
-          asset_name: ${{ steps.metadata.outputs.archive }}.md5
-          asset_content_type: text/plain
+          files: |
+            ${{ steps.metadata.outputs.archive }}
+            ${{ steps.metadata.outputs.archive }}.md5
