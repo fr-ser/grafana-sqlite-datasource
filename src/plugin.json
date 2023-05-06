@@ -13,12 +13,7 @@
       "name": "Sergej Herbert",
       "url": "https://github.com/fr-ser"
     },
-    "keywords": [
-      "sqlite",
-      "sql",
-      "raspberry",
-      "arm"
-    ],
+    "keywords": ["sqlite", "sql", "raspberry", "arm"],
     "logos": {
       "small": "img/logo.svg",
       "large": "img/logo.svg"
@@ -30,7 +25,7 @@
       },
       {
         "name": "License",
-        "url": "https://github.com/fr-ser/grafana-sqlite-datasource/blob/master/LICENSE"
+        "url": "https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/LICENSE"
       }
     ],
     "screenshots": [

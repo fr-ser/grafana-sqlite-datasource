@@ -7,7 +7,7 @@ found at:
 
 - <https://grafana.com/tutorials/build-a-data-source-backend-plugin/>
 - <https://github.com/grafana/grafana-plugin-sdk-go>
-- <https://github.com/grafana/grafana/tree/master/packages/grafana-toolkit>
+- <https://github.com/grafana/grafana/tree/main/packages/grafana-toolkit>
 
 ## Getting started
 
