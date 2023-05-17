@@ -124,6 +124,23 @@ jobs:
           export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
           echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
           echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
+          TAG_WITHOUT_RC=$(echo ${{ steps.metadata.outputs.version }} | sed -r s/-rc\.[0-9]+//)
+          echo "versionWithoutRc=${TAG_WITHOUT_RC}" >> $GITHUB_OUTPUT
+      - name: Check changelog
+        run: |
+          if ! grep -q -F "## [${{ steps.metadata.outputs.versionWithoutRc }}]" CHANGELOG.md; then
+            echo "Error: The (## [${{ steps.metadata.outputs.versionWithoutRc }}]) tag was not found in the CHANGELOG.md."
+            echo "Latest tag: ${{ steps.metadata.outputs.version }}" 1>&2
+            exit 1
+          fi
+      - name: Check package.json
+        run: |
+          PACKAGE_VERSION=$(cat package.json | jq -r .version)
+
+          if [ "$PACKAGE_VERSION" != "${{ steps.metadata.outputs.versionWithoutRc }}" ]; then
+            echo "Error: The version in package.json was $PACKAGE_VERSION instead of ${{ steps.metadata.outputs.versionWithoutRc }}."
+            exit 1
+          fi
       - name: Use Node.js 16.14.x
         uses: actions/setup-node@v3
         with:
@@ -223,15 +240,6 @@ jobs:
           export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
           echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
           echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
-      - name: Check changelog
-        run: |
-          latest_tag_without_rc=$(echo ${{ steps.metadata.outputs.version }} | sed -r s/-rc\.[0-9]+//)
-
-          if ! grep -q -F "## [${latest_tag_without_rc}]" CHANGELOG.md; then
-            echo "Error: The (## [${latest_tag_without_rc}]) tag was not found in the CHANGELOG.md."
-            echo "Latest tag: ${{ steps.metadata.outputs.version }}" 1>&2
-            exit 1
-          fi
       - name: Download plugin package
         uses: actions/download-artifact@v3
         with:
