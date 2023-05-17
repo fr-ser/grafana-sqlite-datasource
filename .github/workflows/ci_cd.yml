@@ -145,7 +145,6 @@ jobs:
           path: ./dist/
       - name: Build frontend
         run: |
-          npm version ${{ steps.metadata.outputs.version }} --no-git-tag-version
           make build-frontend
       - name: package-and-zip
         env:

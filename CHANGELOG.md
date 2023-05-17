@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [3.1.4] - 2023-05-17
+
+Nothing user facing was changed.
+The only difference is a change in meta data to accommodate new Grafana plugin checks.
+
 ## [3.1.3] - 2023-05-06
 
 ### Changed
