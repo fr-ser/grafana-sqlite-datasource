@@ -124,7 +124,7 @@ jobs:
           export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
           echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
           echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
-          TAG_WITHOUT_RC=$(echo ${{ steps.metadata.outputs.version }} | sed -r s/-rc\.[0-9]+//)
+          export TAG_WITHOUT_RC=$(echo ${PLUGIN_VERSION} | sed -r s/-rc\.[0-9]+//)
           echo "versionWithoutRc=${TAG_WITHOUT_RC}" >> $GITHUB_OUTPUT
       - name: Check changelog
         run: |
@@ -166,7 +166,7 @@ jobs:
       - name: package-and-zip
         env:
           GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
-        run: make package-and-zip
+        run: make package-and-zip PLUGIN_VERSION=${{ steps.metadata.outputs.version }}
       # the plugin validation always fails due to "error: It is not permitted to access the file system.""
       # - name: Set up Go
       #   uses: actions/setup-go@v4

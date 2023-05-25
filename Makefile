@@ -1,3 +1,5 @@
+PLUGIN_VERSION ?= $(shell cat package.json | jq .version -r)
+
 UNAME_OS := $(shell uname -s)
 UNAME_ARC := $(shell uname -m)
 
@@ -77,9 +79,9 @@ package-and-zip:
 	chmod +x ./dist/gpx_*
 	cp -R dist dist_old
 
-	npx grafana-toolkit plugin:sign
+	npm run sign
 	mv dist frser-sqlite-datasource
-	zip frser-sqlite-datasource-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
+	zip frser-sqlite-datasource-$(PLUGIN_VERSION).zip ./frser-sqlite-datasource -r
 	rm -rf frser-sqlite-datasource
 	mv dist_old dist
 
@@ -112,13 +114,6 @@ test-backend:
 	@echo
 	@echo "Linting Checks:"
 	@golangci-lint run ./pkg/... && echo "Linting passed!\n"
-
-#: Sign the build artifacts with the private Grafana organization key
-sign:
-	npx grafana-toolkit plugin:sign
-
-#: Build all artifacts for the local architecture and sign them with the private Grafana organization key
-build-and-sign: build sign
 
 #: Run all tests (frontend, backend, end-to-end)
 test: 
