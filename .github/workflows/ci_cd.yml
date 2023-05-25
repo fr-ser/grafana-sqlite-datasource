@@ -18,7 +18,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.17
+          go-version: 1.19
       - name: Install go dependencies
         run: make install-go-dependencies
       - name: Run tests
@@ -54,7 +54,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.17
+          go-version: 1.19
       - name: Install go dependencies
         run: make install-go-dependencies
       - name: build all versions

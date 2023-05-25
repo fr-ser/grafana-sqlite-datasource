@@ -31,6 +31,8 @@ add-git-hook:
 #: Install go dependencies
 install-go-dependencies:
 	go mod download
+	# install golangci-lint
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin 
 	@echo Installing tools from tools.go
 	@cat tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -tI % go install %
 
