@@ -3,7 +3,6 @@ package plugin
 import (
 	"database/sql"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -18,7 +17,7 @@ import (
 var cmpOption = data.FrameTestCompareOptions()
 
 func createTmpDB(seedSQL string) (dbPath string, cleanup func()) {
-	dir, _ := ioutil.TempDir("", "test-check-db")
+	dir, _ := os.MkdirTemp("", "test-check-db")
 	dbPath = filepath.Join(dir, "data.db")
 	db, _ := sql.Open("sqlite", dbPath)
 	_, _ = db.Exec(seedSQL)

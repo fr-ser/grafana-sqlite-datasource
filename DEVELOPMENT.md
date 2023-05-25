@@ -17,7 +17,6 @@ get an overview of the available commands.
 ### Requirements
 
 - nodejs
-- yarn
 - go
 - docker and docker-compose
 - make
@@ -71,7 +70,7 @@ On MacOs you can use the preinstalled "screen sharing" application as a VNC view
 After step 3 Github Actions should take over and create a new release.
 Steps 4 and 5 are for publishing the release to Grafana repository.
 
-1. Update the Changelog
+1. Update the Changelog and the package.json
 2. Tag the commit with a Semver tag, e.g. v2.2.3-rc.1
 3. Push the changes including the tag
 4. Get the md5 hash of the release from the Github Action or from the release page (text file)

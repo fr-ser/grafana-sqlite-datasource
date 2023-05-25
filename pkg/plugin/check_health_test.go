@@ -3,7 +3,6 @@ package plugin
 import (
 	"context"
 	"database/sql"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,7 +15,7 @@ import (
 var ctx = context.Background()
 
 func TestCheckHealthShouldPassForADB(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "test-check-db")
+	dir, _ := os.MkdirTemp("", "test-check-db")
 	defer os.RemoveAll(dir)
 	dbPath := filepath.Join(dir, "my.db")
 
@@ -39,7 +38,7 @@ func TestCheckHealthShouldPassForADB(t *testing.T) {
 }
 
 func TestCheckHealthShouldFailForANotExistingFile(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "test-check-db")
+	dir, _ := os.MkdirTemp("", "test-check-db")
 	defer os.RemoveAll(dir)
 	notExistingDbPath := filepath.Join(dir, "my.db")
 
@@ -63,7 +62,7 @@ func TestCheckHealthShouldFailForANotExistingFile(t *testing.T) {
 }
 
 func TestCheckHealthShouldFailForAFolder(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "test-check-db")
+	dir, _ := os.MkdirTemp("", "test-check-db")
 	defer os.RemoveAll(dir)
 
 	ds := sqliteDatasource{pluginConfig{Path: dir, PathPrefix: "file:"}}
@@ -82,7 +81,7 @@ func TestCheckHealthShouldFailForAFolder(t *testing.T) {
 }
 
 func TestCheckHealthShouldFailOnTextFile(t *testing.T) {
-	f, _ := ioutil.TempFile("", "test-check-db")
+	f, _ := os.CreateTemp("", "test-check-db")
 	defer func() { _ = syscall.Unlink(f.Name()) }()
 	_, _ = f.WriteString("not a sqlite db")
 	f.Close()
@@ -102,7 +101,7 @@ func TestCheckHealthShouldFailOnTextFile(t *testing.T) {
 }
 
 func TestCheckHealthShouldPassForAnEmptyFile(t *testing.T) {
-	f, _ := ioutil.TempFile("", "test-check-db")
+	f, _ := os.CreateTemp("", "test-check-db")
 	defer func() { _ = syscall.Unlink(f.Name()) }()
 
 	ds := sqliteDatasource{pluginConfig{Path: f.Name(), PathPrefix: "file:"}}

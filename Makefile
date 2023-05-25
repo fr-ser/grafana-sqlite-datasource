@@ -1,3 +1,5 @@
+PLUGIN_VERSION ?= $(shell cat package.json | jq .version -r)
+
 UNAME_OS := $(shell uname -s)
 UNAME_ARC := $(shell uname -m)
 
@@ -31,12 +33,14 @@ add-git-hook:
 #: Install go dependencies
 install-go-dependencies:
 	go mod download
+	# install golangci-lint
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin 
 	@echo Installing tools from tools.go
 	@cat tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -tI % go install %
 
 #: Install Javascript dependencies
 install-js-dependencies:
-	yarn install
+	npm install
 
 #: Install all dependencies
 install-dependencies: install-go-dependencies install-js-dependencies
@@ -45,12 +49,6 @@ install-dependencies: install-go-dependencies install-js-dependencies
 start: teardown
 	docker-compose up -d grafana
 	@echo "Go to http://localhost:3000/"
-
-#: Start a local Grafana instance and the frontend in watch mode
-start-dev:
-	docker-compose up -d grafana
-	@echo "Go to http://localhost:3000/"
-	npx grafana-toolkit plugin:dev --watch
 
 #: Teardown the docker resources
 teardown:
@@ -65,45 +63,25 @@ build-backend-docker:
 	GOOS=linux GOARCH=$(arc_name) go build -o dist/gpx_sqlite-datasource_linux_$(arc_name) ./pkg
 
 #: Build the backend for all supported environments
-build-backend-all: build-backend-cross-win-amd64 build-backend-cross-linux-amd64 build-backend-cross-linux-arm build-backend-cross-linux-arm64 build-backend-cross-freebsd-amd64 build-backend-cross-darwin-amd64 build-backend-cross-darwin-arm64
-
-build-backend-cross-win-amd64:
-	GOOS=windows GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_windows_amd64.exe ./pkg
-
-build-backend-cross-linux-amd64:
-	GOOS=linux GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_linux_amd64 ./pkg
-
-build-backend-cross-linux-arm:
-	GOOS=linux GOARCH=arm go build -o dist/gpx_sqlite-datasource_linux_arm ./pkg
-
-build-backend-cross-linux-arm64:
-	GOOS=linux GOARCH=arm64 go build -o dist/gpx_sqlite-datasource_linux_arm64 ./pkg
-
-build-backend-cross-freebsd-amd64:
-	GOOS=freebsd GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_freebsd_amd64 ./pkg
-
-build-backend-cross-darwin-amd64:
-	GOOS=darwin GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_darwin_amd64 ./pkg
-
-build-backend-cross-darwin-arm64:
-	GOOS=darwin GOARCH=arm64 go build -o dist/gpx_sqlite-datasource_darwin_arm64 ./pkg
+build-backend-all:
+	mage BuildAllAndMore
 
 #: Build the frontend
 build-frontend:
-	npx grafana-toolkit plugin:build --skipTest --skipLint
+	npm run build
 
 #: Build the frontend and watch for changes
 build-frontend-watch:
-	npx grafana-toolkit plugin:dev --watch
+	npm run dev
 
 #: Package up the build artifacts and zip them in a file
 package-and-zip:
 	chmod +x ./dist/gpx_*
 	cp -R dist dist_old
 
-	npx grafana-toolkit plugin:sign
+	npm run sign
 	mv dist frser-sqlite-datasource
-	zip frser-sqlite-datasource-$$(cat package.json | jq .version -r).zip ./frser-sqlite-datasource -r
+	zip frser-sqlite-datasource-$(PLUGIN_VERSION).zip ./frser-sqlite-datasource -r
 	rm -rf frser-sqlite-datasource
 	mv dist_old dist
 
@@ -111,10 +89,10 @@ package-and-zip:
 build: build-frontend build-backend-local build-backend-docker
 
 #: Run the end-to-end tests with Selenium after building the backend for docker
-selenium-test: build-backend-docker selenium-test-no-build
+test-e2e: build-backend-docker build-frontend test-e2e-no-build
 
 #: Run the end-to-end tests with Selenium without building the backend for docker. This can be helpful if the packages have already been built and signed
-selenium-test-no-build:
+test-e2e-no-build:
 	@echo
 	@docker-compose rm --force --stop -v grafana
 	GRAFANA_VERSION=7.3.3 docker-compose run --rm start-setup
@@ -124,34 +102,24 @@ selenium-test-no-build:
 	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
 	@echo
 
-#: Run the frontend tests without linting and building the code
-frontend-test-fast:
-	grafana-toolkit plugin:test
-
 #: Run the frontend tests
-frontend-test:
-	# build is run as this is the only way to include linting
-	npx grafana-toolkit plugin:build
+test-frontend:
+	npm run test:ci
+	npm run lint
+	npm run typecheck
 
 #: Run the backend tests
-backend-test:
+test-backend:
 	gotestsum --format testname -- -count=1 -cover ./pkg/...
 	@echo
 	@echo "Linting Checks:"
 	@golangci-lint run ./pkg/... && echo "Linting passed!\n"
 
-#: Sign the build artifacts with the private Grafana organization key
-sign:
-	npx grafana-toolkit plugin:sign
-
-#: Build all artifacts for the local architecture and sign them with the private Grafana organization key
-build-and-sign: build sign
-
 #: Run all tests (frontend, backend, end-to-end)
 test: 
 	# clear the dist directory in case a previous version of the plugin was signed
 	rm -rf dist
-	make backend-test
-	make frontend-test
-	make selenium-test
+	make test-backend
+	make test-frontend
+	make test-e2e
 	make teardown

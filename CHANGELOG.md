@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [3.2.0] - 2023-05-25
+
+### Changed
+
+- updated go version and go grafana plugin sdk
+- use grafana plugin sdk mage file to build the plugin
+- update grafana plugin npm packages
+
 ## [3.1.4] - 2023-05-17
 
 Nothing user facing was changed.

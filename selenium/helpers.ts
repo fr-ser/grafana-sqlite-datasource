@@ -14,7 +14,9 @@ export async function login(driver) {
     try {
       await driver.findElement(By.css("button[aria-label='Login button']"));
     } catch (err) {
-      if (err instanceof error.NoSuchElementError) return true;
+      if (err instanceof error.NoSuchElementError) {
+        return true;
+      }
     }
     return false;
   }, 2 * 1000);
@@ -41,7 +43,9 @@ export function saveTestState(testStatus: { ok: boolean }, testFn: () => Promise
 }
 
 export async function logHTMLOnFailure(testStatus: { ok: boolean }, driver: any) {
-  if (testStatus.ok || process.env.VERBOSE_TEST_OUTPUT !== '1') return;
+  if (testStatus.ok || process.env.VERBOSE_TEST_OUTPUT !== '1') {
+    return;
+  }
 
   let errorText: string;
   try {

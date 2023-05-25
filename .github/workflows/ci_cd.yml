@@ -18,21 +18,21 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.17
+          go-version: 1.19
       - name: Install go dependencies
         run: make install-go-dependencies
       - name: Run tests
-        run: make backend-test
+        run: make test-backend
 
   test-frontend:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 16.14.x
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.14.x
+          node-version: 16.15.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -44,7 +44,7 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: test frontend
-        run: make frontend-test
+        run: make test-frontend
 
   build-plugin-backend:
     runs-on: ubuntu-latest
@@ -54,7 +54,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.17
+          go-version: 1.19
       - name: Install go dependencies
         run: make install-go-dependencies
       - name: build all versions
@@ -80,10 +80,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Use Node.js 16.14.x
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.14.x
+          node-version: 16.15.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -104,7 +104,7 @@ jobs:
       - name: fix file permissions
         run: chmod +x ./dist/gpx_*
       - name: Run Selenium Tests
-        run: make selenium-test-no-build
+        run: make test-e2e-no-build
       - name: Debug Logs
         if: ${{ failure() }}
         run: docker-compose logs grafana
@@ -124,10 +124,27 @@ jobs:
           export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
           echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
           echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
-      - name: Use Node.js 16.14.x
+          export TAG_WITHOUT_RC=$(echo ${PLUGIN_VERSION} | sed -r s/-rc\.[0-9]+//)
+          echo "versionWithoutRc=${TAG_WITHOUT_RC}" >> $GITHUB_OUTPUT
+      - name: Check changelog
+        run: |
+          if ! grep -q -F "## [${{ steps.metadata.outputs.versionWithoutRc }}]" CHANGELOG.md; then
+            echo "Error: The (## [${{ steps.metadata.outputs.versionWithoutRc }}]) tag was not found in the CHANGELOG.md."
+            echo "Latest tag: ${{ steps.metadata.outputs.version }}" 1>&2
+            exit 1
+          fi
+      - name: Check package.json
+        run: |
+          PACKAGE_VERSION=$(cat package.json | jq -r .version)
+
+          if [ "$PACKAGE_VERSION" != "${{ steps.metadata.outputs.versionWithoutRc }}" ]; then
+            echo "Error: The version in package.json was $PACKAGE_VERSION instead of ${{ steps.metadata.outputs.versionWithoutRc }}."
+            exit 1
+          fi
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.14.x
+          node-version: 16.15.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -149,7 +166,15 @@ jobs:
       - name: package-and-zip
         env:
           GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
-        run: make package-and-zip
+        run: make package-and-zip PLUGIN_VERSION=${{ steps.metadata.outputs.version }}
+      # the plugin validation always fails due to "error: It is not permitted to access the file system.""
+      # - name: Set up Go
+      #   uses: actions/setup-go@v4
+      #   with:
+      #     go-version: 1.19
+      # - name: Validate plugin
+      #   run: |
+      #     docker run --pull=always -v .:/the_app -sourceCodeUri file:///the_app /the_app/${{ steps.metadata.outputs.archive }}
       - name: Upload plugin package
         uses: actions/upload-artifact@v3
         with:
@@ -187,10 +212,10 @@ jobs:
         run: | 
           sed -i 's/allow_loading_unsigned_plugins = true//g' grafana_config/grafana.ini
           sed -i 's/app_mode = development/app_mode = production/g' grafana_config/grafana.ini          
-      - name: Use Node.js 16.14.x
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.14.x
+          node-version: 16.15.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -204,7 +229,7 @@ jobs:
       - name: Run Selenium Tests
         env:
           VERBOSE_TEST_OUTPUT: 1
-        run: make selenium-test-no-build
+        run: make test-e2e-no-build
       - name: Debug Logs
         if: ${{ failure() }}
         run: docker-compose logs grafana
@@ -223,15 +248,6 @@ jobs:
           export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
           echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
           echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
-      - name: Check changelog
-        run: |
-          latest_tag_without_rc=$(echo ${{ steps.metadata.outputs.version }} | sed -r s/-rc\.[0-9]+//)
-
-          if ! grep -q -F "## [${latest_tag_without_rc}]" CHANGELOG.md; then
-            echo "Error: The (## [${latest_tag_without_rc}]) tag was not found in the CHANGELOG.md."
-            echo "Latest tag: ${{ steps.metadata.outputs.version }}" 1>&2
-            exit 1
-          fi
       - name: Download plugin package
         uses: actions/download-artifact@v3
         with:

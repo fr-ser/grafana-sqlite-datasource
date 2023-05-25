@@ -4,6 +4,7 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
 node_modules/
 
@@ -21,13 +22,15 @@ coverage
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 dist/
-frser-sqlite-datasource/
-frser-sqlite-datasource-*.zip
 artifacts/
 work/
 ci/
 e2e-results/
+**/cypress/videos
+**/cypress/report.json
 
 # Editor
 .idea
 .vscode
+
+.eslintcache
