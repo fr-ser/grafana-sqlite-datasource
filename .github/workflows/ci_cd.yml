@@ -22,17 +22,17 @@ jobs:
       - name: Install go dependencies
         run: make install-go-dependencies
       - name: Run tests
-        run: make backend-test
+        run: make test-backend
 
   test-frontend:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 16.14.x
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.14.x
+          node-version: 16.15.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -44,7 +44,7 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: test frontend
-        run: make frontend-test
+        run: make test-frontend
 
   build-plugin-backend:
     runs-on: ubuntu-latest
@@ -80,10 +80,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Use Node.js 16.14.x
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.14.x
+          node-version: 16.15.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -104,7 +104,7 @@ jobs:
       - name: fix file permissions
         run: chmod +x ./dist/gpx_*
       - name: Run Selenium Tests
-        run: make selenium-test-no-build
+        run: make test-e2e-no-build
       - name: Debug Logs
         if: ${{ failure() }}
         run: docker-compose logs grafana
@@ -141,10 +141,10 @@ jobs:
             echo "Error: The version in package.json was $PACKAGE_VERSION instead of ${{ steps.metadata.outputs.versionWithoutRc }}."
             exit 1
           fi
-      - name: Use Node.js 16.14.x
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.14.x
+          node-version: 16.15.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -212,10 +212,10 @@ jobs:
         run: | 
           sed -i 's/allow_loading_unsigned_plugins = true//g' grafana_config/grafana.ini
           sed -i 's/app_mode = development/app_mode = production/g' grafana_config/grafana.ini          
-      - name: Use Node.js 16.14.x
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.14.x
+          node-version: 16.15.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -229,7 +229,7 @@ jobs:
       - name: Run Selenium Tests
         env:
           VERBOSE_TEST_OUTPUT: 1
-        run: make selenium-test-no-build
+        run: make test-e2e-no-build
       - name: Debug Logs
         if: ${{ failure() }}
         run: docker-compose logs grafana

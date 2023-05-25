@@ -38,7 +38,7 @@ install-go-dependencies:
 
 #: Install Javascript dependencies
 install-js-dependencies:
-	yarn install
+	npm install
 
 #: Install all dependencies
 install-dependencies: install-go-dependencies install-js-dependencies
@@ -47,12 +47,6 @@ install-dependencies: install-go-dependencies install-js-dependencies
 start: teardown
 	docker-compose up -d grafana
 	@echo "Go to http://localhost:3000/"
-
-#: Start a local Grafana instance and the frontend in watch mode
-start-dev:
-	docker-compose up -d grafana
-	@echo "Go to http://localhost:3000/"
-	npx grafana-toolkit plugin:dev --watch
 
 #: Teardown the docker resources
 teardown:
@@ -72,11 +66,11 @@ build-backend-all:
 
 #: Build the frontend
 build-frontend:
-	npx grafana-toolkit plugin:build --skipTest --skipLint
+	npm run build
 
 #: Build the frontend and watch for changes
 build-frontend-watch:
-	npx grafana-toolkit plugin:dev --watch
+	npm run dev
 
 #: Package up the build artifacts and zip them in a file
 package-and-zip:
@@ -93,10 +87,10 @@ package-and-zip:
 build: build-frontend build-backend-local build-backend-docker
 
 #: Run the end-to-end tests with Selenium after building the backend for docker
-selenium-test: build-backend-docker selenium-test-no-build
+test-e2e: build-backend-docker build-frontend test-e2e-no-build
 
 #: Run the end-to-end tests with Selenium without building the backend for docker. This can be helpful if the packages have already been built and signed
-selenium-test-no-build:
+test-e2e-no-build:
 	@echo
 	@docker-compose rm --force --stop -v grafana
 	GRAFANA_VERSION=7.3.3 docker-compose run --rm start-setup
@@ -106,17 +100,14 @@ selenium-test-no-build:
 	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
 	@echo
 
-#: Run the frontend tests without linting and building the code
-frontend-test-fast:
-	grafana-toolkit plugin:test
-
 #: Run the frontend tests
-frontend-test:
-	# build is run as this is the only way to include linting
-	npx grafana-toolkit plugin:build
+test-frontend:
+	npm run test:ci
+	npm run lint
+	npm run typecheck
 
 #: Run the backend tests
-backend-test:
+test-backend:
 	gotestsum --format testname -- -count=1 -cover ./pkg/...
 	@echo
 	@echo "Linting Checks:"
@@ -133,7 +124,7 @@ build-and-sign: build sign
 test: 
 	# clear the dist directory in case a previous version of the plugin was signed
 	rm -rf dist
-	make backend-test
-	make frontend-test
-	make selenium-test
+	make test-backend
+	make test-frontend
+	make test-e2e
 	make teardown

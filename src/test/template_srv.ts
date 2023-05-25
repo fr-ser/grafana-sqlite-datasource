@@ -1,98 +1,65 @@
-import * as _ from 'lodash';
-import { TimeRange, VariableModel } from '@grafana/data';
+// copied from: https://github.com/grafana/grafana/blob/37e2becdd71b350e4c1f82416844d900f23fd0ce/public/app/features/templating/template_srv.mock.ts
 
-export class TemplateSrv {
-  variables: any[] = [];
-  timeRange: any = {};
+import { ScopedVars, TimeRange, TypedVariableModel } from '@grafana/data';
+import { TemplateSrv } from '@grafana/runtime';
 
-  private regex = /\$(\w+)|\[\[([\s\S]+?)(?::(\w+))?\]\]|\${(\w+)(?::(\w+))?}/g;
-  private index: any = {};
-  private grafanaVariables: any = {};
+export const variableRegex = /\$(\w+)|\[\[(\w+?)(?::(\w+))?\]\]|\${(\w+)(?:\.([^:^\}]+))?(?::([^\}]+))?}/g;
 
-  constructor() {}
+/**
+ * Mock for TemplateSrv where you can just supply map of key and values and it will do the interpolation based on that.
+ * For simple tests whether you your data source for example calls correct replacing code.
+ *
+ * This is implementing TemplateSrv interface but that is not enough in most cases. Datasources require some additional
+ * methods and usually require TemplateSrv class directly instead of just the interface which probably should be fixed
+ * later on.
+ */
+export class TemplateSrvMock implements TemplateSrv {
+  private regex = variableRegex;
+  constructor(private variables: Record<string, string>) {}
 
-  init(variables: any, timeRange?: TimeRange) {
-    this.variables = variables;
-    this.updateTemplateData();
-    this.timeRange = timeRange;
+  getVariables(): TypedVariableModel[] {
+    return Object.keys(this.variables).map((key) => {
+      return {
+        type: 'custom',
+        name: key,
+        label: key,
+      };
+      // TODO: we remove this type assertion in a later PR
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    }) as TypedVariableModel[];
   }
 
-  highlightVariablesAsHtml() {}
-  updateTemplateData() {
-    this.index = {};
-
-    for (var i = 0; i < this.variables.length; i++) {
-      var variable = this.variables[i];
-
-      if (!variable.current || (!variable.current.isNone && !variable.current.value)) {
-        continue;
-      }
-
-      this.index[variable.name] = variable;
-    }
-  }
-
-  formatValue(value: any, format: any, variable: any) {
-    if (typeof format === 'function') {
-      return format(value, variable, this.formatValue);
-    }
-
-    if (_.isString(value)) {
-      return value;
-    }
-    return value.join(',');
-  }
-
-  replace(target: string, scopedVars?: any, format?: string | Function): any {
+  replace(target?: string, scopedVars?: ScopedVars, format?: string | Function): string {
     if (!target) {
-      return target;
+      return target ?? '';
     }
 
-    let variable, systemValue, value, fmt;
     this.regex.lastIndex = 0;
 
-    return target.replace(this.regex, (match, var1, var2, fmt2, var3, fmt3) => {
-      variable = this.index[var1 || var2 || var3];
-      fmt = fmt2 || fmt3 || format;
-      if (scopedVars) {
-        value = scopedVars[var1 || var2 || var3];
-        if (value) {
-          return this.formatValue(value.value, fmt, variable);
-        }
-      }
-
-      if (!variable) {
-        return match;
-      }
-
-      systemValue = this.grafanaVariables[variable.current.value];
-      if (systemValue) {
-        return this.formatValue(systemValue, fmt, variable);
-      }
-
-      value = variable.current.value;
-      if (this.isAllValue(value)) {
-        value = this.getAllValue(variable);
-        // skip formatting of custom all values
-        if (variable.allValue) {
-          return this.replace(value as any);
-        }
-      }
-
-      const res = this.formatValue(value, fmt, variable);
-      return res;
+    return target.replace(this.regex, (match, var1, var2, fmt2, var3, fieldPath, fmt3) => {
+      const variableName = var1 || var2 || var3;
+      return this.variables[variableName];
     });
   }
 
-  isAllValue(value: any) {
-    return false;
+  getVariableName(expression: string) {
+    this.regex.lastIndex = 0;
+    const match = this.regex.exec(expression);
+    if (!match) {
+      return null;
+    }
+    return match.slice(1).find((match) => match !== undefined);
   }
 
-  getAllValue(variable: any) {
-    return null;
+  containsTemplate(target: string | undefined): boolean {
+    if (!target) {
+      return false;
+    }
+
+    this.regex.lastIndex = 0;
+    const match = this.regex.exec(target);
+    return match !== null;
   }
 
-  getVariables(): VariableModel[] {
-    return this.variables;
-  }
+  updateTimeRange(timeRange: TimeRange) {}
 }

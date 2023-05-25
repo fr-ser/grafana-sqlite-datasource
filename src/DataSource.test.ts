@@ -1,15 +1,15 @@
 import { setTemplateSrv } from '@grafana/runtime';
 
-import { TemplateSrv } from './test/template_srv';
+import { TemplateSrvMock } from './test/template_srv';
 import { DataSource } from './DataSource';
 import { FieldType, MutableDataFrame } from '@grafana/data';
 
 describe('DataSource', () => {
   beforeEach(() => {
-    setTemplateSrv(new TemplateSrv());
+    setTemplateSrv(new TemplateSrvMock({}));
   });
   describe('variable replacing', () => {
-    it('used the template service for replacing variables', () => {
+    it('uses the template service for replacing variables', () => {
       const ds = new DataSource({} as any);
       const mockReplace = jest.fn((input: string) => 'mock response');
       ds.templateSrv.replace = mockReplace;

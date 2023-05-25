@@ -51,7 +51,7 @@ describe('QueryEditor', () => {
 
     await act(async () => {
       await userEvent.type(selectorInput, 'test_column', { delay: 1 });
-      userEvent.keyboard('{enter}');
+      await userEvent.keyboard('{enter}');
     });
 
     expect(onRunQueryMock).toHaveBeenCalled();
@@ -64,8 +64,8 @@ describe('QueryEditor', () => {
     const { findByText } = render(queryEditor);
 
     await act(async () => {
-      const timeTag = await findByText('time', { selector: 'div>span' });
-      userEvent.click(timeTag.parentElement!.querySelector('svg') as SVGElement);
+      const timeTag = await findByText('time', { selector: "div[role='time-column-selector'] span" });
+      await userEvent.click(timeTag.parentElement!.querySelector('svg') as SVGElement);
     });
 
     expect(onRunQueryMock).toHaveBeenCalled();

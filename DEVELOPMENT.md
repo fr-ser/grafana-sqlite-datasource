@@ -17,7 +17,6 @@ get an overview of the available commands.
 ### Requirements
 
 - nodejs
-- yarn
 - go
 - docker and docker-compose
 - make
