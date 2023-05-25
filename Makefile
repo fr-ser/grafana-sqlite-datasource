@@ -67,28 +67,8 @@ build-backend-docker:
 	GOOS=linux GOARCH=$(arc_name) go build -o dist/gpx_sqlite-datasource_linux_$(arc_name) ./pkg
 
 #: Build the backend for all supported environments
-build-backend-all: build-backend-cross-win-amd64 build-backend-cross-linux-amd64 build-backend-cross-linux-arm build-backend-cross-linux-arm64 build-backend-cross-freebsd-amd64 build-backend-cross-darwin-amd64 build-backend-cross-darwin-arm64
-
-build-backend-cross-win-amd64:
-	GOOS=windows GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_windows_amd64.exe ./pkg
-
-build-backend-cross-linux-amd64:
-	GOOS=linux GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_linux_amd64 ./pkg
-
-build-backend-cross-linux-arm:
-	GOOS=linux GOARCH=arm go build -o dist/gpx_sqlite-datasource_linux_arm ./pkg
-
-build-backend-cross-linux-arm64:
-	GOOS=linux GOARCH=arm64 go build -o dist/gpx_sqlite-datasource_linux_arm64 ./pkg
-
-build-backend-cross-freebsd-amd64:
-	GOOS=freebsd GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_freebsd_amd64 ./pkg
-
-build-backend-cross-darwin-amd64:
-	GOOS=darwin GOARCH=amd64 go build -o dist/gpx_sqlite-datasource_darwin_amd64 ./pkg
-
-build-backend-cross-darwin-arm64:
-	GOOS=darwin GOARCH=arm64 go build -o dist/gpx_sqlite-datasource_darwin_arm64 ./pkg
+build-backend-all:
+	mage BuildAllAndMore
 
 #: Build the frontend
 build-frontend:
