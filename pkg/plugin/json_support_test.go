@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -17,7 +18,7 @@ func TestJsonSupport(t *testing.T) {
 	baseQuery := `SELECT json_array_length('[1,2,3,4]') as value;`
 	dataQuery := getDataQuery(queryModel{QueryText: baseQuery})
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}

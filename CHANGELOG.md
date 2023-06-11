@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Changed
+
+- updated sqlite package version to allow setting limits
+- add option to set `SQLITE_LIMIT_ATTACHED` (current default 10).
+  In a future version the default will be reduced to 0.
+
 ## [3.2.0] - 2023-05-25
 
 ### Changed

@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"os"
@@ -58,7 +59,7 @@ func TestEmptyQuery(t *testing.T) {
 
 	dataQuery := getDataQuery(queryModel{QueryText: "-- not a query"})
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -77,6 +78,18 @@ func TestEmptyQuery(t *testing.T) {
 	}
 }
 
+func TestLimitAttached(t *testing.T) {
+	dbPath, cleanup := createTmpDB(`SELECT 1`)
+	defer cleanup()
+
+	dataQuery := getDataQuery(queryModel{QueryText: "ATTACH DATABASE ':memory:' AS test_name; SELECT 1"})
+
+	response := query(dataQuery, pluginConfig{Path: dbPath, AttachLimit: intPointer(0)}, context.Background())
+	if response.Error == nil {
+		t.Errorf("Expected error but got nothing. Response: %+v", response)
+	}
+}
+
 func TestNoResultsTable(t *testing.T) {
 	dbPath, cleanup := createTmpDB(`
 		CREATE TABLE test(time INTEGER, value REAL, name TEXT);
@@ -87,7 +100,7 @@ func TestNoResultsTable(t *testing.T) {
 
 	dataQuery := getDataQuery(queryModel{QueryText: "SELECT * FROM test WHERE false"})
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -127,7 +140,7 @@ func TestNoResultsTimeSeriesWithUnknownColumns(t *testing.T) {
 	})
 	dataQuery.QueryType = "time series"
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -162,7 +175,7 @@ func TestInvalidQuery(t *testing.T) {
 
 	dataQuery := backend.DataQuery{JSON: []byte(`not even json`)}
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error == nil {
 		t.Errorf("Expected unmarshal error but got nothing. Response: %+v", response)
 	}
@@ -176,7 +189,7 @@ func TestReplaceToAndFromVariables(t *testing.T) {
 	dataQuery.TimeRange.From = time.Unix(123, 0)
 	dataQuery.TimeRange.To = time.Unix(456, 0)
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}

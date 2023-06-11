@@ -27,6 +27,7 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
   path?: string;
   pathPrefix?: string;
   pathOptions?: string;
+  attachLimit?: number;
 }
 export interface MySecureJsonData {
   securePathOptions?: string;

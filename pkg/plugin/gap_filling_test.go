@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"testing"
@@ -24,7 +25,7 @@ func TestEpochGroupSecondsShouldBeReplacedInTheFinalQueryForTables(t *testing.T)
 	})
 	dataQuery.QueryType = tableType
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -63,7 +64,7 @@ func TestEpochGroupSecondsShouldFillInNullValuesForTables(t *testing.T) {
 	})
 	dataQuery.QueryType = tableType
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -109,7 +110,7 @@ func TestEpochGroupSecondsShouldFillInNullValuesForTimeSeriesWithDoubleGaps(t *t
 	})
 	dataQuery.QueryType = timeSeriesType
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -166,7 +167,7 @@ func TestEpochGroupSecondsShouldFillInNullValuesWithMultipleTimeColumns(t *testi
 	})
 	dataQuery.QueryType = tableType
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -217,7 +218,7 @@ func TestEpochGroupSecondsShouldBeReplacedInTheFinalQueryForTimeSeries(t *testin
 	})
 	dataQuery.QueryType = timeSeriesType
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -246,7 +247,7 @@ func TestEpochGroupSecondsShouldBeReplacedInTheFinalQueryForTimeSeries(t *testin
 	}
 }
 
-func TestEpochGroupSecondsWithMultiFrameTimeseriesAndGaps(t *testing.T) {
+func TestEpochGroupSecondsWithMultiFrameTimeSeriesAndGaps(t *testing.T) {
 	var inputFrame *data.Frame
 	mockableLongToWide = func(a *data.Frame, b *data.FillMissing) (*data.Frame, error) {
 		inputFrame = a
@@ -269,7 +270,7 @@ func TestEpochGroupSecondsWithMultiFrameTimeseriesAndGaps(t *testing.T) {
 	})
 	dataQuery.QueryType = "time series"
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -342,7 +343,7 @@ func TestEpochGroupSecondsShouldNotAcceptOneArgument(t *testing.T) {
 	})
 	dataQuery.QueryType = tableType
 
-	response := query(dataQuery, pluginConfig{Path: "dbPath"})
+	response := query(dataQuery, pluginConfig{Path: "dbPath"}, context.Background())
 	if response.Error == nil {
 		t.Errorf("Expected error but got nothing. Response: %+v", response)
 	}
@@ -359,7 +360,7 @@ func TestEpochGroupSecondsShouldNotAcceptAnyStringAsGapValue(t *testing.T) {
 	})
 	dataQuery.QueryType = tableType
 
-	response := query(dataQuery, pluginConfig{Path: "dbPath"})
+	response := query(dataQuery, pluginConfig{Path: "dbPath"}, context.Background())
 	if response.Error == nil {
 		t.Errorf("Expected error but got nothing. Response: %+v", response)
 	}
@@ -383,7 +384,7 @@ func TestEpochGroupSecondsShouldRequireATimeColumnForGapFilling(t *testing.T) {
 	})
 	dataQuery.QueryType = tableType
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error == nil {
 		t.Errorf("Expected error but got nothing. Response: %+v", response)
 	}
@@ -407,7 +408,7 @@ func TestEpochGroupSecondsShouldRequireAnOrderedTimeColumnForGapFilling(t *testi
 	})
 	dataQuery.QueryType = tableType
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error == nil {
 		t.Errorf("Expected error but got nothing. Response: %+v", response)
 	}
@@ -433,7 +434,7 @@ func TestEpochGroupSecondsShouldRequireNonNullTimeColumnForGapFilling(t *testing
 	})
 	dataQuery.QueryType = tableType
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error == nil {
 		t.Errorf("Expected error but got nothing. Response: %+v", response)
 	}

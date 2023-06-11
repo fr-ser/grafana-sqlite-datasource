@@ -21,8 +21,6 @@ var (
 	_ backend.CheckHealthHandler = (*sqliteDatasource)(nil)
 )
 
-// sqliteDatasource is an example datasource used to scaffold
-// new datasource plugins with an backend.
 type sqliteDatasource struct {
 	pluginConfig pluginConfig
 }
@@ -31,6 +29,7 @@ type pluginConfig struct {
 	Path        string
 	PathOptions string
 	PathPrefix  string
+	AttachLimit *int64
 }
 
 // NewDataSource creates a new datasource instance.
@@ -68,7 +67,7 @@ func (ds *sqliteDatasource) QueryData(ctx context.Context, req *backend.QueryDat
 
 	// loop over queries and execute them individually.
 	for _, q := range req.Queries {
-		response.Responses[q.RefID] = query(q, ds.pluginConfig)
+		response.Responses[q.RefID] = query(q, ds.pluginConfig, ctx)
 		log.DefaultLogger.Debug("Finished query", "refID", q.RefID)
 	}
 

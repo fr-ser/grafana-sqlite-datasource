@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -28,7 +29,7 @@ func TestIgnoreNonTimeSeriesQuery(t *testing.T) {
 	})
 	dataQuery.QueryType = tableType
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -83,7 +84,7 @@ func TestIgnoreWideTimeSeriesQuery(t *testing.T) {
 	})
 	dataQuery.QueryType = "time series"
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -135,7 +136,7 @@ func TestConvertLongTimeSeriesQuery(t *testing.T) {
 	})
 	dataQuery.QueryType = "time series"
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
