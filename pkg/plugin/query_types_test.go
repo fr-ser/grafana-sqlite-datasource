@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -21,7 +22,7 @@ func TestCTETableQuery(t *testing.T) {
 	`
 	dataQuery := getDataQuery(queryModel{QueryText: baseQuery})
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -60,7 +61,7 @@ func TestMixedTypes(t *testing.T) {
 
 	dataQuery := getDataQuery(queryModel{QueryText: "SELECT * FROM test"})
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -94,7 +95,7 @@ func TestSimpleTableQuery(t *testing.T) {
 
 	dataQuery := getDataQuery(queryModel{QueryText: "SELECT * FROM test"})
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -133,7 +134,7 @@ func TestNullValues(t *testing.T) {
 
 	dataQuery := getDataQuery(queryModel{QueryText: "SELECT * FROM test"})
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -170,7 +171,7 @@ func TestNullValuesCTE(t *testing.T) {
 	`
 	dataQuery := getDataQuery(queryModel{QueryText: baseQuery})
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}

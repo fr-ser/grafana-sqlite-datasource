@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+	"modernc.org/sqlite"
 )
 
 var mockableLongToWide = data.LongToWide
@@ -236,16 +238,32 @@ func addTransformedRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 }
 
 func fetchData(
-	dbPathPrefix string, dbPath string, dbPathOptions string, queryConfig *queryConfigStruct,
+	config pluginConfig, queryConfig *queryConfigStruct, ctx context.Context,
 ) (columns []*sqlColumn, err error) {
-	db, err := sql.Open("sqlite", dbPathPrefix+dbPath+"?"+dbPathOptions)
+	db, err := sql.Open("sqlite", config.PathPrefix+config.Path+"?"+config.PathOptions)
 	if err != nil {
 		log.DefaultLogger.Error("Could not open database", "err", err)
 		return columns, err
 	}
 	defer db.Close()
 
-	rows, err := db.Query(queryConfig.FinalQuery)
+	conn, err := db.Conn(ctx)
+	if err != nil {
+		log.DefaultLogger.Error("Could not get connection", "err", err)
+		return columns, err
+	}
+
+	if config.AttachLimit != nil {
+		// https://www.sqlite.org/c3ref/c_limit_attached.html#sqlitelimitattached
+		// #define SQLITE_LIMIT_ATTACHED                  7
+		_, err = sqlite.Limit(conn, 7, int(*config.AttachLimit))
+		if err != nil {
+			log.DefaultLogger.Error("Could not set attach limit", "err", err)
+			return columns, err
+		}
+	}
+
+	rows, err := conn.QueryContext(ctx, queryConfig.FinalQuery)
 	if err != nil {
 		log.DefaultLogger.Error(
 			"Could not execute query", "query", queryConfig.FinalQuery, "err", err,
@@ -323,7 +341,7 @@ type queryModel struct {
 	TimeColumns []string `json:"timeColumns"`
 }
 
-func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.DataResponse) {
+func query(dataQuery backend.DataQuery, config pluginConfig, ctx context.Context) (response backend.DataResponse) {
 	var qm queryModel
 	err := json.Unmarshal(dataQuery.JSON, &qm)
 	if err != nil {
@@ -354,7 +372,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig) (response backend.D
 	}
 	log.DefaultLogger.Debug("Macros applied")
 
-	columns, err := fetchData(config.PathPrefix, config.Path, config.PathOptions, &queryConfig)
+	columns, err := fetchData(config, &queryConfig, ctx)
 	if err != nil {
 		response.Error = err
 		return response

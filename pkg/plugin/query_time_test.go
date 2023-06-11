@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -21,7 +22,7 @@ func TestQueryWithTimeColumn(t *testing.T) {
 		QueryText: "SELECT * FROM test", TimeColumns: []string{"time"},
 	})
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -67,7 +68,7 @@ func TestQueryWithTimeStringColumn(t *testing.T) {
 		QueryText: "SELECT * FROM test", TimeColumns: []string{"time", "time_string"},
 	})
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
@@ -112,7 +113,7 @@ func TestUnixTimestampAsString(t *testing.T) {
 		QueryText: "SELECT * FROM test", TimeColumns: []string{"time"},
 	})
 
-	response := query(dataQuery, pluginConfig{Path: dbPath})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
 		t.Errorf("Unexpected error - %s", response.Error)
 	}
