@@ -32,7 +32,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.15.x
+          node-version: 16.20.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -83,7 +83,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.15.x
+          node-version: 16.20.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -144,7 +144,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.15.x
+          node-version: 16.20.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -215,7 +215,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16.15.x
+          node-version: 16.20.x
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
