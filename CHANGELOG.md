@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [3.3.1] - 2023-07-01
+
+### Fixed
+
+- Closing database connections after every query (bug from v3.3.0)
+
+### Changed
+
+- Functional regression: Query without any content (i.e. "-- not a query") cause the plugin to hang
+
 ## [3.3.0] - 2023-06-11
 
 ### Changed
@@ -60,8 +70,7 @@ I would like to thank the sponsors of this project
 ## [3.0.1] - 2022-03-15
 
 This release should show no feature changes.
-Some underlying packages have been updated, which should improve stability and security but not have any other
-noticeable impact.
+Some underlying packages have been updated, which should improve stability and security but not have any other noticeable impact.
 
 ### Changed
 
@@ -72,9 +81,9 @@ noticeable impact.
 
 ## [3.0.0] - 2022-02-26
 
-This release moved to a new underlying SQLite library: <https://pkg.go.dev/modernc.org/sqlite>. This should have no big
-changes to regular queries but can have effects on more subtle configurations (e.g. path options). Fore more information
-see the `Changed` section below.
+This release moved to a new underlying SQLite library: <https://pkg.go.dev/modernc.org/sqlite>.
+This should have no big changes to regular queries but can have effects on more subtle configurations (e.g. path options).
+Fore more information see the `Changed` section below.
 
 This library has no dependency on CGO, which allows much easier cross-compilation for other systems. This way the
 plugin has a much simpler build process now and also supports more platforms (see information below under `Added`)
@@ -85,9 +94,9 @@ plugin has a much simpler build process now and also supports more platforms (se
 
 ### Changed
 
-- Changed the underlying SQLite library to: <https://pkg.go.dev/modernc.org/sqlite>. While the general SQLite features
-  and especially queries should remain unchanged by this, path options need to be checked for compatibility with the
-  new library now. Please refer to the link above for more information on the options.
+- Changed the underlying SQLite library to: <https://pkg.go.dev/modernc.org/sqlite>.
+  While the general SQLite features and especially queries should remain unchanged by this, path options need to be checked for compatibility with the new library now.
+  Please refer to the link above for more information on the options.
 
 ### Removed
 
@@ -98,9 +107,8 @@ plugin has a much simpler build process now and also supports more platforms (se
 
 ### Added
 
-- An additional option `securePathOptions` has been added in case the user wants to protect some
-  options (typically credentials). For examples see here:
-  <https://github.com/mattn/go-sqlite3#connection-string>
+- An additional option `securePathOptions` has been added in case the user wants to protect some options (typically credentials).
+  For examples see here: <https://github.com/mattn/go-sqlite3#connection-string>
 
 ## [2.2.0] - 2021-11-16
 
@@ -113,8 +121,7 @@ The plugin now supports adding a Path Prefix and Options to the SQLite connectio
 
 ### Changed
 
-- slightly changed the Plugin Health Check (when adding the data source) to provide better error
-  messages.
+- slightly changed the Plugin Health Check (when adding the data source) to provide better error messages.
 - conversion errors during a query are now logged at DEBUG level to avoid too large log files.
 
 ## [2.1.1] - 2021-10-24
@@ -123,8 +130,7 @@ This release adds support for sub second precision for unix time.
 
 ### Added
 
-- When using numeric values for a timestamp in SQLite (unix timestamp)
-  the plugin now supports precision below the second (at nanosecond precision)
+- When using numeric values for a timestamp in SQLite (unix timestamp) the plugin now supports precision below the second (at nanosecond precision)
 
 ## [2.1.0] - 2021-08-08
 
@@ -144,8 +150,7 @@ This release adds testing against Grafana v8.1.0 and fixes an issue with query v
 
 ## [2.0.1] - 2021-07-27
 
-This release fixes some long standing issues that prevented the right use of the alerting feature
-of the plugin even though it was enabled already.
+This release fixes some long standing issues that prevented the right use of the alerting feature of the plugin even though it was enabled already.
 
 ### Fixed
 
@@ -157,8 +162,7 @@ of the plugin even though it was enabled already.
 All current Raspberry Pi Zero and 1 models have an ARMv6 architecture.
 All other models (2 Mod. B v1.2, 3 and 4) have an 64Bit ARMv8 architecture.
 As only the Raspberry Pi 2 Mod. B has an ARMv7 architecture this is not used as default anymore.
-The Raspberry Pi 2 Mod. B will require a manual installation and all others will be handled
-via the Grafana CLI.
+The Raspberry Pi 2 Mod. B will require a manual installation and all others will be handled via the Grafana CLI.
 
 ### Changed
 
@@ -178,16 +182,14 @@ via the Grafana CLI.
 
 ### Added
 
-- The response of the plugin includes the final query as metadata and can be checked in the
-  inspector now
+- The response of the plugin includes the final query as metadata and can be checked in the inspector now
 - Macro `unixEpochGroupSeconds`:
   - replace time columns with an expression to group by
   - Allow filling up missing values with `NULL`
 
 ### Fixed
 
-- return additional time formatted column for time-series formats as normal values (previously
-  they were skipped)
+- return additional time formatted column for time-series formats as normal values (previously they were skipped)
 
 ## [1.1.0] - 2021-03-27
 
@@ -199,8 +201,7 @@ via the Grafana CLI.
 
 ### Fixed
 
-- Showing better error messages for certain fail conditions of the plugin health check (e.g.
-  permission error)
+- Showing better error messages for certain fail conditions of the plugin health check (e.g. permission error)
 
 ## [1.0.2] - 2021-03-23
 
@@ -227,9 +228,7 @@ No breaking change was introduced but due to code stability the first major vers
 ### Changed
 
 - Changing plugin name to SQLite
-
 - added category to plugin.json for better grouping on the Grafana homepage
-
 - updated Readme after first official release of plugin on Grafana homepage
 
 ## [0.2.6] - 2021-01-03
@@ -251,7 +250,6 @@ No breaking change was introduced but due to code stability the first major vers
 - Added option to explicitly convert backend data frame to time series:
 
   - This requires the initial data frame to be in a [Long Format](https://grafana.com/docs/grafana/latest/developers/plugins/data-frames/#long-format)
-
   - The resulting time series consists of one data frame per metric
 
 ## [0.2.3] - 2020-11-28
@@ -268,8 +266,7 @@ No breaking change was introduced but due to code stability the first major vers
 
 ### Changed
 
-- Different content of zip file published with Github release according to new Grafana v7.3
-  standards
+- Different content of zip file published with Github release according to new Grafana v7.3 standards
 
 ## [0.2.1] - 2020-11-22
 
@@ -285,8 +282,7 @@ No breaking change was introduced but due to code stability the first major vers
 
 ### Changed
 
-- For Signing grafana-toolkit 7.3.3 was necessary. The grafana version to test against was
-  bumped to version 7.3.3
+- For Signing grafana-toolkit 7.3.3 was necessary. The grafana version to test against was bumped to version 7.3.3
 
 ## [0.1.3] - 2020-11-02
 
