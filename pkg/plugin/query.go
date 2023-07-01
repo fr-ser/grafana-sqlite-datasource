@@ -252,6 +252,7 @@ func fetchData(
 		log.DefaultLogger.Error("Could not get connection", "err", err)
 		return columns, err
 	}
+	defer conn.Close()
 
 	if config.AttachLimit != nil {
 		// https://www.sqlite.org/c3ref/c_limit_attached.html#sqlitelimitattached

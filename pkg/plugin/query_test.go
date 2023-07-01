@@ -53,11 +53,39 @@ func unixTimePointer(x int64) *time.Time {
 	return timePointer(time.Unix(x, 0))
 }
 
+// Causes the application to hang
+// func TestQueryWithoutRows(t *testing.T) {
+// 	dbPath, cleanup := createTmpDB(`SELECT 1`)
+// 	defer cleanup()
+
+// 	queryText := "-- not a query"
+// 	dataQuery := getDataQuery(queryModel{QueryText: queryText})
+
+// 	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
+// 	if response.Error != nil {
+// 		t.Errorf("Unexpected error - %s", response.Error)
+// 	}
+
+// 	if len(response.Frames) != 1 {
+// 		t.Errorf(
+// 			"Expected one frame but got - %d: Frames %+v", len(response.Frames), response.Frames,
+// 		)
+// 	}
+
+// 	expectedFrame := data.NewFrame("")
+// 	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: queryText}
+
+// 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
+// 		t.Errorf(diff)
+// 	}
+// }
+
 func TestEmptyQuery(t *testing.T) {
 	dbPath, cleanup := createTmpDB(`SELECT 1`)
 	defer cleanup()
 
-	dataQuery := getDataQuery(queryModel{QueryText: "-- not a query"})
+	queryText := "SELECT 1 as foo WHERE false"
+	dataQuery := getDataQuery(queryModel{QueryText: queryText})
 
 	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
 	if response.Error != nil {
@@ -70,8 +98,10 @@ func TestEmptyQuery(t *testing.T) {
 		)
 	}
 
-	expectedFrame := data.NewFrame("")
-	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "-- not a query"}
+	expectedFrame := data.NewFrame("",
+		data.NewField("foo", nil, []*float64{}),
+	)
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: queryText}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Errorf(diff)
