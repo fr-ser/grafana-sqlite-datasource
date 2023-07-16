@@ -54,6 +54,7 @@ func unixTimePointer(x int64) *time.Time {
 }
 
 // Causes the application to hang
+// https://gitlab.com/cznic/sqlite/-/issues/153
 // func TestQueryWithoutRows(t *testing.T) {
 // 	dbPath, cleanup := createTmpDB(`SELECT 1`)
 // 	defer cleanup()

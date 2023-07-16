@@ -280,6 +280,7 @@ func fetchData(
 		return columns, err
 	}
 	// closing on an empty set "sql: no Rows available" causes a panic
+	// https://gitlab.com/cznic/sqlite/-/issues/152
 	defer rows.Close()
 
 	columnCount := len(columnTypes)
