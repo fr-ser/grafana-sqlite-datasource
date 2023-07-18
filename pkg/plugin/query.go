@@ -273,14 +273,10 @@ func fetchData(
 	}
 
 	columnTypes, err := rows.ColumnTypes()
-	if err != nil && err.Error() == "sql: no Rows available" {
-		return make([]*sqlColumn, 0), nil
-	} else if err != nil {
+	if err != nil {
 		log.DefaultLogger.Error("Could not get column types", "err", err)
 		return columns, err
 	}
-	// closing on an empty set "sql: no Rows available" causes a panic
-	// https://gitlab.com/cznic/sqlite/-/issues/152
 	defer rows.Close()
 
 	columnCount := len(columnTypes)
