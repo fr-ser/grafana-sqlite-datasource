@@ -118,13 +118,11 @@ jobs:
           semantic-release
       - name: check
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
         run: npx semantic-release --dry-run --branches ${GITHUB_REF_NAME}
   version_and_tag:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     needs:
       - verify-release
       - test-selenium-local
@@ -155,5 +153,5 @@ jobs:
           path: ./dist/
       - name: commit-and-tag
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
         run: npx semantic-release
