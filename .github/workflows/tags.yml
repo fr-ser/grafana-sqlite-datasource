@@ -1,54 +1,14 @@
-name: CI
+name: release
 
 on:
   push:
-    branches:
-      - "**"
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]'
       - 'v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+'
 
 jobs:
-
-  test-backend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.19
-      - name: Install go dependencies
-        run: make install-go-dependencies
-      - name: Run tests
-        run: make test-backend
-
-  test-frontend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.20.x
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-modules-
-            ${{ runner.OS }}-
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
-      - name: test frontend
-        run: make test-frontend
-
   build-plugin-backend:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go
@@ -64,57 +24,10 @@ jobs:
         with:
           name: plugin-executables
           path: ./dist/
-
-  test-selenium-local:
-    if: ${{ startsWith( github.ref, 'refs/heads/' ) }}
-    runs-on: ubuntu-latest
-    needs:
-      - test-backend
-      - test-frontend
-      - build-plugin-backend
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.20.x
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-modules-
-            ${{ runner.OS }}-
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
-      - name: Download plugin backend
-        uses: actions/download-artifact@v3
-        with:
-          name: plugin-executables
-          path: ./dist/
-      - name: Build frontend
-        run: make build-frontend
-      - name: fix file permissions
-        run: chmod +x ./dist/gpx_*
-      - name: Run Selenium Tests
-        run: make test-e2e-no-build
-      - name: Debug Logs
-        if: ${{ failure() }}
-        run: docker-compose logs grafana
-
   create-artifacts:
-    if: ${{ startsWith( github.ref, 'refs/tags/' ) }}
     runs-on: ubuntu-latest
     needs:
       - build-plugin-backend
-
     steps:
       - uses: actions/checkout@v3
       - name: Get metadata about the plugin
@@ -131,14 +44,6 @@ jobs:
           if ! grep -q -F "## [${{ steps.metadata.outputs.versionWithoutRc }}]" CHANGELOG.md; then
             echo "Error: The (## [${{ steps.metadata.outputs.versionWithoutRc }}]) tag was not found in the CHANGELOG.md."
             echo "Latest tag: ${{ steps.metadata.outputs.version }}" 1>&2
-            exit 1
-          fi
-      - name: Check package.json
-        run: |
-          PACKAGE_VERSION=$(cat package.json | jq -r .version)
-
-          if [ "$PACKAGE_VERSION" != "${{ steps.metadata.outputs.versionWithoutRc }}" ]; then
-            echo "Error: The version in package.json was $PACKAGE_VERSION instead of ${{ steps.metadata.outputs.versionWithoutRc }}."
             exit 1
           fi
       - name: Use Node.js
@@ -167,26 +72,29 @@ jobs:
         env:
           GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
         run: make package-and-zip PLUGIN_VERSION=${{ steps.metadata.outputs.version }}
-      # the plugin validation always fails due to "error: It is not permitted to access the file system.""
-      # - name: Set up Go
-      #   uses: actions/setup-go@v4
-      #   with:
-      #     go-version: 1.19
-      # - name: Validate plugin
-      #   run: |
-      #     docker run --pull=always -v .:/the_app -sourceCodeUri file:///the_app /the_app/${{ steps.metadata.outputs.archive }}
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.19
+      - name: Lint plugin
+        # the rc part of the version is rejected by the plugin validator
+        # do not provide a source code URI as the source code check fails due to:
+        #  "error: It is not permitted to access the file system.""
+        if: ${{ !steps.check_prerelease.outputs.is_prerelease }}
+        run: |
+          docker run --pull=always -v .:/the_app grafana/plugin-validator-cli
+          /the_app/${{ steps.metadata.outputs.archive }}
+        # -sourceCodeUri file:///the_app /the_app/${{ steps.metadata.outputs.archive }}
       - name: Upload plugin package
         uses: actions/upload-artifact@v3
         with:
           name: plugin-package
           path: ${{ steps.metadata.outputs.archive }}
-
   # testing on macos and windows is currently not done as docker is not available on the runners
   test-selenium-release-linux:
     runs-on: ubuntu-latest
     needs:
       - create-artifacts
-
     steps:
       - uses: actions/checkout@v3
       - name: Login to DockerHub
@@ -233,12 +141,10 @@ jobs:
       - name: Debug Logs
         if: ${{ failure() }}
         run: docker-compose logs grafana
-
   create-release:
     runs-on: ubuntu-latest
     needs:
       - test-selenium-release-linux
-
     steps:
       - uses: actions/checkout@v3
       - name: Get metadata about the plugin
@@ -274,13 +180,6 @@ jobs:
           else
             echo "is_prerelease=false" >> $GITHUB_OUTPUT
           fi
-      - name: Lint plugin
-        # the rc part of the version is rejected by the plugin validator
-        if: ${{ !steps.check_prerelease.outputs.is_prerelease }}
-        run: |
-          git clone https://github.com/grafana/plugin-validator
-          cd ./plugin-validator/pkg/cmd/plugincheck
-          go run . ../../../../${{ steps.metadata.outputs.archive }}
       - name: Create release
         id: create_release
         uses: softprops/action-gh-release@v1

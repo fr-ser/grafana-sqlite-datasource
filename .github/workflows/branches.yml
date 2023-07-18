@@ -1,0 +1,156 @@
+name: code
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.19
+      - name: Install go dependencies
+        run: make install-go-dependencies
+      - name: Run tests
+        run: make test-backend
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.20.x
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: test frontend
+        run: make test-frontend
+  build-plugin-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.19
+      - name: Install go dependencies
+        run: make install-go-dependencies
+      - name: build all versions
+        run: make build-backend-all
+      - name: Upload linux binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: plugin-executables
+          path: ./dist/
+  test-selenium-local:
+    runs-on: ubuntu-latest
+    needs:
+      - test-backend
+      - test-frontend
+      - build-plugin-backend
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.20.x
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-modules-
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Download plugin backend
+        uses: actions/download-artifact@v3
+        with:
+          name: plugin-executables
+          path: ./dist/
+      - name: Build frontend
+        run: make build-frontend
+      - name: fix file permissions
+        run: chmod +x ./dist/gpx_*
+      - name: Run Selenium Tests
+        run: make test-e2e-no-build
+      - name: Debug Logs
+        if: ${{ failure() }}
+        run: docker-compose logs grafana
+  verify-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+          cache: 'npm'
+      - name: Install dependencies
+        run: >
+          npm install --global
+          @semantic-release/git
+          @semantic-release/npm
+          @semantic-release/exec
+          conventional-changelog-conventionalcommits
+          semantic-release
+      - name: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release --dry-run --branches ${GITHUB_REF_NAME}
+  version_and_tag:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    needs:
+      - verify-release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+          cache: 'npm'
+      - name: Install dependencies
+        run: >
+          npm install --global
+          @semantic-release/git
+          @semantic-release/npm
+          @semantic-release/exec
+          conventional-changelog-conventionalcommits
+          semantic-release
+      - name: Download plugin backend
+        uses: actions/download-artifact@v3
+        with:
+          name: plugin-executables
+          path: ./dist/
+      - name: commit-and-tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
