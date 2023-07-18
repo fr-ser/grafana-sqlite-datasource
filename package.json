@@ -20,6 +20,8 @@
     "@types/jest": "^29.5.0",
     "@types/lodash": "^4.14.194",
     "@types/node": "^18.15.11",
+    "@types/selenium-webdriver": "^4.1.0",
+    "chromedriver": "^112.0.0",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
     "eslint-webpack-plugin": "^4.0.1",
@@ -32,6 +34,7 @@
     "replace-in-file-webpack-plugin": "^1.0.6",
     "sass": "1.62.1",
     "sass-loader": "13.2.2",
+    "selenium-webdriver": "4.0.X",
     "style-loader": "3.3.2",
     "swc-loader": "^0.2.3",
     "ts-node": "^10.9.1",
@@ -39,10 +42,7 @@
     "typescript": "4.8.4",
     "webpack": "^5.79.0",
     "webpack-cli": "^5.0.1",
-    "webpack-livereload-plugin": "^3.0.2",
-    "@types/selenium-webdriver": "^4.1.0",
-    "chromedriver": "^112.0.0",
-    "selenium-webdriver": "4.0.X"
+    "webpack-livereload-plugin": "^3.0.2"
   },
   "engines": {
     "node": ">=16"
