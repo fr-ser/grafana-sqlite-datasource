@@ -53,33 +53,31 @@ func unixTimePointer(x int64) *time.Time {
 	return timePointer(time.Unix(x, 0))
 }
 
-// Causes the application to hang
-// https://gitlab.com/cznic/sqlite/-/issues/153
-// func TestQueryWithoutRows(t *testing.T) {
-// 	dbPath, cleanup := createTmpDB(`SELECT 1`)
-// 	defer cleanup()
+func TestQueryWithoutRows(t *testing.T) {
+	dbPath, cleanup := createTmpDB(`SELECT 1`)
+	defer cleanup()
 
-// 	queryText := "-- not a query"
-// 	dataQuery := getDataQuery(queryModel{QueryText: queryText})
+	queryText := "-- not a query"
+	dataQuery := getDataQuery(queryModel{QueryText: queryText})
 
-// 	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
-// 	if response.Error != nil {
-// 		t.Errorf("Unexpected error - %s", response.Error)
-// 	}
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
+	if response.Error != nil {
+		t.Errorf("Unexpected error - %s", response.Error)
+	}
 
-// 	if len(response.Frames) != 1 {
-// 		t.Errorf(
-// 			"Expected one frame but got - %d: Frames %+v", len(response.Frames), response.Frames,
-// 		)
-// 	}
+	if len(response.Frames) != 1 {
+		t.Errorf(
+			"Expected one frame but got - %d: Frames %+v", len(response.Frames), response.Frames,
+		)
+	}
 
-// 	expectedFrame := data.NewFrame("")
-// 	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: queryText}
+	expectedFrame := data.NewFrame("")
+	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: queryText}
 
-// 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
-// 		t.Errorf(diff)
-// 	}
-// }
+	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
+		t.Errorf(diff)
+	}
+}
 
 func TestEmptyQuery(t *testing.T) {
 	dbPath, cleanup := createTmpDB(`SELECT 1`)
