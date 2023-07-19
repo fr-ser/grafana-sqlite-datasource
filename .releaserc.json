@@ -6,7 +6,7 @@
       "@semantic-release/exec",
       {
         "verifyReleaseCmd": "grep -q -F '## [Unreleased]' CHANGELOG.md || (echo \"There was no header for '## [Unreleased]' in the CHANGELOG.md\" && exit 1)",
-        "prepareCmd": "sed -i 's/## [Unreleased]/## [${nextRelease.version}] - ${new Date().toISOString().slice(0,10)}/g' CHANGELOG.md"
+        "prepareCmd": "sed -i 's/## \\[Unreleased\\]/## [${nextRelease.version}] - ${new Date().toISOString().slice(0,10)}/g' CHANGELOG.md"
       }
     ],
     ["@semantic-release/npm", { "npmPublish": false }],
@@ -14,13 +14,7 @@
       "@semantic-release/git",
       {
         "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}",
-        "assets": [
-          "CHANGELOG.md",
-          "package.json",
-          "package-lock.json",
-          "npm-shrinkwrap.json",
-          "dist/go_plugin_build_manifest"
-        ]
+        "assets": ["CHANGELOG.md", "package.json", "package-lock.json", "dist/go_plugin_build_manifest"]
       }
     ]
   ]
