@@ -50,16 +50,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.20.x
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-modules-
-            ${{ runner.OS }}-
+          cache: npm
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: npm ci
       - name: Download plugin backend
         uses: actions/download-artifact@v3
         with:
@@ -124,16 +117,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.20.x
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-modules-
-            ${{ runner.OS }}-
+          cache: npm
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: npm ci
       - name: Run Selenium Tests
         env:
           VERBOSE_TEST_OUTPUT: 1
