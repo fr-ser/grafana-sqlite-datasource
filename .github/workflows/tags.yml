@@ -71,12 +71,12 @@ jobs:
           go-version: 1.19
       - name: Lint plugin
         # the rc part of the version is rejected by the plugin validator
-        # do not provide a source code URI as the source code check fails due to:
-        #  "error: It is not permitted to access the file system.""
         if: ${{ !steps.check_prerelease.outputs.is_prerelease }}
-        run: |
+        run: >
           docker run --pull=always -v ${PWD}/:/the_app grafana/plugin-validator-cli
           /the_app/${{ steps.metadata.outputs.archive }}
+        # do not provide a source code URI as the source code check fails due to:
+        #  "error: It is not permitted to access the file system.""
         # -sourceCodeUri file:///the_app /the_app/${{ steps.metadata.outputs.archive }}
       - name: Upload plugin package
         uses: actions/upload-artifact@v3
