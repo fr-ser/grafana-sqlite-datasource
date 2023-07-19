@@ -82,7 +82,7 @@ jobs:
         #  "error: It is not permitted to access the file system.""
         if: ${{ !steps.check_prerelease.outputs.is_prerelease }}
         run: |
-          docker run --pull=always -v .:/the_app grafana/plugin-validator-cli
+          docker run --pull=always -v ${PWD}/:/the_app grafana/plugin-validator-cli
           /the_app/${{ steps.metadata.outputs.archive }}
         # -sourceCodeUri file:///the_app /the_app/${{ steps.metadata.outputs.archive }}
       - name: Upload plugin package
