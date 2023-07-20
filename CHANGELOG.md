@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and follows semantic Versioning.
 
+## [Unreleased]
+
+### Changed
+
+- updated frontend packages with the grafana/create-plugin tool
+
 ## [3.3.2] - 2023-07-19
 
 ### Fixed

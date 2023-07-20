@@ -13,6 +13,7 @@ const nodeModulesToTransform = (moduleNames) => `node_modules\/(?!(${moduleNames
 // Array of known nested grafana package dependencies that only bundle an ESM version
 const grafanaESModules = [
   '.pnpm', // Support using pnpm symlinked packages
+  '@grafana/schema',
   'd3',
   'd3-color',
   'd3-force',
@@ -20,10 +21,11 @@ const grafanaESModules = [
   'd3-scale-chromatic',
   'ol',
   'react-colorful',
+  'rxjs',
   'uuid',
 ];
 
 module.exports = {
   nodeModulesToTransform,
-  grafanaESModules
-}
+  grafanaESModules,
+};
