@@ -53,7 +53,7 @@ jobs:
         # the rc part of the version is rejected by the plugin validator
         if: ${{ !steps.check_prerelease.outputs.is_prerelease }}
         run: >
-          docker run --pull=always -v ${PWD}/:/the_app grafana/plugin-validator-cli
+          docker run --pull=always -e DEBUG=1 -v ${PWD}/:/the_app grafana/plugin-validator-cli
           /the_app/${{ steps.metadata.outputs.archive }}
         # do not provide a source code URI as the source code check fails due to:
         #  "error: It is not permitted to access the file system.""
