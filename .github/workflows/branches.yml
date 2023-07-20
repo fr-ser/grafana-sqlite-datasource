@@ -134,11 +134,6 @@ jobs:
           @semantic-release/exec
           conventional-changelog-conventionalcommits
           semantic-release
-      - name: Download plugin backend
-        uses: actions/download-artifact@v3
-        with:
-          name: plugin-executables
-          path: ./dist/
       - name: commit-and-tag
         env:
           GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
