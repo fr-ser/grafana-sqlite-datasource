@@ -7,27 +7,8 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+'
 
 jobs:
-  build-plugin-backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.19
-      - name: Install go dependencies
-        run: make install-go-dependencies
-      - name: build all versions
-        run: make build-backend-all
-      - name: Upload linux binaries
-        uses: actions/upload-artifact@v3
-        with:
-          name: plugin-executables
-          path: ./dist/
   create-artifacts:
     runs-on: ubuntu-latest
-    needs:
-      - build-plugin-backend
     steps:
       - uses: actions/checkout@v3
       - name: Get metadata about the plugin
@@ -53,27 +34,26 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Download plugin backend
-        uses: actions/download-artifact@v3
-        with:
-          name: plugin-executables
-          path: ./dist/
       - name: Build frontend
         run: |
           make build-frontend
-      - name: package-and-zip
-        env:
-          GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
-        run: make package-and-zip PLUGIN_VERSION=${{ steps.metadata.outputs.version }}
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.19
+      - name: Install go dependencies
+        run: make install-go-dependencies
+      - name: build all versions
+        run: make build-backend-all
+      - name: package-and-zip
+        env:
+          GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
+        run: make package-and-zip PLUGIN_VERSION=${{ steps.metadata.outputs.version }}
       - name: Lint plugin
         # the rc part of the version is rejected by the plugin validator
         if: ${{ !steps.check_prerelease.outputs.is_prerelease }}
         run: >
-          docker run --pull=always -v ${PWD}/:/the_app grafana/plugin-validator-cli
+          docker run --pull=always -e DEBUG=1 -v ${PWD}/:/the_app grafana/plugin-validator-cli
           /the_app/${{ steps.metadata.outputs.archive }}
         # do not provide a source code URI as the source code check fails due to:
         #  "error: It is not permitted to access the file system.""

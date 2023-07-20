@@ -14,7 +14,7 @@
       "@semantic-release/git",
       {
         "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}",
-        "assets": ["CHANGELOG.md", "package.json", "package-lock.json", "dist/go_plugin_build_manifest"]
+        "assets": ["CHANGELOG.md", "package.json", "package-lock.json"]
       }
     ]
   ]
