@@ -9,6 +9,7 @@ export class DataSource extends DataSourceWithBackend<SQLiteQuery, MyDataSourceO
     super(instanceSettings);
 
     this.templateSrv = getTemplateSrv();
+    this.annotations = {};
   }
 
   applyTemplateVariables(query: SQLiteQuery, scopedVars: ScopedVars): SQLiteQuery {
