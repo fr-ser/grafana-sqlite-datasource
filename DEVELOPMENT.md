@@ -70,9 +70,8 @@ On MacOs you can use the preinstalled "screen sharing" application as a VNC view
 After step 3 Github Actions should take over and create a new release.
 Steps 4 and 5 are for publishing the release to Grafana repository.
 
-1. Update the Changelog and the package.json
-2. Tag the commit with a Semver tag, e.g. v2.2.3-rc.1
-3. Push the changes including the tag
-4. Get the md5 hash of the release from the Github Action or from the release page (text file)
-5. Within the Grafana Cloud account a request for a plugin update can be started:
+1. Make sure a section in the Changelog exists with `## [Unreleased]`
+2. Push the changes and merge to the default branch
+3. Get the md5 hash of the release from the Github Action or from the release page (text file)
+4. Within the Grafana Cloud account a request for a plugin update can be started:
    <https://grafana.com/orgs/frser/plugins>

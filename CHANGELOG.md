@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and follows semantic Versioning.
 
+## [Unreleased]
+
+Thank you to the collaborators on this release:
+
+- [@eeddaann](https://github.com/eeddaann)
+
+### Added
+
+- added support for Grafana annotations
+
 ## [3.3.3] - 2023-07-21
 
 ### Changed
