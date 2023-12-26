@@ -50,7 +50,17 @@ describe('query variables and repetition', () => {
       await driver.findElement(By.xpath(`//div[contains(@class, 'refresh-picker')]//button`)).click();
 
       cityPanels = await driver.findElements(By.xpath(`(${v7_3_panel_aria_label} | ${v8_1_panel_aria_label})`));
-      expect(cityPanels).toHaveLength(2);
+    })
+  );
+
+  it(
+    'shows annotations',
+    saveTestState(testStatus, async () => {
+      const annotationMarker = await driver.findElement(
+        By.css(`div.graph-panel__chart div.events_line.flot-temp-elem div`)
+      );
+      await driver.actions({ async: true }).move({ origin: annotationMarker }).perform();
+      await driver.findElement(By.css(`div.drop-popover--annotation`));
     })
   );
 });

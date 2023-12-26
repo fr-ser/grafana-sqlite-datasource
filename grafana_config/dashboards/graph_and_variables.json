@@ -88,9 +88,7 @@
           "queryType": "table",
           "rawQueryText": "SELECT $__unixEpochGroupSeconds(time, $intervalS) as window, avg(value)\nFROM sine_wave\nWHERE time > $__from / 1000 and time <= $__to / 1000\nGROUP BY 1\nORDER BY 1 asc",
           "refId": "A",
-          "timeColumns": [
-            "window"
-          ]
+          "timeColumns": ["window"]
         }
       ],
       "thresholds": [],
@@ -175,9 +173,7 @@
           "queryText": "SELECT 1 as time, 4 as value where time >= 1234 and time < 134567",
           "rawQueryText": "SELECT  avg(value), max(value), min(value) from sine_wave where time >= $__from / 1000 and time < $__to / 1000",
           "refId": "A",
-          "timeColumns": [
-            "time"
-          ]
+          "timeColumns": ["time"]
         }
       ],
       "timeFrom": null,
@@ -220,17 +216,7 @@
     "to": "1992-12-13T01:00:00.000Z"
   },
   "timepicker": {
-    "refresh_intervals": [
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ]
+    "refresh_intervals": ["10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
   },
   "timezone": "",
   "title": "Sine Wave Example",
