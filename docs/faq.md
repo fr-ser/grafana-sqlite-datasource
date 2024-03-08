@@ -67,3 +67,14 @@ The legend can read "value value" or "temperature temperature".
 This can be controlled through the field display name configuration.
 There a hardcoded value can be set but the value can also be based on the "labels" of the search.
 Some more information about setting the display name via labels can be found in the [Grafana documentation](https://grafana.com/docs/grafana/latest/panels/configure-standard-options/#display-name).
+
+## Can I run the plugin with Grafana Cloud
+
+Currently (2024-03-08) there is little use in running the SQLite plugin with Grafana Cloud.
+
+The problem is that Grafana (and the plugin) run on a separate "cloud instance" and normally SQLite databases are only locally accessible.
+
+It can be useful to run the plugin to connect to an SQLite database on the Grafana cloud instance but that is rarely the goal.
+
+The current ["Grafana Agent"](https://grafana.com/docs/agent/latest/) that is installed on a local machine is only about collecting logs and traces.
+No plugins are executed with the agent, which makes it not relevant for this plugin.
