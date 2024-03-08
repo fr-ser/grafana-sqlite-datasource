@@ -52,6 +52,13 @@ systemctl daemon-reload
 systemctl restart grafana-server
 ```
 
+## I want to open a read only database and get errors
+
+If you get an error like this: "attempt to write a readonly database", make sure that your database is not running in WAL mode.
+
+If it is running in WAL mode, make sure to check the extra requirements for read only WAL databases:
+<https://www.sqlite.org/wal.html#read_only_databases>.
+
 ## The legend of my time series appears twice / is doubled
 
 Sometimes (especially when displaying multiple lines in a time series chart) the legend (the information below the chart) can show the name of the column twice.
