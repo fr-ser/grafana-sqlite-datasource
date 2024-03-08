@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and follows semantic Versioning.
 
+## [Unreleased]
+
+### Added
+
+- Added the ability to use "__text" and "__value" columns for query variables
+
 ## [3.4.0] - 2023-12-26
 
 Thank you to the collaborators on this release:
