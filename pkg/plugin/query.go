@@ -27,6 +27,7 @@ type queryConfigStruct struct {
 	QueryType   string
 	FinalQuery  string
 
+	TimeRange                 backend.TimeRange
 	ShouldFillValues          bool
 	FillInterval              int
 	FillValuesTimeColumnIndex int
@@ -353,6 +354,7 @@ func query(dataQuery backend.DataQuery, config pluginConfig, ctx context.Context
 		FinalQuery:                qm.QueryText,
 		TimeColumns:               qm.TimeColumns,
 		QueryType:                 dataQuery.QueryType,
+		TimeRange:                 dataQuery.TimeRange,
 		FillValuesTimeColumnIndex: -1,
 	}
 

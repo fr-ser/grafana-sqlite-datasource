@@ -30,6 +30,11 @@ func applyMacros(queryConfig *queryConfigStruct) error {
 
 		var replacedString string
 		switch groups[1] {
+		case "timeFilter":
+			replacedString, err = timeFilter(queryConfig, strings.Split(groups[2], ","))
+			if err != nil {
+				return err
+			}
 		case "unixEpochGroupSeconds":
 			replacedString, err = unixEpochGroupSeconds(queryConfig, strings.Split(groups[2], ","))
 			if err != nil {
@@ -46,6 +51,26 @@ func applyMacros(queryConfig *queryConfigStruct) error {
 	queryConfig.FinalQuery = newQuery + queryConfig.FinalQuery[lastReplacedIndex:]
 
 	return nil
+}
+
+func timeFilter(queryConfig *queryConfigStruct, arguments []string) (string, error) {
+	if len(arguments) != 1 {
+		return "", fmt.Errorf(
+			"unsupported number of arguments (%d) for timeFilter", len(arguments),
+		)
+	}
+
+	return fmt.Sprintf(
+		// TODO: Check if this is faster
+		// `CASE
+		// 	WHEN typeof(%[1]s) = 'integer' THEN %[1]s BETWEEN %[4]d AND %[5]d
+		// 	ELSE %[1]s BETWEEN %[2]s AND %[3]s
+		// END`,
+		`CAST(CASE WHEN typeof(%[1]s) = 'integer' THEN %[1]s ELSE strftime("%%s", %[1]s) END AS INTEGER) BETWEEN %[2]d AND %[3]d`,
+		arguments[0],
+		queryConfig.TimeRange.From.Unix(),
+		queryConfig.TimeRange.To.Unix(),
+	), nil
 }
 
 func unixEpochGroupSeconds(queryConfig *queryConfigStruct, arguments []string) (string, error) {

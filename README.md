@@ -71,6 +71,13 @@ However, as each macro needs to be re-implemented from scratch, only the followi
 supported. Other macros (that you might expect from other SQL databases) are not supported by the
 plugin (yet).
 
+### $__timeFilter(timestampColumnName)
+
+Example: `$__timeFilter(timestamp)`
+
+Will be replaced by an expression that evaluates to true if a timestamp is in
+the time range specified in the grafana user interface.
+
 ### $__unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds)
 
 Example: `$__unixEpochGroupSeconds("time", 10)`

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and follows semantic Versioning.
 
+## [Unreleased]
+
+### Added
+
+- Added the ability to use "__timeFilter" for query macros
+
 ## [3.5.0] - 2024-03-08
 
 ### Added
