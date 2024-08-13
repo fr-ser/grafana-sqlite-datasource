@@ -18,7 +18,7 @@ get an overview of the available commands.
 
 - nodejs
 - go
-- docker and docker-compose
+- docker and docker compose
 - make
 
 ### (First Time) Installation

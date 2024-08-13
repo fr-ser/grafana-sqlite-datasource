@@ -47,12 +47,12 @@ install-dependencies: install-go-dependencies install-js-dependencies
 
 #: Teardown and start a local Grafana instance
 start: teardown
-	docker-compose up -d grafana
+	docker compose up -d grafana
 	@echo "Go to http://localhost:3000/"
 
 #: Teardown the docker resources
 teardown:
-	docker-compose down --remove-orphans --volumes --timeout=2
+	docker compose down --remove-orphans --volumes --timeout=2
 
 #: Build the backend for the local architecture
 build-backend-local:
@@ -94,11 +94,11 @@ test-e2e: build-backend-docker build-frontend test-e2e-no-build
 #: Run the end-to-end tests with Selenium without building the backend for docker. This can be helpful if the packages have already been built and signed
 test-e2e-no-build:
 	@echo
-	@docker-compose rm --force --stop -v grafana
-	GRAFANA_VERSION=7.3.3 docker-compose run --rm start-setup
+	@docker compose rm --force --stop -v grafana
+	GRAFANA_VERSION=7.3.3 docker compose run --rm start-setup
 	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
 	@echo
-	GRAFANA_VERSION=8.1.0 docker-compose run --rm start-setup
+	GRAFANA_VERSION=8.1.0 docker compose run --rm start-setup
 	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
 	@echo
 
