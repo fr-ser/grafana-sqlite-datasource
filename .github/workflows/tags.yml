@@ -10,7 +10,7 @@ jobs:
   create-artifacts:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get metadata about the plugin
         id: metadata
         run: |
@@ -28,7 +28,7 @@ jobs:
             exit 1
           fi
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 16.20.x
           cache: npm
@@ -38,7 +38,7 @@ jobs:
         run: |
           make build-frontend
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: 1.19
       - name: Install go dependencies
@@ -59,7 +59,7 @@ jobs:
         #  "error: It is not permitted to access the file system.""
         # -sourceCodeUri file:///the_app /the_app/${{ steps.metadata.outputs.archive }}
       - name: Upload plugin package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: plugin-package
           path: ${{ steps.metadata.outputs.archive }}
@@ -69,9 +69,9 @@ jobs:
     needs:
       - create-artifacts
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -83,18 +83,18 @@ jobs:
           echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
           echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
       - name: Download plugin package
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: plugin-package
           path: ./
       - name: unzip plugin
         run: unzip ${{ steps.metadata.outputs.archive }} && mv frser-sqlite-datasource dist
       - name: update Grafana config to production values
-        run: | 
+        run: |
           sed -i 's/allow_loading_unsigned_plugins = true//g' grafana_config/grafana.ini
-          sed -i 's/app_mode = development/app_mode = production/g' grafana_config/grafana.ini          
+          sed -i 's/app_mode = development/app_mode = production/g' grafana_config/grafana.ini
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 16.20.x
           cache: npm
@@ -106,13 +106,13 @@ jobs:
         run: make test-e2e-no-build
       - name: Debug Logs
         if: ${{ failure() }}
-        run: docker-compose logs grafana
+        run: docker compose logs grafana
   create-release:
     runs-on: ubuntu-latest
     needs:
       - test-selenium-release-linux
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get metadata about the plugin
         id: metadata
         run: |
@@ -121,7 +121,7 @@ jobs:
           echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
           echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
       - name: Download plugin package
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: plugin-package
           path: ./
