@@ -78,3 +78,24 @@ It can be useful to run the plugin to connect to an SQLite database on the Grafa
 
 The current ["Grafana Agent"](https://grafana.com/docs/agent/latest/) that is installed on a local machine is only about collecting logs and traces.
 No plugins are executed with the agent, which makes it not relevant for this plugin.
+
+## Can I use provisioning with this plugin
+
+Any (backend) plugin supports provisioning; this one included.
+The main question is which values to use.
+The values can be derived by looking at the configuration of the plugin here:
+<https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/src/types.ts>.
+
+An example provisioning file would look like this:
+
+```yaml
+apiVersion: 1
+datasources:
+  - name: sqlite
+    type: frser-sqlite-datasource
+    access: proxy
+    isDefault: true
+    editable: true
+    jsonData:
+      path: /app/data.db
+```
