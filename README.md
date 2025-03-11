@@ -29,7 +29,7 @@ The recommended way to install the plugin for most users is to use the grafana C
 3. To make sure the plugin was installed, check the list of installed data sources. Click the
    Plugins item in the main menu. Both core data sources and installed data sources will appear.
 
-For other installation options (e.g. to install versions not yet releases in the Grafana registry but in Github) see
+For other installation options (e.g. to install versions not yet released in the Grafana registry but in Github) see
 [./docs/installation.md](https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/docs/installation.md).
 
 ## Support for Time Formatted Columns
