@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and follows semantic Versioning.
 
-## [Unreleased]
+## [3.6.0] - 2025-03-11
 
 ### Changed
 
