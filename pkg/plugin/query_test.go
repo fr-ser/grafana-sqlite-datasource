@@ -75,7 +75,7 @@ func TestQueryWithoutRows(t *testing.T) {
 	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: queryText}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }
 
@@ -103,7 +103,7 @@ func TestEmptyQuery(t *testing.T) {
 	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: queryText}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }
 
@@ -237,6 +237,6 @@ func TestReplaceToAndFromVariables(t *testing.T) {
 	expectedFrame.Meta = &data.FrameMeta{ExecutedQueryString: "SELECT 123000 AS a, 456000 AS b"}
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
-		t.Errorf(diff)
+		t.Error(diff)
 	}
 }
