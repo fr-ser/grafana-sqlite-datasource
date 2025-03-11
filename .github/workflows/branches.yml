@@ -13,7 +13,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.19
+          go-version: 1.24
       - name: Install go dependencies
         run: make install-go-dependencies
       - name: Run tests
@@ -38,7 +38,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.19
+          go-version: 1.24
       - name: Install go dependencies
         run: make install-go-dependencies
       - name: build all versions

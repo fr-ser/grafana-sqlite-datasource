@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com) and follows semantic Versioning.
 
+## [Unreleased]
+
+### Changed
+
+- updated the underlying sqlite library
+
 ## [3.5.0] - 2024-03-08
 
 ### Added
