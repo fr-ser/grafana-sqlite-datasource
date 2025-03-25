@@ -150,7 +150,7 @@ func TestConvertLongTimeSeriesQuery(t *testing.T) {
 		data.NewField("name", nil, []*string{strPointer("one"), strPointer("two")}),
 	)
 	expectedInputFrame.Meta = &data.FrameMeta{
-		Type: data.FrameTypeTimeSeriesWide, ExecutedQueryString: "SELECT * FROM test",
+		Type: data.FrameTypeTimeSeriesWide, TypeVersion: [2]uint{0, 1}, ExecutedQueryString: "SELECT * FROM test",
 	}
 
 	if diff := cmp.Diff(expectedInputFrame, inputFrame, cmpOption...); diff != "" {
