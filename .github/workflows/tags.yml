@@ -132,10 +132,13 @@ jobs:
         id: set_release_notes
         run: |
           sed 's/$VERSION/${{ steps.metadata.outputs.version }}/g' release_template.md > release_notes.md
+          echo "" >> release_notes.md
 
-          awk '/^## / {s++} s == 2 {print}' CHANGELOG.md > changelog_extract.md
-          # skip the first two lines
-          tail -n +3 changelog_extract.md >> release_notes.md
+          # extracting the changelog for the current version (first ## heading)
+          awk '/^## / {s++} s == 1 {print}' CHANGELOG.md > changelog_extract.md
+
+          # skipping the first line (containing the version number)
+          tail -n +2 changelog_extract.md >> release_notes.md
 
           echo "path=release_notes.md" >> $GITHUB_OUTPUT
       - name: Check prerelease
