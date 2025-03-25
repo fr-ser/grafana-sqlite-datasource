@@ -22,8 +22,8 @@ func createTmpDB(seedSQL string) (dbPath string, cleanup func()) {
 	dbPath = filepath.Join(dir, "data.db")
 	db, _ := sql.Open("sqlite", dbPath)
 	_, _ = db.Exec(seedSQL)
-	db.Close()
-	cleanup = func() { os.RemoveAll(dir) }
+	_ = db.Close()
+	cleanup = func() { _ = os.RemoveAll(dir) }
 
 	return dbPath, cleanup
 }
