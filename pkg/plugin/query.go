@@ -163,11 +163,12 @@ func addTransformedRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 		if column.Type == "INTEGER" {
 			var value int64
 
-			if valueType == "INTEGER" {
+			switch valueType {
+			case "INTEGER":
 				value = intV
-			} else if valueType == "FLOAT" {
+			case "FLOAT":
 				value = int64(floatV)
-			} else {
+			default:
 				value, err = strconv.ParseInt(string(stringV), 10, 64)
 				if err != nil {
 					log.DefaultLogger.Debug("Could not convert value to int", "value", stringV)
@@ -186,11 +187,12 @@ func addTransformedRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 		if column.Type == "FLOAT" {
 			var value float64
 
-			if valueType == "FLOAT" {
+			switch valueType {
+			case "FLOAT":
 				value = floatV
-			} else if valueType == "INTEGER" {
+			case "INTEGER":
 				value = float64(intV)
-			} else {
+			default:
 				value, err = strconv.ParseFloat(string(stringV), 64)
 
 				if err != nil {
@@ -210,11 +212,12 @@ func addTransformedRow(rows *sql.Rows, columns []*sqlColumn) (err error) {
 		if column.Type == "STRING" {
 			var value string
 
-			if valueType == "INTEGER" {
+			switch valueType {
+			case "INTEGER":
 				value = fmt.Sprintf("%d", intV)
-			} else if valueType == "FLOAT" {
+			case "FLOAT":
 				value = fmt.Sprintf("%f", floatV)
-			} else {
+			default:
 				value = fmt.Sprintf("%v", values[i])
 			}
 
@@ -245,14 +248,22 @@ func fetchData(
 		log.DefaultLogger.Error("Could not open database", "err", err)
 		return columns, err
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.DefaultLogger.Error("Error closing database", "err", err)
+		}
+	}()
 
 	conn, err := db.Conn(ctx)
 	if err != nil {
 		log.DefaultLogger.Error("Could not get connection", "err", err)
 		return columns, err
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			log.DefaultLogger.Error("Error closing connection", "err", err)
+		}
+	}()
 
 	if config.AttachLimit != nil {
 		// https://www.sqlite.org/c3ref/c_limit_attached.html#sqlitelimitattached
@@ -277,7 +288,11 @@ func fetchData(
 		log.DefaultLogger.Error("Could not get column types", "err", err)
 		return columns, err
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			log.DefaultLogger.Error("Error closing connection", "err", err)
+		}
+	}()
 
 	columnCount := len(columnTypes)
 	columns = make([]*sqlColumn, columnCount)

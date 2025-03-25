@@ -26,11 +26,15 @@ func checkDB(pathPrefix string, path string, options string) error {
 	if err != nil {
 		return fmt.Errorf("error opening %s%s: %v", pathPrefix, path, err)
 	}
-	defer db.Close()
 
 	_, err = db.Exec("pragma schema_version;")
 	if err != nil {
 		return fmt.Errorf("error checking for valid SQLite file: %v", err)
+	}
+
+	err = db.Close()
+	if err != nil {
+		return fmt.Errorf("error closing database file: %v", err)
 	}
 
 	return nil

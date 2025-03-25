@@ -33,17 +33,17 @@ type pluginConfig struct {
 }
 
 // NewDataSource creates a new datasource instance.
-func NewDataSource(setting backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+func NewDataSource(ctx context.Context, settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	log.DefaultLogger.Info("Creating instance")
 	var config pluginConfig
 
-	err := json.Unmarshal(setting.JSONData, &config)
+	err := json.Unmarshal(settings.JSONData, &config)
 	if err != nil {
 		log.DefaultLogger.Error("Could unmarshal settings of data source", "err", err)
 		return &sqliteDatasource{}, fmt.Errorf("error while unmarshalling data source settings: %s", err)
 	}
 
-	securePathOptions, securePathOptionsExist := setting.DecryptedSecureJSONData["securePathOptions"]
+	securePathOptions, securePathOptionsExist := settings.DecryptedSecureJSONData["securePathOptions"]
 	if securePathOptionsExist {
 		if config.PathOptions == "" {
 			config.PathOptions = securePathOptions

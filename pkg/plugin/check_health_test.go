@@ -16,12 +16,12 @@ var ctx = context.Background()
 
 func TestCheckHealthShouldPassForADB(t *testing.T) {
 	dir, _ := os.MkdirTemp("", "test-check-db")
-	defer os.RemoveAll(dir)
+	defer func() { _ = os.RemoveAll(dir) }()
 	dbPath := filepath.Join(dir, "my.db")
 
 	db, _ := sql.Open("sqlite", dbPath)
 	_, _ = db.Exec("CREATE TABLE test(id int);")
-	db.Close()
+	_ = db.Close()
 
 	ds := sqliteDatasource{pluginConfig{Path: dbPath, PathPrefix: "file:"}}
 	result, err := ds.CheckHealth(ctx, nil)
@@ -39,7 +39,7 @@ func TestCheckHealthShouldPassForADB(t *testing.T) {
 
 func TestCheckHealthShouldFailForANotExistingFile(t *testing.T) {
 	dir, _ := os.MkdirTemp("", "test-check-db")
-	defer os.RemoveAll(dir)
+	defer func() { _ = os.RemoveAll(dir) }()
 	notExistingDbPath := filepath.Join(dir, "my.db")
 
 	ds := sqliteDatasource{pluginConfig{Path: notExistingDbPath, PathPrefix: "file:"}}
@@ -63,7 +63,7 @@ func TestCheckHealthShouldFailForANotExistingFile(t *testing.T) {
 
 func TestCheckHealthShouldFailForAFolder(t *testing.T) {
 	dir, _ := os.MkdirTemp("", "test-check-db")
-	defer os.RemoveAll(dir)
+	defer func() { _ = os.RemoveAll(dir) }()
 
 	ds := sqliteDatasource{pluginConfig{Path: dir, PathPrefix: "file:"}}
 	result, err := ds.CheckHealth(ctx, nil)
@@ -84,7 +84,7 @@ func TestCheckHealthShouldFailOnTextFile(t *testing.T) {
 	f, _ := os.CreateTemp("", "test-check-db")
 	defer func() { _ = syscall.Unlink(f.Name()) }()
 	_, _ = f.WriteString("not a sqlite db")
-	f.Close()
+	_ = f.Close()
 
 	ds := sqliteDatasource{pluginConfig{Path: f.Name(), PathPrefix: "file:"}}
 	result, err := ds.CheckHealth(ctx, nil)

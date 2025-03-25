@@ -12,6 +12,7 @@ is running.
 Table of contents:
 
 - [Plugin Installation](#plugin-installation)
+- [Security Considerations](#security-considerations)
 - [Support for Time Formatted Columns](#support-for-time-formatted-columns)
 - [Macros](#macros)
 - [Alerting](#alerting)
@@ -31,6 +32,33 @@ The recommended way to install the plugin for most users is to use the grafana C
 
 For other installation options (e.g. to install versions not yet released in the Grafana registry but in Github) see
 [./docs/installation.md](https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/docs/installation.md).
+
+## Security considerations
+
+### Using the "Attach" Feature of SQLite to Connect to Private Database
+
+A data source of the SQLite plugin specifies a specific SQLite location.
+But by using the [attach feature](https://www.sqlite.org/lang_attach.html) this restriction can be circumvented.
+
+A **user with read only permissions** on the database can use the attach feature in a query to connect to any database that the Grafana user has access to on the system.
+
+Recommendations to Mitigate Risks:
+
+- Set the "AttachLimit" (a configuration of the SQLite data source) to 0, to disable this option.
+
+### Access to The Grafana Internal SQLite Database
+
+Grafana itself can run with an SQLite database as a data storage.
+Using this plugin this file can be accessed.
+
+There are no built-in restrictions preventing a **user with permissions to edit the data source configuration** from attaching to the SQLite database and accessing its contents.
+
+This means that sensitive data, including secrets stored within the database, could potentially be exposed if appropriate access controls are not enforced at the Grafana level.
+
+Recommendations to Mitigate Risks:
+
+- Limit Data Source Editing Permissions: Restrict the ability to modify the data source configuration to only trusted administrators.
+- Do not use SQLite as the data storage for Grafana but a database with more access controls (like Postgres).
 
 ## Support for Time Formatted Columns
 

@@ -285,7 +285,7 @@ func TestEpochGroupSecondsWithMultiFrameTimeSeriesAndGaps(t *testing.T) {
 	)
 	// we use the response as we do not care about the value (tested elsewhere)
 	expectedInputFrame.Meta = &data.FrameMeta{
-		ExecutedQueryString: response.Frames[0].Meta.ExecutedQueryString, Type: data.FrameTypeTimeSeriesWide,
+		ExecutedQueryString: response.Frames[0].Meta.ExecutedQueryString, Type: data.FrameTypeTimeSeriesWide, TypeVersion: [2]uint{0, 1},
 	}
 
 	if diff := cmp.Diff(expectedInputFrame, inputFrame, cmpOption...); diff != "" {
