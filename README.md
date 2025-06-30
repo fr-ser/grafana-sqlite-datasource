@@ -164,5 +164,5 @@ project with monthly or one-time contributions.
 
 - A changelog of the plugin can be found in the [CHANGELOG.md](https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/CHANGELOG.md).
 - More documentation about the plugin can be found under [the docs section in Github](https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/docs).
-- The plugin in the Grafana registry can be found [here](https://grafana.com/grafana/plugins/frser-sqlite-datasource/).
+- The plugin can be found in the [Grafana plugin registry](https://grafana.com/grafana/plugins/frser-sqlite-datasource/).
 - Questions or bugs about the plugin can be found and reported [in Github](https://github.com/fr-ser/grafana-sqlite-datasource/issues?q=) or in the [Grafana community](https://community.grafana.com/search?q=sqlite%20order%3Alatest).

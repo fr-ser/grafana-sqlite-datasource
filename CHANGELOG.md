@@ -8,6 +8,12 @@ The following changes are waiting for the next major release:
 
 - changing the default value of "AttachLimit" to 0
 
+## [Unreleased]
+
+### Changed
+
+- updated the underlying sqlite library (using SQLite 3.50.1)
+
 ## [3.6.0] - 2025-03-11
 
 ### Changed
