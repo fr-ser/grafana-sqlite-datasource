@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and follow
 The following changes are waiting for the next major release:
 
 - changing the default value of "AttachLimit" to 0
+- supporting only Grafana v10 onwards
 
 ## [Unreleased]
 

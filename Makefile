@@ -43,7 +43,7 @@ install-js-dependencies:
 	npm install
 
 #: Install all dependencies
-install-dependencies: install-go-dependencies install-js-dependencies
+install: install-go-dependencies install-js-dependencies
 
 #: Teardown and start a local Grafana instance
 start: teardown

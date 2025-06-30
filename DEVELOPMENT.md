@@ -27,7 +27,7 @@ get an overview of the available commands.
 # installing packages
 make install
 # optional: using git hooks
-git config core.hooksPath githooks
+make add-git-hook
 ```
 
 ### Start up Grafana

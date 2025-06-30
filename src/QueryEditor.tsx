@@ -1,5 +1,5 @@
-import { TextArea, TagsInput, Icon, Alert, InlineFormLabel, Select, CodeEditor, Switch } from '@grafana/ui';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
+import { Alert, CodeEditor, Icon, InlineFormLabel, Select, Switch, TagsInput, TextArea } from '@grafana/ui';
 import defaults from 'lodash/defaults';
 import React, { ChangeEvent, useState } from 'react';
 
