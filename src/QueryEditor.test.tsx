@@ -1,7 +1,7 @@
-import React from 'react';
-import { render, fireEvent, act } from '@testing-library/react';
 import * as ui from '@grafana/ui';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 import { QueryEditor } from './QueryEditor';
 
@@ -17,7 +17,7 @@ jest.mock('@grafana/ui', () => ({
 describe('QueryEditor', () => {
   let onChangeMock: jest.Mock;
   let onRunQueryMock: jest.Mock;
-  let queryEditor: JSX.Element;
+  let queryEditor: React.ReactElement;
 
   beforeEach(() => {
     onChangeMock = jest.fn();
@@ -27,15 +27,13 @@ describe('QueryEditor', () => {
     );
   });
 
-  it('allows editing the queryType', async () => {
-    const { findByRole, findByText } = render(queryEditor);
+  it.only('allows editing the queryType', async () => {
+    const { findByRole } = render(queryEditor);
     const queryTypeContainer = await findByRole('query-type-container');
 
-    await act(async () => {
-      fireEvent.focus(queryTypeContainer.querySelector('input') as HTMLInputElement);
-      fireEvent.keyDown(queryTypeContainer.querySelector('input') as HTMLInputElement, { key: 'Down', code: 'Down' });
-      fireEvent.click(await findByText('Time series'));
-    });
+    fireEvent.focus(queryTypeContainer.querySelector('input') as HTMLInputElement);
+    fireEvent.keyDown(queryTypeContainer.querySelector('input') as HTMLInputElement, { key: 'Down', code: 'Down' });
+    fireEvent.click(await screen.findByText('Time series'));
 
     expect(onRunQueryMock).toHaveBeenCalled();
     expect(onChangeMock).toHaveBeenLastCalledWith({
@@ -49,10 +47,8 @@ describe('QueryEditor', () => {
     const selector = await findByRole('time-column-selector');
     const selectorInput = selector.querySelector('input') as HTMLInputElement;
 
-    await act(async () => {
-      await userEvent.type(selectorInput, 'test_column', { delay: 1 });
-      await userEvent.keyboard('{enter}');
-    });
+    await userEvent.type(selectorInput, 'test_column', { delay: 1 });
+    await userEvent.keyboard('{enter}');
 
     expect(onRunQueryMock).toHaveBeenCalled();
     expect(onChangeMock).toHaveBeenLastCalledWith({
@@ -63,10 +59,8 @@ describe('QueryEditor', () => {
   it('allows removing time columns', async () => {
     const { findByText } = render(queryEditor);
 
-    await act(async () => {
-      const timeTag = await findByText('time', { selector: "div[role='time-column-selector'] span" });
-      await userEvent.click(timeTag.parentElement!.querySelector('svg') as SVGElement);
-    });
+    const timeTag = await findByText('time', { selector: "div[role='time-column-selector'] span" });
+    await userEvent.click(timeTag.parentElement!.querySelector('svg') as SVGElement);
 
     expect(onRunQueryMock).toHaveBeenCalled();
     expect(onChangeMock).toHaveBeenLastCalledWith({
