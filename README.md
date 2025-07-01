@@ -16,6 +16,7 @@ Table of contents:
 - [Support for Time Formatted Columns](#support-for-time-formatted-columns)
 - [Macros](#macros)
 - [Alerting](#alerting)
+- [Configuration](#configuration)
 - [Common Problems - FAQ](#common-problems---faq)
 - [Development and Contributing](#development-and-contributing)
 - [Supporting the Project](#supporting-the-project)
@@ -42,7 +43,7 @@ But by using the [attach feature](https://www.sqlite.org/lang_attach.html) this 
 
 A **user with read only permissions** on the database can use the attach feature in a query to connect to any database that the Grafana user has access to on the system.
 
-Recommendations to Mitigate Risks:
+Recommendations to mitigate risks:
 
 - Set the "AttachLimit" (a configuration of the SQLite data source) to 0, to disable this option.
 
@@ -55,8 +56,9 @@ There are no built-in restrictions preventing a **user with permissions to edit 
 
 This means that sensitive data, including secrets stored within the database, could potentially be exposed if appropriate access controls are not enforced at the Grafana level.
 
-Recommendations to Mitigate Risks:
+Recommendations to mitigate risks:
 
+- Use the "block_list" option in the grafana.ini ([see below for more information](#configuration)) to block access.
 - Limit Data Source Editing Permissions: Restrict the ability to modify the data source configuration to only trusted administrators.
 - Do not use SQLite as the data storage for Grafana but a database with more access controls (like Postgres).
 
@@ -125,6 +127,22 @@ for the alerts. In order to allow time filtering this plugin supports the variab
 `$__to`. For more information about those variables see here:
 <https://grafana.com/docs/grafana/latest/variables/variable-types/global-variables/#__from-and-__to>.
 Formatting of those variables (e.g. `${__from:date:iso}`) is not supported for alerts, however.
+
+## Configuration
+
+Most of the plugin configuration happens when adding a datasource via the Grafana frontend.
+All such configuration can also be provisioned ([see the FAQ for more details](https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/docs/faq.md#can-i-use-provisioning-with-this-plugin)).
+
+Aside from that, the plugin supports the following configuration via the `grafana.ini` file.
+The following block shows the default values and gives an explanation of each field.
+
+```ini
+[plugin.frser-sqlite-datasource]
+   ; this is a comma separated list of strings that the whole path of the SQLite database cannot contain.
+   ; use this to prevent access (even from Grafana admin users) from certain files or paths
+   ;block_list = "grafana.db,private_folder,other.db"
+   block_list = ""
+```
 
 ## Common Problems - FAQ
 

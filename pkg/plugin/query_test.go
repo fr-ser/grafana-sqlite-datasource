@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -238,5 +239,32 @@ func TestReplaceToAndFromVariables(t *testing.T) {
 
 	if diff := cmp.Diff(expectedFrame, response.Frames[0], cmpOption...); diff != "" {
 		t.Error(diff)
+	}
+}
+
+func TestQueryShouldFailWhenPathIsBlocked(t *testing.T) {
+	dbPath, cleanup := createTmpDB(`SELECT 1`)
+	defer cleanup()
+
+	// Set the block list environment variable
+	originalValue := os.Getenv("GF_PLUGIN_BLOCK_LIST")
+	defer func() {
+		if originalValue == "" {
+			_ = os.Unsetenv("GF_PLUGIN_BLOCK_LIST")
+		} else {
+			_ = os.Setenv("GF_PLUGIN_BLOCK_LIST", originalValue)
+		}
+	}()
+	_ = os.Setenv("GF_PLUGIN_BLOCK_LIST", dbPath)
+
+	dataQuery := getDataQuery(queryModel{QueryText: "SELECT 1"})
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
+
+	if response.Error == nil {
+		t.Errorf("Expected error but got none")
+	}
+
+	if !strings.Contains(response.Error.Error(), "path contains blocked term from GF_PLUGIN_BLOCK_LIST") {
+		t.Errorf("Unexpected error message: %s", response.Error.Error())
 	}
 }

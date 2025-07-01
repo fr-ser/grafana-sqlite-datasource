@@ -114,3 +114,114 @@ func TestCheckHealthShouldPassForAnEmptyFile(t *testing.T) {
 		t.Errorf("Expected HealthStatusOk, but got - %s", result.Status)
 	}
 }
+
+func TestCheckHealthShouldFailWhenPathIsBlocked(t *testing.T) {
+	dbPath := "/some/root/path/secret-database.db"
+
+	originalValue := os.Getenv("GF_PLUGIN_BLOCK_LIST")
+	defer func() {
+		if originalValue == "" {
+			_ = os.Unsetenv("GF_PLUGIN_BLOCK_LIST")
+		} else {
+			_ = os.Setenv("GF_PLUGIN_BLOCK_LIST", originalValue)
+		}
+	}()
+	_ = os.Setenv("GF_PLUGIN_BLOCK_LIST", "secret")
+
+	ds := sqliteDatasource{pluginConfig{Path: dbPath, PathPrefix: "file:"}}
+	result, err := ds.CheckHealth(ctx, nil)
+	if err != nil {
+		t.Errorf("Unexpected error - %s", err)
+	}
+
+	if result.Status != backend.HealthStatusError {
+		t.Errorf("Expected HealthStatusError, but got - %s", result.Status)
+	}
+	if !strings.Contains(result.Message, "path contains blocked term from GF_PLUGIN_BLOCK_LIST") {
+		t.Errorf("Unexpected error message: %s", result.Message)
+	}
+}
+
+func TestIsPathBlocked(t *testing.T) {
+	tests := []struct {
+		name        string
+		blockList   string
+		path        string
+		shouldBlock bool
+	}{
+		{
+			name:        "single term matches",
+			blockList:   "secret",
+			path:        "/some/path/secret-database.db",
+			shouldBlock: true,
+		},
+		{
+			name:        "multiple terms, middle matches",
+			blockList:   "secret,admin,sensitive",
+			path:        "/some/root/path/admin/test-check-db",
+			shouldBlock: true,
+		},
+		{
+			name:        "block list with spaces around terms",
+			blockList:   " secret , config , admin ",
+			path:        "/some/root/path/config-file.db",
+			shouldBlock: true,
+		},
+		{
+			name:        "no terms match",
+			blockList:   "secret,admin,sensitive",
+			path:        "/some/path/public-data.db",
+			shouldBlock: false,
+		},
+		{
+			name:        "empty block list",
+			blockList:   "",
+			path:        "/some/path/secret-database.db",
+			shouldBlock: false,
+		},
+		{
+			name:        "block list with only commas",
+			blockList:   ",,,",
+			path:        "/some/path/secret-database.db",
+			shouldBlock: false,
+		},
+		{
+			name:        "case sensitive matching",
+			blockList:   "Secret",
+			path:        "/some/path/secret-database.db",
+			shouldBlock: false,
+		},
+		{
+			name:        "partial path matching",
+			blockList:   "tmp",
+			path:        "/tmp/database.db",
+			shouldBlock: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Set environment variable
+			originalValue := os.Getenv("GF_PLUGIN_BLOCK_LIST")
+			defer func() {
+				if originalValue == "" {
+					_ = os.Unsetenv("GF_PLUGIN_BLOCK_LIST")
+				} else {
+					_ = os.Setenv("GF_PLUGIN_BLOCK_LIST", originalValue)
+				}
+			}()
+
+			if tt.blockList == "" {
+				_ = os.Unsetenv("GF_PLUGIN_BLOCK_LIST")
+			} else {
+				_ = os.Setenv("GF_PLUGIN_BLOCK_LIST", tt.blockList)
+			}
+
+			result := IsPathBlocked(tt.path)
+
+			if result != tt.shouldBlock {
+				t.Errorf("Expected IsPathBlocked to return %v, but got %v", tt.shouldBlock, result)
+			}
+		})
+	}
+}
