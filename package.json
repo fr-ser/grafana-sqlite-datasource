@@ -1,7 +1,7 @@
 {
   "name": "frser-sqlite-datasource",
   "description": "SQLite as a (Backend) Datasource",
-  "version": "3.7.0",
+  "version": "3.8.0",
   "author": "Sergej Herbert",
   "license": "Apache-2.0",
   "repository": "https://github.com/fr-ser/grafana-sqlite-datasource.git",
