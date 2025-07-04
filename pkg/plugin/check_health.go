@@ -6,11 +6,32 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
+func IsPathBlocked(path string) bool {
+	blockList, exists := os.LookupEnv("GF_PLUGIN_BLOCK_LIST")
+	if !exists || blockList == "" {
+		return false
+	}
+
+	blockedTerms := strings.Split(blockList, ",")
+	for _, term := range blockedTerms {
+		term = strings.TrimSpace(term)
+		if term != "" && strings.Contains(path, term) {
+			return true
+		}
+	}
+	return false
+}
+
 func checkDB(pathPrefix string, path string, options string) error {
+	if IsPathBlocked(path) {
+		return fmt.Errorf("path contains blocked term from GF_PLUGIN_BLOCK_LIST")
+	}
+
 	if pathPrefix == "file:" || pathPrefix == "" {
 		fileInfo, err := os.Stat(path)
 		if errors.Is(err, os.ErrNotExist) {

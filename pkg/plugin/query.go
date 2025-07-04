@@ -355,6 +355,16 @@ type queryModel struct {
 }
 
 func query(dataQuery backend.DataQuery, config pluginConfig, ctx context.Context) (response backend.DataResponse) {
+	// Check if the database path is blocked by the GF_PLUGIN_BLOCK_LIST
+	// This check is performed here in addition to the health check because:
+	// - Health checks do not prevent saving a datasource configuration in Grafana
+	// - Users can still execute queries even if the health check fails
+	// - This provides runtime protection against accessing blocked paths
+	if IsPathBlocked(config.Path) {
+		response.Error = fmt.Errorf("path contains blocked term from GF_PLUGIN_BLOCK_LIST")
+		return response
+	}
+
 	var qm queryModel
 	err := json.Unmarshal(dataQuery.JSON, &qm)
 	if err != nil {
