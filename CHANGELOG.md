@@ -9,6 +9,12 @@ The following changes are waiting for the next major release:
 - changing the default value of "AttachLimit" to 0
 - supporting only Grafana v10 onwards
 
+## [Unreleased]
+
+### Changed
+
+- Upgraded some frontend packages due to security alerts
+
 ## [3.8.1] - 2025-10-19
 
 ### Changed
