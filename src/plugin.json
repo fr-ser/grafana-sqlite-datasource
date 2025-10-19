@@ -27,6 +27,10 @@
       {
         "name": "License",
         "url": "https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/LICENSE"
+      },
+      {
+        "name": "Sponsor",
+        "url": "https://github.com/sponsors/fr-ser"
       }
     ],
     "screenshots": [
