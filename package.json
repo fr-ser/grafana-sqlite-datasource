@@ -11,6 +11,7 @@
     "@grafana/e2e-selectors": "9.5.2",
     "@grafana/eslint-config": "^8.0.0",
     "@grafana/tsconfig": "^2.0.0",
+    "@stylistic/eslint-plugin-ts": "^2.9.0",
     "@swc/core": "^1.12.9",
     "@swc/helpers": "^0.5.15",
     "@swc/jest": "^0.2.37",
@@ -21,13 +22,22 @@
     "@types/lodash": "^4.14.194",
     "@types/node": "^20.8.7",
     "@types/selenium-webdriver": "^4.1.0",
-    "chromedriver": "^112.0.0",
+    "@types/testing-library__jest-dom": "5.14.8",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
+    "chromedriver": "^119.0.1",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-jsdoc": "^46.8.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-webpack-plugin": "^4.0.1",
     "fork-ts-checker-webpack-plugin": "^8.0.0",
     "glob": "^10.2.7",
     "identity-obj-proxy": "3.0.0",
+    "imports-loader": "^5.0.0",
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
     "prettier": "^2.8.7",
@@ -37,23 +47,13 @@
     "selenium-webdriver": "4.0.X",
     "style-loader": "3.3.3",
     "swc-loader": "^0.2.3",
+    "terser-webpack-plugin": "^5.3.10",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "5.5.4",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4",
     "webpack-livereload-plugin": "^3.0.2",
-    "@stylistic/eslint-plugin-ts": "^2.9.0",
-    "@types/testing-library__jest-dom": "5.14.8",
-    "@typescript-eslint/eslint-plugin": "^8.3.0",
-    "@typescript-eslint/parser": "^8.3.0",
-    "eslint": "^8.0.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-jsdoc": "^46.8.0",
-    "eslint-plugin-react": "^7.33.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "imports-loader": "^5.0.0",
-    "terser-webpack-plugin": "^5.3.10",
     "webpack-subresource-integrity": "^5.1.0",
     "webpack-virtual-modules": "^0.6.2"
   },
@@ -65,8 +65,8 @@
     "@emotion/css": "11.10.6",
     "@grafana/data": "^12.0.2",
     "@grafana/runtime": "^12.0.2",
-    "@grafana/ui": "^12.0.2",
     "@grafana/schema": "^12.0.2",
+    "@grafana/ui": "^12.0.2",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
@@ -86,9 +86,27 @@
   "overrides": {
     "jest-environment-jsdom": {
       "tr46": "4.0.0"
+    },
+    "underscore": "1.12.1",
+    "form-data": "2.5.4",
+    "streamroller": {
+      "debug": "^2.6.9"
+    },
+    "test-exclude": {
+      "minimatch": "^3.0.5"
+    },
+    "glob": {
+      "minimatch": "^3.0.5"
+    },
+    "fork-ts-checker-webpack-plugin": {
+      "minimatch": "^3.0.5"
+    },
+    "mocha": {
+      "minimatch": "^3.0.5"
     }
   },
   "_comments": {
-    "overrides": "tr46: Upgraded from 3.0.0 to 4.0.0 to address: [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead."
+    "overrides": "tr46: Upgraded from 3.0.0 to 4.0.0 to address: [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.",
+    "others": "security fixes for grafana plugin release via osv-scanner"
   }
 }
