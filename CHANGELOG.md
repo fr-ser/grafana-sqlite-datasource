@@ -9,6 +9,14 @@ The following changes are waiting for the next major release:
 - changing the default value of "AttachLimit" to 0
 - supporting only Grafana v10 onwards
 
+## [Unreleased]
+
+### Changed
+
+- Replaced the Linux 32-Bit ARM build with an ARMv6 build.
+  This was already the case in v 3.5.0 and below.
+  This should allow seamless usage of the plugin on Raspberry Pi Zero models.
+
 ## [3.8.0] - 2025-07-04
 
 ### Added
