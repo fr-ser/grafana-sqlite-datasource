@@ -109,6 +109,10 @@ jobs:
         run: docker compose logs grafana
   create-release:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
     needs:
       - test-selenium-release-linux
     steps:
@@ -120,6 +124,11 @@ jobs:
           export PLUGIN_ARTIFACT=frser-sqlite-datasource-${PLUGIN_VERSION}.zip
           echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
           echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
+      - name: Generate artifact attestation
+        id: attestation
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: ${{ steps.metadata.outputs.archive }}
       - name: Download plugin package
         uses: actions/download-artifact@v4
         with:
@@ -139,6 +148,8 @@ jobs:
 
           # skipping the first line (containing the version number)
           tail -n +2 changelog_extract.md >> release_notes.md
+
+          echo "This build has been attested. You can view the [attestation details](${{ steps.attestation.outputs.attestation-url }})." >> release_notes.md
 
           echo "path=release_notes.md" >> $GITHUB_OUTPUT
       - name: Check prerelease
