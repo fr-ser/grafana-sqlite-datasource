@@ -32,4 +32,4 @@ More details can also be found in the installation section of the [Readme](READM
 
 ## Changelog
 
-For the full changelog see [here](CHANGELOG.md).
+For the full changelog refer to the [CHANGELOG.md](CHANGELOG.md).
