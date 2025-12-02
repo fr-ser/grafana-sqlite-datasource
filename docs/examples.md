@@ -27,7 +27,7 @@ The key here is to use the Grafana variables `__to` and `__from` and format them
 default those variables represent milliseconds instead of seconds in Unix time.
 
 ```sql
-SELECT avg(value), max(value), min(value) FROM sine_wave 
+SELECT avg(value), max(value), min(value) FROM sine_wave
 WHERE time >= $__from / 1000 and time < $__to / 1000
 ```
 
@@ -66,8 +66,7 @@ ORDER BY 1 ASC
 ### Dealing with "missing readings"
 
 Sometimes there are no readings for a time frame but we still want to display this time frame.
-In such cases we need to "fill the gaps" of missing readings. They can be filled with `NULL` values
-or a reasonable default (such as `0`)
+In such cases we need to "fill the gaps" of missing readings. They can be filled with `NULL` values.
 
 ```sql
 SELECT $__unixEpochGroupSeconds(time, 500, NULL) as window, avg(value)

@@ -23,7 +23,7 @@ func fillGaps(columns []*sqlColumn, queryConfig *queryConfigStruct) error {
 		gapFilledColumns[idx] = &sqlColumn{Name: column.Name, Type: column.Type}
 	}
 
-	// substract one interval to start the gap filling after the first value
+	// subtract one interval to start the gap filling after the first value
 	currentRowTime := (*timeColumn)[0].Add(
 		time.Second * -1 * time.Duration(queryConfig.FillInterval),
 	)
