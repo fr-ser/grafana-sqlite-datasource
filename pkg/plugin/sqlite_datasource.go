@@ -52,6 +52,12 @@ func NewDataSource(ctx context.Context, settings backend.DataSourceInstanceSetti
 		}
 	}
 
+	// Default AttachLimit to 0
+	if config.AttachLimit == nil {
+		defaultAttachLimit := int64(0)
+		config.AttachLimit = &defaultAttachLimit
+	}
+
 	return &sqliteDatasource{pluginConfig: config}, nil
 }
 
