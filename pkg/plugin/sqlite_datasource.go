@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
@@ -56,6 +57,14 @@ func NewDataSource(ctx context.Context, settings backend.DataSourceInstanceSetti
 	if config.AttachLimit == nil {
 		defaultAttachLimit := int64(0)
 		config.AttachLimit = &defaultAttachLimit
+	}
+
+	// Add query_only pragma by default
+	queryOnlyPragma := "_pragma=query_only(1)"
+	if config.PathOptions == "" {
+		config.PathOptions = queryOnlyPragma
+	} else if !strings.Contains(config.PathOptions, "_pragma=query_only") {
+		config.PathOptions = config.PathOptions + "&" + queryOnlyPragma
 	}
 
 	return &sqliteDatasource{pluginConfig: config}, nil

@@ -186,16 +186,59 @@ func TestIsPathBlocked(t *testing.T) {
 			shouldBlock: false,
 		},
 		{
-			name:        "case sensitive matching",
+			name:        "case insensitive matching",
 			blockList:   "Secret",
 			path:        "/some/path/secret-database.db",
-			shouldBlock: false,
+			shouldBlock: true,
 		},
 		{
 			name:        "partial path matching",
 			blockList:   "tmp",
 			path:        "/tmp/database.db",
 			shouldBlock: true,
+		},
+		// Default blocklist tests (no env var needed)
+		{
+			name:        "default blocklist blocks .aws",
+			blockList:   "",
+			path:        "/home/user/.aws/credentials.db",
+			shouldBlock: true,
+		},
+		{
+			name:        "default blocklist blocks .ssh",
+			blockList:   "",
+			path:        "/home/user/.ssh/keys.db",
+			shouldBlock: true,
+		},
+		{
+			name:        "default blocklist blocks grafana.db",
+			blockList:   "",
+			path:        "/var/lib/grafana/grafana.db",
+			shouldBlock: true,
+		},
+		{
+			name:        "default blocklist is case insensitive",
+			blockList:   "",
+			path:        "/home/user/.AWS/credentials.db",
+			shouldBlock: true,
+		},
+		{
+			name:        "default blocklist blocks /etc/shadow",
+			blockList:   "",
+			path:        "/etc/shadow",
+			shouldBlock: true,
+		},
+		{
+			name:        "default blocklist blocks id_rsa",
+			blockList:   "",
+			path:        "/home/user/.ssh/id_rsa",
+			shouldBlock: true,
+		},
+		{
+			name:        "safe path not blocked by default blocklist",
+			blockList:   "",
+			path:        "/var/data/myapp/analytics.db",
+			shouldBlock: false,
 		},
 	}
 

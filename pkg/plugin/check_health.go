@@ -11,19 +11,68 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
-func IsPathBlocked(path string) bool {
-	blockList, exists := os.LookupEnv("GF_PLUGIN_BLOCK_LIST")
-	if !exists || blockList == "" {
-		return false
-	}
+// Default blocklist of sensitive paths that should never be accessible
+var defaultBlockList = []string{
+	// Cloud provider credentials
+	".aws",
+	".config/gcloud",
+	".azure",
+	".kube/config",
+	".docker/config",
 
-	blockedTerms := strings.Split(blockList, ",")
-	for _, term := range blockedTerms {
-		term = strings.TrimSpace(term)
-		if term != "" && strings.Contains(path, term) {
+	// SSH and crypto keys
+	".ssh",
+	".gnupg",
+	".pki",
+
+	// System sensitive files
+	"/etc/shadow",
+	"/etc/passwd",
+	"/etc/gshadow",
+	"/proc/",
+	"/sys/",
+
+	// Grafana internal
+	"grafana.db",
+
+	// Common secret file patterns
+	".env",
+	"credentials",
+	".git/config",
+	".netrc",
+	".npmrc",
+	".pypirc",
+
+	// Private keys
+	"id_rsa",
+	"id_dsa",
+	"id_ecdsa",
+	"id_ed25519",
+}
+
+func IsPathBlocked(path string) bool {
+	// Normalize path to lowercase for case-insensitive matching
+	lowerPath := strings.ToLower(path)
+
+	// Check against default blocklist
+	for _, term := range defaultBlockList {
+		if strings.Contains(lowerPath, strings.ToLower(term)) {
 			return true
 		}
 	}
+
+	// Check against additional user-defined blocklist from environment variable
+	blockList, exists := os.LookupEnv("GF_PLUGIN_BLOCK_LIST")
+	if exists && blockList != "" {
+		blockedTerms := strings.Split(blockList, ",")
+		for _, term := range blockedTerms {
+			term = strings.TrimSpace(term)
+			if term != "" && strings.Contains(lowerPath, strings.ToLower(term)) {
+				return true
+			}
+		}
+	}
+
 	return false
 }
 
