@@ -7,6 +7,13 @@ datasources:
     editable: true
     jsonData:
       path: /app/data.db
+  - name: other
+    type: frser-sqlite-datasource
+    access: proxy
+    isDefault: false
+    editable: true
+    jsonData:
+      path: /app/other.db
   - name: postgres
     type: postgres
     access: proxy
@@ -19,6 +26,6 @@ datasources:
       postgresVersion: 1200
       timescaledb: false
       maxOpenConns: 5
-      sslmode: "disable"
+      sslmode: 'disable'
     secureJsonData:
       password: changed_later

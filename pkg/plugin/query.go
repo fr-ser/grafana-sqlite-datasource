@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -265,14 +266,16 @@ func fetchData(
 		}
 	}()
 
-	if config.AttachLimit != nil {
+	if config.AttachLimit != nil && os.Getenv("GF_PLUGIN_UNSAFE_ALLOW_ATTACH_LIMIT_ABOVE_ZERO") == "true" {
 		// https://www.sqlite.org/c3ref/c_limit_attached.html#sqlitelimitattached
 		// #define SQLITE_LIMIT_ATTACHED                  7
 		_, err = sqlite.Limit(conn, 7, int(*config.AttachLimit))
-		if err != nil {
-			log.DefaultLogger.Error("Could not set attach limit", "err", err)
-			return columns, err
-		}
+	} else {
+		_, err = sqlite.Limit(conn, 7, 0)
+	}
+	if err != nil {
+		log.DefaultLogger.Error("Could not set attach limit", "err", err)
+		return columns, err
 	}
 
 	rows, err := conn.QueryContext(ctx, queryConfig.FinalQuery)

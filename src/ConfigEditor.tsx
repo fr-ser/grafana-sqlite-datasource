@@ -1,6 +1,6 @@
-import React, { ChangeEvent, PureComponent } from 'react';
-import { LegacyForms, Alert } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
+import { Alert, LegacyForms } from '@grafana/ui';
+import React, { ChangeEvent, PureComponent } from 'react';
 
 import { MyDataSourceOptions, MySecureJsonData } from './types';
 
@@ -148,7 +148,10 @@ export class ConfigEditor extends PureComponent<Props, State> {
         <div className="gf-form">
           <FormField
             label="Attach limit"
-            tooltip="The runtime limit for attached databases (see: https://www.sqlite.org/limits.html)."
+            tooltip={
+              'The runtime limit for attached databases (see: https://www.sqlite.org/limits.html). ' +
+              'A value above 0 is only possible if the unsafe_allow_attach_limit_above_zero option is set to true in the plugin configuration.'
+            }
             labelWidth={10}
             inputWidth={20}
             value={jsonData.attachLimit}

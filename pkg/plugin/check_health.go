@@ -125,6 +125,15 @@ func (ds *sqliteDatasource) CheckHealth(ctx context.Context, _ *backend.CheckHea
 		}, nil
 	}
 
+	if ds.pluginConfig.AttachLimit != nil && *ds.pluginConfig.AttachLimit > 0 {
+		if os.Getenv("GF_PLUGIN_UNSAFE_ALLOW_ATTACH_LIMIT_ABOVE_ZERO") != "true" {
+			return &backend.CheckHealthResult{
+				Status:  backend.HealthStatusError,
+				Message: "An 'attach limit' above 0 is not allowed without setting 'unsafe_allow_attach_limit_above_zero' in the plugin configuration",
+			}, nil
+		}
+	}
+
 	return &backend.CheckHealthResult{
 		Status:  backend.HealthStatusOk,
 		Message: "Data source is working",

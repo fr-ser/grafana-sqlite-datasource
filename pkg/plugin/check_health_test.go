@@ -268,3 +268,68 @@ func TestIsPathBlocked(t *testing.T) {
 		})
 	}
 }
+
+func TestCheckHealth_AttachLimitAboveZero_Disallowed(t *testing.T) {
+	dir, _ := os.MkdirTemp("", "test-check-db")
+	defer func() { _ = os.RemoveAll(dir) }()
+	dbPath := filepath.Join(dir, "my.db")
+	db, _ := sql.Open("sqlite", dbPath)
+	_, _ = db.Exec("CREATE TABLE test(id int);")
+	_ = db.Close()
+
+	attachLimit := int64(1)
+	ds := sqliteDatasource{pluginConfig{Path: dbPath, PathPrefix: "file:", AttachLimit: &attachLimit}}
+
+	// Ensure env variable is not set
+	originalValue := os.Getenv("GF_PLUGIN_UNSAFE_ALLOW_ATTACH_LIMIT_ABOVE_ZERO")
+	defer func() {
+		if originalValue == "" {
+			_ = os.Unsetenv("GF_PLUGIN_UNSAFE_ALLOW_ATTACH_LIMIT_ABOVE_ZERO")
+		} else {
+			_ = os.Setenv("GF_PLUGIN_UNSAFE_ALLOW_ATTACH_LIMIT_ABOVE_ZERO", originalValue)
+		}
+	}()
+	_ = os.Unsetenv("GF_PLUGIN_UNSAFE_ALLOW_ATTACH_LIMIT_ABOVE_ZERO")
+
+	result, err := ds.CheckHealth(ctx, nil)
+	if err != nil {
+		t.Errorf("Unexpected error - %s", err)
+	}
+	if result.Status != backend.HealthStatusError {
+		t.Errorf("Expected HealthStatusError, but got - %s", result.Status)
+	}
+	if !strings.Contains(result.Message, "An 'attach limit' above 0 is not allowed") {
+		t.Errorf("Unexpected error message: %s", result.Message)
+	}
+}
+
+func TestCheckHealth_AttachLimitAboveZero_Allowed(t *testing.T) {
+	dir, _ := os.MkdirTemp("", "test-check-db")
+	defer func() { _ = os.RemoveAll(dir) }()
+	dbPath := filepath.Join(dir, "my.db")
+	db, _ := sql.Open("sqlite", dbPath)
+	_, _ = db.Exec("CREATE TABLE test(id int);")
+	_ = db.Close()
+
+	attachLimit := int64(1)
+	ds := sqliteDatasource{pluginConfig{Path: dbPath, PathPrefix: "file:", AttachLimit: &attachLimit}}
+
+	// Set env variable to allow attach limit above zero
+	originalValue := os.Getenv("GF_PLUGIN_UNSAFE_ALLOW_ATTACH_LIMIT_ABOVE_ZERO")
+	defer func() {
+		if originalValue == "" {
+			_ = os.Unsetenv("GF_PLUGIN_UNSAFE_ALLOW_ATTACH_LIMIT_ABOVE_ZERO")
+		} else {
+			_ = os.Setenv("GF_PLUGIN_UNSAFE_ALLOW_ATTACH_LIMIT_ABOVE_ZERO", originalValue)
+		}
+	}()
+	_ = os.Setenv("GF_PLUGIN_UNSAFE_ALLOW_ATTACH_LIMIT_ABOVE_ZERO", "true")
+
+	result, err := ds.CheckHealth(ctx, nil)
+	if err != nil {
+		t.Errorf("Unexpected error - %s", err)
+	}
+	if result.Status != backend.HealthStatusOk {
+		t.Errorf("Expected HealthStatusOk, but got - %s", result.Status)
+	}
+}

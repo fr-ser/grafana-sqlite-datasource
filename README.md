@@ -101,14 +101,14 @@ However, as each macro needs to be re-implemented from scratch, only the followi
 supported. Other macros (that you might expect from other SQL databases) are not supported by the
 plugin (yet).
 
-### $__unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds)
+### $\_\_unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds)
 
 Example: `$__unixEpochGroupSeconds("time", 10)`
 
 Will be replaced by an expression usable in GROUP BY clause. For example:
 `cast(("time" / 10) as int) * 10`
 
-### $__unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds, NULL)
+### $\_\_unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds, NULL)
 
 Example: `$__unixEpochGroupSeconds(timestamp, 10, NULL)`
 
@@ -138,10 +138,15 @@ The following block shows the default values and gives an explanation of each fi
 
 ```ini
 [plugin.frser-sqlite-datasource]
-   ; this is a comma separated list of strings that the whole path of the SQLite database cannot contain.
-   ; use this to prevent access (even from Grafana admin users) from certain files or paths
-   ;block_list = "grafana.db,private_folder,other.db"
+   ; this is a comma separated list of strings that any part of the path of the SQLite database cannot contain.
+   ; use this to prevent access (even for Grafana admin users) from certain files or paths
+   ; block_list = "grafana.db,private_folder,other.db"
    block_list = ""
+   ; this settings allows setting attach limits above 0.
+   ; this enables any users wit access to the plugin to attach any database that the Grafana users has access to
+   ; this is also not controlled via the block_list.
+   ; enabling this setting is not recommended for security reasons
+   unsafe_allow_attach_limit_above_zero = false
 ```
 
 ## Common Problems - FAQ
