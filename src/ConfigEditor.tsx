@@ -1,6 +1,6 @@
-import React, { ChangeEvent, PureComponent } from 'react';
-import { LegacyForms, Alert } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
+import { Alert, LegacyForms } from '@grafana/ui';
+import React, { ChangeEvent, PureComponent } from 'react';
 
 import { MyDataSourceOptions, MySecureJsonData } from './types';
 
@@ -82,6 +82,12 @@ export class ConfigEditor extends PureComponent<Props, State> {
         jsonData: { ...options.jsonData, attachLimit: 0 },
       });
     }
+    if (jsonData.pathOptions === undefined) {
+      onOptionsChange({
+        ...options,
+        jsonData: { ...options.jsonData, pathOptions: '_pragma=query_only(1)' },
+      });
+    }
 
     return (
       <div className="gf-form-group">
@@ -115,13 +121,14 @@ export class ConfigEditor extends PureComponent<Props, State> {
             label="Path Options"
             tooltip={
               'This string is appended to the path (after adding a "?") when opening the ' +
-              'database. A typical example is "mode=ro" (without the quotes) for readonly mode.'
+              'database. The default "_pragma=query_only(1)" prevents any write operations. ' +
+              'Supported options: _pragma, _time_format, _txlock.'
             }
             labelWidth={10}
             inputWidth={20}
             onChange={this.onPathOptionsChange}
             value={jsonData.pathOptions}
-            placeholder="mode=ro&_ignore_check_constraints=1"
+            placeholder="_pragma=query_only(1)"
           />
         </div>
         <div className="gf-form">
@@ -141,7 +148,10 @@ export class ConfigEditor extends PureComponent<Props, State> {
         <div className="gf-form">
           <FormField
             label="Attach limit"
-            tooltip="The runtime limit for attached databases (see: https://www.sqlite.org/limits.html)."
+            tooltip={
+              'The runtime limit for attached databases (see: https://www.sqlite.org/limits.html). ' +
+              'A value above 0 is only possible if the unsafe_allow_attach_limit_above_zero option is set to true in the plugin configuration.'
+            }
             labelWidth={10}
             inputWidth={20}
             value={jsonData.attachLimit}

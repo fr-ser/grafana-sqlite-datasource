@@ -43,14 +43,12 @@ But by using the [attach feature](https://www.sqlite.org/lang_attach.html) this 
 
 A **user with read only permissions** on the database can use the attach feature in a query to connect to any database that the Grafana user has access to on the system.
 
-Recommendations to mitigate risks:
-
-- Set the "AttachLimit" (a configuration of the SQLite data source) to 0, to disable this option.
+To prevent such behavior the attach limit is set to 0 by default and can only be increased when setting the `unsafe_allow_attach_limit_above_zero` ([see below for more information](#configuration)) at plugin level.
 
 ### Access to The Grafana Internal SQLite Database
 
 Grafana itself can run with an SQLite database as a data storage.
-Using this plugin this file can be accessed.
+Using this plugin the internal Grafana database file can be accessed.
 
 There are no built-in restrictions preventing a **user with permissions to edit the data source configuration** from attaching to the SQLite database and accessing its contents.
 
@@ -58,7 +56,8 @@ This means that sensitive data, including secrets stored within the database, co
 
 Recommendations to mitigate risks:
 
-- Use the "block_list" option in the grafana.ini ([see below for more information](#configuration)) to block access.
+- By default any file with the name `grafana.db` cannot be opened. This can be disabled via setting `unsafe_disable_grafana_internal_blocklist` ([see below for more information](#configuration)).
+- Use the "block_list" option in the grafana.ini ([see below for more information](#configuration)) to block access if the file has another name.
 - Limit Data Source Editing Permissions: Restrict the ability to modify the data source configuration to only trusted administrators.
 - Do not use SQLite as the data storage for Grafana but a database with more access controls (like Postgres).
 
@@ -101,14 +100,14 @@ However, as each macro needs to be re-implemented from scratch, only the followi
 supported. Other macros (that you might expect from other SQL databases) are not supported by the
 plugin (yet).
 
-### $__unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds)
+### $\_\_unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds)
 
 Example: `$__unixEpochGroupSeconds("time", 10)`
 
 Will be replaced by an expression usable in GROUP BY clause. For example:
 `cast(("time" / 10) as int) * 10`
 
-### $__unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds, NULL)
+### $\_\_unixEpochGroupSeconds(unixEpochColumnName, intervalInSeconds, NULL)
 
 Example: `$__unixEpochGroupSeconds(timestamp, 10, NULL)`
 
@@ -138,10 +137,30 @@ The following block shows the default values and gives an explanation of each fi
 
 ```ini
 [plugin.frser-sqlite-datasource]
-   ; this is a comma separated list of strings that the whole path of the SQLite database cannot contain.
-   ; use this to prevent access (even from Grafana admin users) from certain files or paths
-   ;block_list = "grafana.db,private_folder,other.db"
+   ; this settings allows setting attach limits above 0.
+   ; this enables any users with access to the plugin to attach any database that the Grafana users has access to
+   ; this is also not controlled via the block_list.
+   ; enabling this setting is not recommended for security reasons
+   unsafe_allow_attach_limit_above_zero = false
+   ; this is a comma separated list of strings that any part of the path of the SQLite database cannot contain.
+   ; use this to prevent access (even for Grafana admin users) from certain files or paths
+   ; the path check is case insensitive
+   ; block_list = "grafana.db,private_folder,other.db"
    block_list = ""
+   ; this setting prevents blocking security related path elements that are blocked by default
+   ; the path check is case insensitive
+   ; the blocked path elements are: .aws, .config/gcloud, .azure, .kube/config, .docker/config, .ssh, .gnupg, .pki, /etc/shadow, /etc/passwd, /etc/gshadow, /proc/, /sys/, .env, credentials, .git/config, .netrc, .npmrc, .pypirc, id_rsa, id_dsa, id_ecdsa, id_ed25519
+   ; enabling this setting is not recommended for security reasons
+   unsafe_disable_security_blocklist = false
+   ; this setting prevents blocking grafana internal related path elements that are blocked by default
+   ; the path check is case insensitive
+   ; the blocked path elements are: grafana.db
+   ; enabling this setting is not recommended for security reasons
+   unsafe_disable_grafana_internal_blocklist = false
+   ; by default the plugin adds "_pragma=query_only(1)" to the path options if no _pragma=query_only is already specified
+   ; this setting prevents setting this default value.
+   ; enabling this setting is not recommended for security reasons
+   unsafe_disable_query_only_path_option = false
 ```
 
 ## Common Problems - FAQ

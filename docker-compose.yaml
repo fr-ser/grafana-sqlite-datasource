@@ -9,12 +9,11 @@ services:
     #   GF_INSTALL_PLUGINS: grafana-worldmap-panel
     volumes:
       - './grafana_config/data.db:/app/data.db'
+      - './grafana_config/other.db:/app/other.db'
       - './grafana_config/grafana.ini:/etc/grafana/grafana.ini'
       - './grafana_config/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml'
       - './grafana_config/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml'
-      - './grafana_config/dashboards/alert.json:/app/dashboards/alert.json'
-      - './grafana_config/dashboards/graph_and_variables.json:/app/dashboards/graph_and_variables.json'
-      - './grafana_config/dashboards/query_and_repitition.json:/app/dashboards/query_and_repitition.json'
+      - './grafana_config/dashboards:/app/dashboards'
       - './dist:/var/lib/grafana/plugins/frser-sqlite-datasource'
     ports:
       - 3000:3000

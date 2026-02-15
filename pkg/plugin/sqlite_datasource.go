@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
@@ -49,6 +51,16 @@ func NewDataSource(ctx context.Context, settings backend.DataSourceInstanceSetti
 			config.PathOptions = securePathOptions
 		} else {
 			config.PathOptions = config.PathOptions + "&" + securePathOptions
+		}
+	}
+
+	if os.Getenv("GF_PLUGIN_UNSAFE_DISABLE_QUERY_ONLY_PATH_OPTION") != "true" {
+		// Add query_only pragma by default
+		queryOnlyPragma := "_pragma=query_only(1)"
+		if config.PathOptions == "" {
+			config.PathOptions = queryOnlyPragma
+		} else if !strings.Contains(config.PathOptions, "_pragma=query_only") {
+			config.PathOptions = config.PathOptions + "&" + queryOnlyPragma
 		}
 	}
 
