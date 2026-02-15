@@ -157,6 +157,10 @@ The following block shows the default values and gives an explanation of each fi
    ; the blocked path elements are: grafana.db
    ; enabling this setting is not recommended for security reasons
    unsafe_disable_grafana_internal_blocklist = false
+   ; by default the plugin adds "_pragma=query_only(1)" to the path options if no _pragma=query_only is already specified
+   ; this setting prevents setting this default value.
+   ; enabling this setting is not recommended for security reasons
+   unsafe_disable_query_only_path_option = false
 ```
 
 ## Common Problems - FAQ

@@ -54,6 +54,9 @@ This is a "semantic versioning" major release and contains breaking changes.
 
   For an up to date list please see the plugin documentation
 
+- **Read only connection**: The plugin now sets the `_pragma=query_only(1)` path option if not specified otherwise.
+  To prevent this use `unsafe_disable_query_only_path_option`.
+
 ### Security
 
 - the default value of "AttachLimit" is now 0 (can be adjusted)
