@@ -6,12 +6,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and follow
 
 The following changes are waiting for the next major release:
 
-- changing the default value of "AttachLimit" to 0
 - supporting only Grafana v10 onwards
+
+## [Unreleased]
+
+This is a "semantic versioning" major release and contains breaking changes.
+
+**Migration Instructions:** The following is the list of breaking changes and how to deal with them.
+
+- **AttachLimit**: The attach limit has been set to 0 by default.
+  In order to set a value above 0 the `unsafe_allow_attach_limit_above_zero` plugin configuration value has to be set.
+- **Default Grafana Internal Blocklist**: The plugin blocks various grafana internal paths by default now.
+  In to unblock those set `unsafe_disable_grafana_internal_blocklist` in the plugin configuration.
+  As per the release of this version the blocked path elements are the following:
+
+  - grafana.db
+
+  For an up to date list please see the plugin documentation
+
+- **Default Security Path Blocklist**: The plugin blocks various security related paths by default now.
+  In to unblock those set `unsafe_disable_security_blocklist` in the plugin configuration.
+  As per the release of this version the blocked path elements are the following:
+
+  - .aws
+  - .config/gcloud
+  - .azure
+  - .kube/config
+  - .docker/config
+  - .ssh
+  - .gnupg
+  - .pki
+  - /etc/shadow
+  - /etc/passwd
+  - /etc/gshadow
+  - /proc/
+  - /sys/
+  - .env
+  - credentials
+  - .git/config
+  - .netrc
+  - .npmrc
+  - .pypirc
+  - id_rsa
+  - id_dsa
+  - id_ecdsa
+  - id_ed25519
+
+  For an up to date list please see the plugin documentation
+
+### Security
+
+- the default value of "AttachLimit" is now 0 (can be adjusted)
+- there is a list of "security related" path prefixes, which are blocked by default (can be adjusted)
+- adding `_pragma=query_only(1)` as a default path option (can be adjusted)
 
 ## [3.8.2] - 2025-10-19
 
-### Changed
+### Security
 
 - Upgraded some frontend packages due to security alerts
 
@@ -25,7 +76,7 @@ The following changes are waiting for the next major release:
 
 ## [3.8.0] - 2025-07-04
 
-### Added
+### Security
 
 - Added the "block_list" option to allow setting a list of SQLite paths that cannot be accessed
 
@@ -45,7 +96,7 @@ The following changes are waiting for the next major release:
 
 ### Added
 
-- Added the ability to use "__text" and "__value" columns for query variables
+- Added the ability to use "**text" and "**value" columns for query variables
 
 ## [3.4.0] - 2023-12-26
 
@@ -88,6 +139,9 @@ Thank you to the collaborators on this release:
 ### Changed
 
 - updated sqlite package version to allow setting limits
+
+### Security
+
 - add option to set `SQLITE_LIMIT_ATTACHED` (current default 10).
   In a future version the default will be reduced to 0.
 
