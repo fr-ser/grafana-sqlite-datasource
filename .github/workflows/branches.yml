@@ -6,6 +6,15 @@ on:
       - '**'
 
 jobs:
+  osv-scan:
+    uses: 'google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.3.3'
+    permissions:
+      # Required to upload SARIF file to CodeQL. See: https://github.com/github/codeql-action/issues/2117
+      actions: read
+      # Require writing security events to upload SARIF file to security tab
+      security-events: write
+      # Only need to read contents
+      contents: read
   test-backend:
     runs-on: ubuntu-latest
     steps:
