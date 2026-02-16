@@ -8,6 +8,12 @@ The following changes are waiting for the next major release:
 
 - supporting only Grafana v10 onwards
 
+## [Unreleased]
+
+### Security
+
+- updating the backend (go) and frontend (npm) packages
+
 ## [4.0.0] - 2026-02-15
 
 This is a "semantic versioning" major release and contains breaking changes.
