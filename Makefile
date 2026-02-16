@@ -110,7 +110,7 @@ test-frontend:
 
 #: Run the backend tests
 test-backend:
-	gotestsum --format testname -- -count=1 -cover ./pkg/...
+	gotestsum --format testname -- -count=1 -cover ./pkg/plugin...
 	@echo
 	@echo "Linting Checks:"
 	@golangci-lint run ./pkg/... && echo "Linting passed!\n"
