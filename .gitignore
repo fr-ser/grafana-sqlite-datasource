@@ -29,6 +29,9 @@ e2e-results/
 # Editor
 .idea
 .vscode
+
+# AI / LLM
 .claude
+.serena
 
 .eslintcache
