@@ -13,7 +13,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.24
+          go-version: 1.26.1
       - name: Install go dependencies
         run: make install-go-dependencies
       - name: Run tests
@@ -25,7 +25,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.11.x
+          node-version: 22.22.x
           cache: npm
       - name: Install dependencies
         run: npm ci
@@ -38,7 +38,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.24
+          go-version: 1.26.1
       - name: Install go dependencies
         run: make install-go-dependencies
       - name: build all versions
@@ -64,7 +64,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.11.x
+          node-version: 22.22.x
           cache: npm
       - name: Install dependencies
         run: npm ci

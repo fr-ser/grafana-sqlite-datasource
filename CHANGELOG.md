@@ -8,6 +8,13 @@ The following changes are waiting for the next major release:
 
 - supporting only Grafana v10 onwards
 
+## [Unreleased]
+
+### Security
+
+- update Go to 1.26.1 (CVE-2025-68121) and grpc to v1.80.0 (CVE-2026-33186)
+- update frontend and backend dependencies
+
 ## [4.0.1] - 2026-02-16
 
 ### Security

@@ -30,4 +30,8 @@ e2e-results/
 .idea
 .vscode
 
+# AI / LLM
+.claude
+.serena
+
 .eslintcache
