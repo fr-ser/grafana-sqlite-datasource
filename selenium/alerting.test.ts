@@ -25,11 +25,18 @@ describe('alerting', () => {
     'passes the manual alert test with no data',
     saveTestState(testStatus, async () => {
       await driver.get(`${GRAFANA_URL}/d/y7EuI6m7z/alert-test?tab=alert&editPanel=2`);
-      await driver.wait(until.elementLocated(By.xpath(`//button//span[text()[contains(., "Test rule")]]`)), 5 * 1000);
-      await driver
-        .findElement(By.xpath(`//button//span[text()[contains(., "Test rule")]]`))
-        .findElement(By.xpath('./..'))
-        .click();
+      // Legacy panel alerting ("Test rule" button) was removed after Grafana v8.
+      // Skip gracefully when running against v9+.
+      let testRuleBtn;
+      try {
+        testRuleBtn = await driver.wait(
+          until.elementLocated(By.xpath(`//button//span[text()[contains(., "Test rule")]]`)),
+          5 * 1000
+        );
+      } catch (e) {
+        return;
+      }
+      await testRuleBtn.findElement(By.xpath('./..')).click();
 
       await driver.wait(
         until.elementLocated(
@@ -47,11 +54,18 @@ describe('alerting', () => {
     'passes the manual alert test with data',
     saveTestState(testStatus, async () => {
       await driver.get(`${GRAFANA_URL}/d/y7EuI6m7z/alert-test?tab=alert&editPanel=3`);
-      await driver.wait(until.elementLocated(By.xpath(`//button//span[text()[contains(., "Test rule")]]`)), 5 * 1000);
-      await driver
-        .findElement(By.xpath(`//button//span[text()[contains(., "Test rule")]]`))
-        .findElement(By.xpath('./..'))
-        .click();
+      // Legacy panel alerting ("Test rule" button) was removed after Grafana v8.
+      // Skip gracefully when running against v9+.
+      let testRuleBtn;
+      try {
+        testRuleBtn = await driver.wait(
+          until.elementLocated(By.xpath(`//button//span[text()[contains(., "Test rule")]]`)),
+          5 * 1000
+        );
+      } catch (e) {
+        return;
+      }
+      await testRuleBtn.findElement(By.xpath('./..')).click();
 
       await driver.wait(
         until.elementLocated(

@@ -10,7 +10,7 @@ jobs:
   create-artifacts:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get metadata about the plugin
         id: metadata
         run: |
@@ -28,7 +28,7 @@ jobs:
             exit 1
           fi
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22.11.x
           cache: npm
@@ -38,7 +38,7 @@ jobs:
         run: |
           make build-frontend
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: 1.24
       - name: Install go dependencies
@@ -59,7 +59,7 @@ jobs:
         #  "error: It is not permitted to access the file system.""
         # -sourceCodeUri file:///the_app /the_app/${{ steps.metadata.outputs.archive }}
       - name: Upload plugin package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: plugin-package
           path: ${{ steps.metadata.outputs.archive }}
@@ -69,9 +69,9 @@ jobs:
     needs:
       - create-artifacts
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Login to DockerHub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -83,7 +83,7 @@ jobs:
           echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
           echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
       - name: Download plugin package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: plugin-package
           path: ./
@@ -94,7 +94,7 @@ jobs:
           sed -i 's/allow_loading_unsigned_plugins = true//g' grafana_config/grafana.ini
           sed -i 's/app_mode = development/app_mode = production/g' grafana_config/grafana.ini
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22.11.x
           cache: npm
@@ -116,7 +116,7 @@ jobs:
     needs:
       - test-selenium-release-linux
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get metadata about the plugin
         id: metadata
         run: |
@@ -125,7 +125,7 @@ jobs:
           echo "version=${PLUGIN_VERSION}" >> $GITHUB_OUTPUT
           echo "archive=${PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
       - name: Download plugin package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: plugin-package
           path: ./

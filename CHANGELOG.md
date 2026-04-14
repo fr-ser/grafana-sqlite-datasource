@@ -8,6 +8,20 @@ The following changes are waiting for the next major release:
 
 - supporting only Grafana v10 onwards
 
+## [Unreleased]
+
+### Fixed
+
+- Improve error message when opening a WAL-mode database from a read-only directory: the hint now
+  explains that SQLite requires write access to the directory for the shared-memory (`-shm`) file
+  and links to the FAQ for solutions.
+
+### Documentation
+
+- Expand FAQ entry "I want to open a read only database and get errors" with the root cause
+  explanation, how to detect WAL mode, and three remediation options (`journal_mode=DELETE`,
+  writable directory, `immutable=1`).
+
 ## [4.0.2] - 2026-04-02
 
 ### Security
