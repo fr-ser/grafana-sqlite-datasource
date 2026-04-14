@@ -1,4 +1,4 @@
-const { By, Builder, error } = require('selenium-webdriver');
+const { By, Builder, error, until } = require('selenium-webdriver');
 const chromeDriver = require('selenium-webdriver/chrome');
 
 export const GRAFANA_URL = process.env.GRAFANA_URL || 'http://grafana:3000';
@@ -7,6 +7,8 @@ const SELENIUM_URL = process.env.SELENIUM_URL || 'localhost:4444';
 export async function login(driver) {
   await driver.get(GRAFANA_URL);
 
+  // Wait for the login form — v12 takes longer to fully initialize after port 3000 opens
+  await driver.wait(until.elementLocated(By.css("input[name='user']")), 15 * 1000);
   await driver.findElement(By.css("input[name='user']")).sendKeys('admin');
   await driver.findElement(By.css("input[name='password']")).sendKeys('admin123');
   // v12 dropped aria-label on the login button; fall back to button[type=submit]
