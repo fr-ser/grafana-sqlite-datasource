@@ -9,17 +9,12 @@ export async function login(driver) {
 
   await driver.findElement(By.css("input[name='user']")).sendKeys('admin');
   await driver.findElement(By.css("input[name='password']")).sendKeys('admin123');
-  await driver.findElement(By.css("button[aria-label='Login button']")).click();
+  // v12 dropped aria-label on the login button; fall back to button[type=submit]
+  await driver.findElement(By.css("button[aria-label='Login button'], button[type=submit]")).click();
   await driver.wait(async () => {
-    try {
-      await driver.findElement(By.css("button[aria-label='Login button']"));
-    } catch (err) {
-      if (err instanceof error.NoSuchElementError) {
-        return true;
-      }
-    }
-    return false;
-  }, 2 * 1000);
+    const url = await driver.getCurrentUrl();
+    return !url.includes('/login');
+  }, 5 * 1000);
 }
 
 export async function getDriver() {

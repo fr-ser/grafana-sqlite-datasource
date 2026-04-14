@@ -1,6 +1,6 @@
 const { By, until } = require('selenium-webdriver');
 
-import { getDriver, login, logHTMLOnFailure, saveTestState, GRAFANA_URL } from './helpers';
+import { getDriver, GRAFANA_URL, logHTMLOnFailure, login, saveTestState } from './helpers';
 
 describe('configure', () => {
   jest.setTimeout(30000);
@@ -25,9 +25,20 @@ describe('configure', () => {
   it(
     'configures the plugin',
     saveTestState(testStatus, async () => {
+      // /datasources/new works on v7/v8; v12 redirects it to /connections/datasources/new
       await driver.get(`${GRAFANA_URL}/datasources/new`);
-      await driver.wait(until.elementLocated(By.css('div.add-data-source-category')), 5 * 1000);
-      await driver.findElement(By.css("div.add-data-source-item[aria-label='Data source plugin item SQLite']")).click();
+      // v12 replaced the category list with a button per datasource type
+      await driver.wait(
+        until.elementLocated(By.css("div.add-data-source-category, button[aria-label='Add new data source SQLite']")),
+        5 * 1000
+      );
+      await driver
+        .findElement(
+          By.css(
+            "div.add-data-source-item[aria-label='Data source plugin item SQLite'], button[aria-label='Add new data source SQLite']"
+          )
+        )
+        .click();
 
       await driver.wait(until.elementLocated(By.css("input[placeholder='/path/to/the/database.db']")), 5 * 1000);
       await driver.findElement(By.css("input[placeholder='/path/to/the/database.db']")).sendKeys('/app/data.db');

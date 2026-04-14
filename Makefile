@@ -101,6 +101,9 @@ test-e2e-no-build:
 	GRAFANA_VERSION=8.1.0 docker compose run --rm start-setup
 	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
 	@echo
+	GRAFANA_VERSION=12.0.0 docker compose run --rm start-setup
+	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
+	@echo
 
 #: Run the frontend tests
 test-frontend:

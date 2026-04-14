@@ -1,6 +1,6 @@
 const { By, until, Key } = require('selenium-webdriver');
 
-import { getDriver, login, logHTMLOnFailure, saveTestState, GRAFANA_URL } from './helpers';
+import { getDriver, GRAFANA_URL, logHTMLOnFailure, login, saveTestState } from './helpers';
 
 describe.only('writing queries', () => {
   jest.setTimeout(30000);
@@ -29,7 +29,8 @@ describe.only('writing queries', () => {
     saveTestState(testStatus, async () => {
       // the .inputarea element is an invisible accessibility element belonging to the monaco code editor
       await driver.findElement(By.css('.inputarea')).sendKeys(Key.chord(Key.CONTROL, 'a'), 'SELECT 12345678987654321');
-      await driver.findElement(By.css('.explore-toolbar')).click();
+      // v12 renamed .explore-toolbar to a nav with aria-label
+      await driver.findElement(By.css('.explore-toolbar, nav[aria-label="Explore toolbar"]')).click();
 
       // check that the query was executed with the new input
       await driver.wait(
