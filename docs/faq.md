@@ -54,10 +54,44 @@ systemctl restart grafana-server
 
 ## I want to open a read only database and get errors
 
-If you get an error like this: "attempt to write a readonly database", make sure that your database is not running in WAL mode.
+If you get an error like `attempt to write a readonly database`, the most common cause is that
+your database is in **WAL (Write-Ahead Logging) mode** and Grafana does not have write access to
+the directory containing the database file.
 
-If it is running in WAL mode, make sure to check the extra requirements for read only WAL databases:
-<https://www.sqlite.org/wal.html#read_only_databases>.
+In WAL mode, SQLite must create or update a shared-memory index file (`<db>-shm`) alongside the
+database — even for read-only connections. If the directory is not writable by the Grafana
+process, SQLite cannot create this file and the connection fails, regardless of `mode=ro` being
+set in the path options.
+
+To check whether your database uses WAL mode:
+
+```sh
+sqlite3 /path/to/your.db "PRAGMA journal_mode;"
+# returns "wal" if WAL mode is active
+```
+
+**Option 1 — switch to journal mode** (simplest, if you control the database):
+
+```sh
+sqlite3 /path/to/your.db "PRAGMA journal_mode=DELETE;"
+```
+
+**Option 2 — ensure the directory is writable** by the Grafana process so that SQLite can manage
+the `-shm` file. Read access on the database file itself is sufficient; only the directory needs
+to be writable.
+
+**Option 3 — use `immutable=1`** in the path options if the database will never change while
+Grafana is running. This bypasses all WAL locking requirements entirely:
+
+```txt
+immutable=1
+```
+
+> Warning: with `immutable=1`, SQLite will not see any changes made to the database after it is
+> opened. Only use this if the database is truly static.
+
+For more background see the official SQLite documentation on
+[read-only WAL databases](https://www.sqlite.org/wal.html#read_only_databases).
 
 ## The legend of my time series appears twice / is doubled
 

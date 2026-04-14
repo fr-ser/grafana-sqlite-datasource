@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
@@ -33,7 +34,13 @@ func checkDB(pathPrefix string, path string, options string) error {
 
 	_, err = db.Exec("pragma schema_version;")
 	if err != nil {
-		return fmt.Errorf("error checking for valid SQLite file: %v", err)
+		errMsg := fmt.Sprintf("error checking for valid SQLite file: %v", err)
+		if strings.Contains(err.Error(), "readonly") {
+			errMsg += ". Hint: if the database is in WAL mode, SQLite requires write access" +
+				" to the directory to manage the shared memory (-shm) file, even for read-only" +
+				" connections. See the FAQ for solutions: https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/docs/faq.md#i-want-to-open-a-read-only-database-and-get-errors"
+		}
+		return errors.New(errMsg)
 	}
 
 	err = db.Close()
