@@ -6,6 +6,8 @@ const { grafanaESModules, nodeModulesToTransform } = require('./.config/jest/uti
 module.exports = {
   // Jest configuration provided by @grafana/create-plugin
   ...require('./.config/jest.config'),
+  // Prevent Jest from picking up Playwright e2e test files
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/e2e/'],
   // Inform Jest to only transform specific node_module packages.
   transformIgnorePatterns: [
     nodeModulesToTransform([
