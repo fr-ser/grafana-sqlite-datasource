@@ -12,7 +12,9 @@ test.describe('alerting', () => {
     // Skip gracefully when running against v9+.
     const testRuleBtn = page.locator(`xpath=//button//span[text()[contains(., "Test rule")]]`);
     const found = await testRuleBtn.waitFor({ timeout: 5_000 }).then(() => true).catch(() => false);
-    if (!found) return;
+    if (!found) {
+      return;
+    }
 
     await testRuleBtn.locator('xpath=./..').click();
 
@@ -32,7 +34,9 @@ test.describe('alerting', () => {
     // Skip gracefully when running against v9+.
     const testRuleBtn = page.locator(`xpath=//button//span[text()[contains(., "Test rule")]]`);
     const found = await testRuleBtn.waitFor({ timeout: 5_000 }).then(() => true).catch(() => false);
-    if (!found) return;
+    if (!found) {
+      return;
+    }
 
     await testRuleBtn.locator('xpath=./..').click();
 

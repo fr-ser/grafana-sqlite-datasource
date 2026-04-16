@@ -62,7 +62,9 @@ test.describe('query variables and repetition', () => {
       `div.graph-panel__chart div.events_line.flot-temp-elem div`
     );
     const count = await annotationMarkers.count();
-    if (count === 0) return;
+    if (count === 0) {
+      return;
+    }
 
     await annotationMarkers.first().hover({ force: true });
     // the open popup has drop-after-open; last() skips the marker element which shares the class

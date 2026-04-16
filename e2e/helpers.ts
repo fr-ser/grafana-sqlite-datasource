@@ -15,7 +15,9 @@ export async function login(page: Page): Promise<void> {
 }
 
 export async function logHTMLOnFailure(page: Page): Promise<void> {
-  if (process.env.VERBOSE_TEST_OUTPUT !== '1') return;
+  if (process.env.VERBOSE_TEST_OUTPUT !== '1') {
+    return;
+  }
   const html = await page.content();
   console.warn(html);
 }
