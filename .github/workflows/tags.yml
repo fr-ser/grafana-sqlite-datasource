@@ -162,7 +162,7 @@ jobs:
           fi
       - name: Create release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets._GITHUB_TOKEN }}
           name: Release ${{ steps.metadata.outputs.version }}
