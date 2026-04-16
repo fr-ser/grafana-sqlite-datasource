@@ -88,21 +88,23 @@ package-and-zip:
 #: Build the frontend and backend for the local and test environment
 build: build-frontend build-backend-local build-backend-docker
 
-#: Run the end-to-end tests with Selenium after building the backend for docker
+#: Run the end-to-end tests with Playwright after building the backend for docker
 test-e2e: build-backend-docker build-frontend test-e2e-no-build
 
-#: Run the end-to-end tests with Selenium without building the backend for docker. This can be helpful if the packages have already been built and signed
+#: Run the end-to-end tests with Playwright without building the backend for docker. This can be helpful if the packages have already been built and signed
 test-e2e-no-build:
 	@echo
 	@docker compose rm --force --stop -v grafana
 	GRAFANA_VERSION=7.3.3 docker compose run --rm start-setup
-	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
+	GRAFANA_VERSION=7.3.3 npx playwright test
 	@echo
+	@docker compose rm --force --stop -v grafana
 	GRAFANA_VERSION=8.1.0 docker compose run --rm start-setup
-	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
+	GRAFANA_VERSION=8.1.0 npx playwright test
 	@echo
+	@docker compose rm --force --stop -v grafana
 	GRAFANA_VERSION=12.0.0 docker compose run --rm start-setup
-	npx jest --runInBand --testMatch '<rootDir>/selenium/**/*.test.{js,ts}'
+	GRAFANA_VERSION=12.0.0 npx playwright test
 	@echo
 
 #: Run the frontend tests

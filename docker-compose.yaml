@@ -17,18 +17,11 @@ services:
       - 3000:3000
     depends_on:
       - postgres
-  selenium:
-    image: ${SELENIUM_IMAGE:-selenium/standalone-chrome:112.0}
-    shm_size: 2gb
-    ports:
-      - 4444:4444
-      - 5900:5900 # this is the VNC port. the password is "secret"
   start-setup:
     image: dadarek/wait-for-dependencies:0.2
     depends_on:
       - grafana
-      - selenium
-    command: grafana:3000 selenium:4444
+    command: grafana:3000
   postgres:
     # used to compare the sqlite plugin
     image: postgres:12-alpine

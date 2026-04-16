@@ -43,8 +43,8 @@ make teardown
 ```sh
 make test-backend    # gotestsum + golangci-lint for ./pkg/...
 make test-frontend   # jest (CI mode) + eslint + typecheck
-make test-e2e        # build backend for docker + frontend, then selenium tests
-make test-e2e-no-build  # selenium tests without rebuilding
+make test-e2e        # build backend for docker + frontend, then playwright tests
+make test-e2e-no-build  # playwright tests without rebuilding
 make test            # all of the above
 ```
 
@@ -120,4 +120,4 @@ Security-sensitive env vars (set via `grafana.ini` `[plugin.frser-sqlite-datasou
 
 ### CI (`.github/workflows/branches.yml`)
 
-On every push: backend tests + lint, frontend tests + lint + typecheck, multi-arch backend build, selenium E2E tests. On `main` only: `semantic-release` for automated versioning and tagging.
+On every push: backend tests + lint, frontend tests + lint + typecheck, multi-arch backend build, Playwright E2E tests. On `main` only: `semantic-release` for automated versioning and tagging.
