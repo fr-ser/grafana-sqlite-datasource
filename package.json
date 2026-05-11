@@ -99,7 +99,9 @@
     },
     "mocha": {
       "minimatch": "^3.0.5"
-    }
+    },
+    "serialize-javascript": "^7.0.5",
+    "immutable": "^5.1.5"
   },
   "_comments": {
     "overrides": "tr46: Upgraded from 3.0.0 to 4.0.0 to address: [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.",

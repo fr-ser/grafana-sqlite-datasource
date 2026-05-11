@@ -8,6 +8,13 @@ The following changes are waiting for the next major release:
 
 - supporting only Grafana v10 onwards
 
+## [Unreleased]
+
+### Security
+
+- Upgrade Go from 1.26.1 to 1.26.3.
+- Upgrade Go and npm packages (see `go.mod` and `package.json`).
+
 ## [4.0.5] - 2026-05-11
 
 ### Fixed
