@@ -8,6 +8,13 @@ The following changes are waiting for the next major release:
 
 - supporting only Grafana v10 onwards
 
+## [Unreleased]
+
+### Fixed
+
+- Fix release pipeline: Playwright browsers were not installed in the release E2E job, causing all
+  tests to fail with a missing Chromium binary.
+
 ## [4.0.4] - 2026-05-11
 
 A special thank you to the collaborators on this release:
