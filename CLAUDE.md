@@ -121,3 +121,11 @@ Security-sensitive env vars (set via `grafana.ini` `[plugin.frser-sqlite-datasou
 ### CI (`.github/workflows/branches.yml`)
 
 On every push: backend tests + lint, frontend tests + lint + typecheck, multi-arch backend build, Playwright E2E tests. On `main` only: `semantic-release` for automated versioning and tagging.
+
+**Important:** Keep runtime versions in sync across all files that pin them:
+
+- **Go** — `go.mod` (`go` directive), `.tool-versions` (`golang`), `branches.yml` + `tags.yml` (`go-version:`).
+- **Node** — `.tool-versions` (`nodejs`), `package.json` (`engines.node`), `branches.yml` + `tags.yml` (`node-version: 22.22.x`).
+- **Shared action versions** — `actions/checkout`, `actions/setup-go`, `actions/setup-node`, `actions/upload-artifact`, `actions/download-artifact`, `docker/login-action` should be on the same version in both workflow files.
+
+When bumping any of these, grep all of the above files and update every occurrence together.
