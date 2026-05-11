@@ -8,6 +8,19 @@ The following changes are waiting for the next major release:
 
 - supporting only Grafana v10 onwards
 
+## [Unreleased]
+
+A special thank you to the collaborators on this release:
+
+- [@DedHorse](https://github.com/DedHorse)
+
+### Security
+
+- Fix path-check bypass: the blocklist was applied only to the `Path` field, allowing an attacker
+  to reach sensitive files (e.g. `grafana.db`) by placing the full path in `PathPrefix` or by
+  splitting it across `PathPrefix` and `Path`. The check now validates the concatenated
+  `PathPrefix + Path` string.
+
 ## [4.0.3] - 2026-04-16
 
 ### Fixed
@@ -130,7 +143,7 @@ This is a "semantic versioning" major release and contains breaking changes.
 
 ## [3.4.0] - 2023-12-26
 
-Thank you to the collaborators on this release:
+A special thank you to the collaborators on this release:
 
 - [@eeddaann](https://github.com/eeddaann)
 

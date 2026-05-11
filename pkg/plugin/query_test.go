@@ -268,3 +268,21 @@ func TestQueryShouldFailWhenPathIsBlocked(t *testing.T) {
 		t.Errorf("Unexpected error message: %s", response.Error.Error())
 	}
 }
+
+func TestQueryShouldFailWhenBlockedPathIsSplitAcrossPrefixAndPath(t *testing.T) {
+	// Bypass: "grafana.db" (default blocklist) is split so that neither field alone triggers
+	// the check — only the concatenated PathPrefix+Path does.
+	dataQuery := getDataQuery(queryModel{QueryText: "SELECT 1"})
+	response := query(dataQuery, pluginConfig{
+		Path:       "ana.db",
+		PathPrefix: "file:/var/lib/grafana/graf",
+	}, context.Background())
+
+	if response.Error == nil {
+		t.Errorf("Expected error but got none")
+	}
+
+	if !strings.Contains(response.Error.Error(), "path contains blocked term from GF_PLUGIN_BLOCK_LIST") {
+		t.Errorf("Unexpected error message: %s", response.Error.Error())
+	}
+}
