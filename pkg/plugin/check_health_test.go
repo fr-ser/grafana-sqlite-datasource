@@ -142,6 +142,26 @@ func TestCheckHealthShouldFailWhenPathIsBlocked(t *testing.T) {
 	}
 }
 
+func TestCheckHealthShouldFailWhenBlockedPathIsSplitAcrossPrefixAndPath(t *testing.T) {
+	// Bypass: "grafana.db" (default blocklist) is split so that neither field alone triggers
+	// the check — only the concatenated PathPrefix+Path does.
+	ds := sqliteDatasource{pluginConfig{
+		Path:       "ana.db",
+		PathPrefix: "file:/var/lib/graf",
+	}}
+	result, err := ds.CheckHealth(ctx, nil)
+	if err != nil {
+		t.Errorf("Unexpected error - %s", err)
+	}
+
+	if result.Status != backend.HealthStatusError {
+		t.Errorf("Expected HealthStatusError, but got - %s", result.Status)
+	}
+	if !strings.Contains(result.Message, "path contains blocked term from GF_PLUGIN_BLOCK_LIST") {
+		t.Errorf("Unexpected error message: %s", result.Message)
+	}
+}
+
 func TestCheckHealth_AttachLimitAboveZero_Disallowed(t *testing.T) {
 	dir, _ := os.MkdirTemp("", "test-check-db")
 	defer func() { _ = os.RemoveAll(dir) }()

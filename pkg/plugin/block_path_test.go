@@ -103,6 +103,12 @@ func TestIsPathBlocked(t *testing.T) {
 			path:        "/var/data/myapp/analytics.db",
 			shouldBlock: false,
 		},
+		{
+			name:        "percent-encoded slash and dot is decoded and blocked",
+			blockList:   "",
+			path:        "/var/lib/grafana%2Fgrafana%2Edb",
+			shouldBlock: true,
+		},
 	}
 
 	for _, tt := range tests {

@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"net/url"
 	"os"
 	"strings"
 )
@@ -51,12 +52,24 @@ var defaultGrafanaInternalBlockList = []string{
 }
 
 func IsPathBlocked(path string) bool {
-	// Normalize path to lowercase for case-insensitive matching
+	// Also check the percent-decoded path to catch URI-encoded bypasses like
+	// "grafana%2Edb" which SQLite resolves to "grafana.db".
+	decoded, err := url.PathUnescape(path)
+	if err != nil {
+		decoded = path
+	}
+
 	lowerPath := strings.ToLower(path)
+	lowerDecoded := strings.ToLower(decoded)
+
+	contains := func(term string) bool {
+		lowerTerm := strings.ToLower(term)
+		return strings.Contains(lowerPath, lowerTerm) || strings.Contains(lowerDecoded, lowerTerm)
+	}
 
 	if os.Getenv("GF_PLUGIN_UNSAFE_DISABLE_SECURITY_BLOCKLIST") != "true" {
 		for _, term := range defaultSecurityBlockList {
-			if strings.Contains(lowerPath, strings.ToLower(term)) {
+			if contains(term) {
 				return true
 			}
 		}
@@ -64,7 +77,7 @@ func IsPathBlocked(path string) bool {
 
 	if os.Getenv("GF_PLUGIN_UNSAFE_DISABLE_GRAFANA_INTERNAL_BLOCKLIST") != "true" {
 		for _, term := range defaultGrafanaInternalBlockList {
-			if strings.Contains(lowerPath, strings.ToLower(term)) {
+			if contains(term) {
 				return true
 			}
 		}
@@ -76,7 +89,7 @@ func IsPathBlocked(path string) bool {
 		blockedTerms := strings.Split(blockList, ",")
 		for _, term := range blockedTerms {
 			term = strings.TrimSpace(term)
-			if term != "" && strings.Contains(lowerPath, strings.ToLower(term)) {
+			if term != "" && contains(term) {
 				return true
 			}
 		}
