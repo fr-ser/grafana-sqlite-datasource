@@ -20,6 +20,9 @@ A special thank you to the collaborators on this release:
   to reach sensitive files (e.g. `grafana.db`) by placing the full path in `PathPrefix` or by
   splitting it across `PathPrefix` and `Path`. The check now validates the concatenated
   `PathPrefix + Path` string.
+- Fix percent-encoding bypass: blocked paths could be reached by percent-encoding characters in
+  the URI (e.g. `grafana%2Edb` instead of `grafana.db`). The check now also inspects the
+  URL-decoded form of the path.
 
 ## [4.0.3] - 2026-04-16
 
