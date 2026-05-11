@@ -275,7 +275,7 @@ func TestQueryShouldFailWhenBlockedPathIsSplitAcrossPrefixAndPath(t *testing.T) 
 	dataQuery := getDataQuery(queryModel{QueryText: "SELECT 1"})
 	response := query(dataQuery, pluginConfig{
 		Path:       "ana.db",
-		PathPrefix: "file:/var/lib/grafana/graf",
+		PathPrefix: "file:/var/lib/graf",
 	}, context.Background())
 
 	if response.Error == nil {
