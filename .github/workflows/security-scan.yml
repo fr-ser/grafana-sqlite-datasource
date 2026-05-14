@@ -1,0 +1,30 @@
+name: osv-scan
+
+on:
+  workflow_dispatch:
+
+jobs:
+  # both jobs do not fail the workflow.
+  # that is because there is always some package outdated (and not fixable).
+  # the severe issues should be fixed but failing by severity is not supported by osv scan, so this job is just "informational" for now.
+  osv-scan:
+    uses: 'google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.3.3'
+    with:
+      fail-on-vuln: false
+    permissions:
+      # Required to upload SARIF file to CodeQL. See: https://github.com/github/codeql-action/issues/2117
+      actions: read
+      # Require writing security events to upload SARIF file to security tab
+      security-events: write
+      # Only need to read contents
+      contents: read
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22.22.x
+      - name: Run npm audit
+        run: npm audit || true
