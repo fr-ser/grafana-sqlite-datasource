@@ -1,4 +1,4 @@
-name: osv-scan
+name: Security Scan
 
 on:
   workflow_dispatch:
