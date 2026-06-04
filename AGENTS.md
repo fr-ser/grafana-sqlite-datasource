@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file documents repository-specific AI agent development guidance.
 
 ## Project Overview
 
@@ -80,7 +80,6 @@ All logic lives in `pkg/plugin/`:
 - **`sqlite_datasource.go`** — implements `backend.QueryDataHandler` and `backend.CheckHealthHandler`. `NewDataSource` reads datasource settings (path, pathPrefix, pathOptions, attachLimit) and appends `_pragma=query_only(1)` by default unless `GF_PLUGIN_UNSAFE_DISABLE_QUERY_ONLY_PATH_OPTION=true`.
 
 - **`query.go`** — core query pipeline:
-
   1. `query()` — entry point per DataQuery: path-block check → variable replacement → macro expansion → `fetchData` → gap filling → build Grafana `data.Frame`
   2. `fetchData()` — opens DB as `{PathPrefix}{Path}?{PathOptions}`, sets `SQLITE_LIMIT_ATTACHED`, runs query, maps column types
   3. Column type mapping: declared DB type (INTEGER/REAL/etc.) → runtime value type inference for `UNKNOWN` columns. Columns listed in `timeColumns` are overridden to `"TIME"`.

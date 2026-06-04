@@ -3,7 +3,9 @@ logs
 *.log
 npm-debug.log*
 
+# general node.js files
 node_modules/
+.eslintcache
 
 # Runtime data
 pids
@@ -32,6 +34,6 @@ e2e-results/
 
 # AI / LLM
 .claude
+.codex
 .serena
 
-.eslintcache
