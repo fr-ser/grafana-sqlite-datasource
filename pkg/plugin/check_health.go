@@ -12,7 +12,11 @@ import (
 )
 
 func checkDB(pathPrefix string, path string, options string) error {
-	if IsPathBlocked(pathPrefix + path) {
+	blocked, err := IsPathBlocked(pathPrefix + path)
+	if err != nil {
+		return err
+	}
+	if blocked {
 		return fmt.Errorf("path contains blocked term from GF_PLUGIN_BLOCK_LIST")
 	}
 

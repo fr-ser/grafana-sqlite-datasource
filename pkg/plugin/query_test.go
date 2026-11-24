@@ -286,3 +286,15 @@ func TestQueryShouldFailWhenBlockedPathIsSplitAcrossPrefixAndPath(t *testing.T) 
 		t.Errorf("Unexpected error message: %s", response.Error.Error())
 	}
 }
+
+func TestQueryShouldFailWhenPathHasMalformedEncoding(t *testing.T) {
+	dataQuery := getDataQuery(queryModel{QueryText: "SELECT 1"})
+	response := query(dataQuery, pluginConfig{
+		Path:       "/fixtures/g%72afana.db#%zz",
+		PathPrefix: "file:",
+	}, context.Background())
+
+	if response.Error == nil || !strings.Contains(response.Error.Error(), `invalid URL escape "%zz"`) {
+		t.Fatalf("Expected invalid URL encoding error, got %v", response.Error)
+	}
+}

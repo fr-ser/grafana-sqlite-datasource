@@ -134,6 +134,7 @@ All such configuration can also be provisioned ([see the FAQ for more details](h
 
 Aside from that, the plugin supports the following configuration via the `grafana.ini` file.
 The following block shows the default values and gives an explanation of each field.
+Database paths containing invalid percent-encoding are blocked, even when the default blocklists are disabled.
 
 ```ini
 [plugin.frser-sqlite-datasource]
