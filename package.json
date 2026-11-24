@@ -81,7 +81,10 @@
   },
   "overrides": {
     "jest-environment-jsdom": {
-      "tr46": "4.0.0"
+      "tr46": "4.0.0",
+      "jsdom": {
+        "ws": "^8.21.0"
+      }
     },
     "underscore": "1.12.1",
     "form-data": "2.5.5",
