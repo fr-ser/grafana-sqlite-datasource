@@ -8,7 +8,7 @@ The following changes are waiting for the next major release:
 
 - supporting only Grafana v10 onwards
 
-## [Unreleased]
+## [4.0.7] - 2026-11-24
 
 ### Security
 
