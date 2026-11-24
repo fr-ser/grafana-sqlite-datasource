@@ -8,6 +8,16 @@ The following changes are waiting for the next major release:
 
 - supporting only Grafana v10 onwards
 
+## [Unreleased]
+
+### Security
+
+- Update `form-data` to 4.0.6 to address GHSA-hmw2-7cc7-3qxx.
+
+### Changed
+
+- Update the Grafana plugin SDK for Go to v0.302.0 and Mage to v1.17.2.
+
 ## [4.0.8] - 2026-11-24
 
 ### Fixed

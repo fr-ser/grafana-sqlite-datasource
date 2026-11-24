@@ -87,7 +87,6 @@
       }
     },
     "underscore": "1.12.1",
-    "form-data": "2.5.5",
     "streamroller": {
       "debug": "^2.6.9"
     },
