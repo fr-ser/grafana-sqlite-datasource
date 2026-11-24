@@ -162,6 +162,20 @@ func TestCheckHealthShouldFailWhenBlockedPathIsSplitAcrossPrefixAndPath(t *testi
 	}
 }
 
+func TestCheckHealthShouldFailWhenPathHasMalformedEncoding(t *testing.T) {
+	ds := sqliteDatasource{pluginConfig{
+		Path:       "/fixtures/g%72afana.db#%zz",
+		PathPrefix: "file:",
+	}}
+	result, err := ds.CheckHealth(ctx, nil)
+	if err != nil {
+		t.Fatalf("Unexpected error: %s", err)
+	}
+	if result.Status != backend.HealthStatusError || !strings.Contains(result.Message, `invalid URL escape "%zz"`) {
+		t.Fatalf("Expected invalid URL encoding error, got %+v", result)
+	}
+}
+
 func TestCheckHealth_AttachLimitAboveZero_Disallowed(t *testing.T) {
 	dir, _ := os.MkdirTemp("", "test-check-db")
 	defer func() { _ = os.RemoveAll(dir) }()

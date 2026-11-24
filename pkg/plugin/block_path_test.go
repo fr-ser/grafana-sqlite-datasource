@@ -1,16 +1,19 @@
 package plugin
 
 import (
+	"errors"
+	"net/url"
 	"os"
 	"testing"
 )
 
 func TestIsPathBlocked(t *testing.T) {
 	tests := []struct {
-		name        string
-		blockList   string
-		path        string
-		shouldBlock bool
+		name            string
+		blockList       string
+		path            string
+		shouldBlock     bool
+		invalidEncoding bool
 	}{
 		{
 			name:        "single term matches",
@@ -109,6 +112,29 @@ func TestIsPathBlocked(t *testing.T) {
 			path:        "/var/lib/grafana%2Fgrafana%2Edb",
 			shouldBlock: true,
 		},
+		{
+			name:        "valid percent-encoded safe path is allowed",
+			path:        "file:/var/data/my%20database.db",
+			shouldBlock: false,
+		},
+		{
+			name:            "malformed escape in path is blocked",
+			path:            "file:/var/data/my%zzdatabase.db",
+			shouldBlock:     true,
+			invalidEncoding: true,
+		},
+		{
+			name:            "malformed escape in query is blocked",
+			path:            "file:/var/data/my.db?option=%",
+			shouldBlock:     true,
+			invalidEncoding: true,
+		},
+		{
+			name:            "malformed fragment cannot hide encoded blocked path",
+			path:            "file:/fixtures/g%72afana.db#%zz",
+			shouldBlock:     true,
+			invalidEncoding: true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -129,12 +155,31 @@ func TestIsPathBlocked(t *testing.T) {
 				_ = os.Setenv("GF_PLUGIN_BLOCK_LIST", tt.blockList)
 			}
 
-			result := IsPathBlocked(tt.path)
+			result, err := IsPathBlocked(tt.path)
 
 			if result != tt.shouldBlock {
 				t.Errorf("Expected IsPathBlocked to return %v, but got %v", tt.shouldBlock, result)
 			}
+			var escapeErr url.EscapeError
+			if tt.invalidEncoding {
+				if !errors.As(err, &escapeErr) {
+					t.Errorf("Expected URL escape error, got %v", err)
+				}
+			} else if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+			}
 		})
+	}
+}
+
+func TestIsPathBlocked_MalformedEncodingWithDefaultBlocklistsDisabled(t *testing.T) {
+	t.Setenv("GF_PLUGIN_UNSAFE_DISABLE_SECURITY_BLOCKLIST", "true")
+	t.Setenv("GF_PLUGIN_UNSAFE_DISABLE_GRAFANA_INTERNAL_BLOCKLIST", "true")
+	t.Setenv("GF_PLUGIN_BLOCK_LIST", "")
+
+	blocked, err := IsPathBlocked("file:/fixtures/g%72afana.db#%zz")
+	if !blocked || err == nil {
+		t.Errorf("Expected malformed URL encoding to be blocked with an error, got blocked=%v, error=%v", blocked, err)
 	}
 }
 
@@ -149,14 +194,16 @@ func TestIsPathBlocked_DisableSecurityBlocklistEnv(t *testing.T) {
 		}
 	}()
 
-	if !IsPathBlocked(defaultSecurityBlockList[0]) {
+	blocked, err := IsPathBlocked(defaultSecurityBlockList[0])
+	if err != nil || !blocked {
 		t.Errorf("Expected IsPathBlocked to return true when GF_PLUGIN_UNSAFE_DISABLE_SECURITY_BLOCKLIST is unset, but got false")
 	}
 
 	_ = os.Setenv("GF_PLUGIN_UNSAFE_DISABLE_SECURITY_BLOCKLIST", "true")
 
 	// Should NOT be blocked when env var is set
-	if IsPathBlocked(defaultSecurityBlockList[0]) {
+	blocked, err = IsPathBlocked(defaultSecurityBlockList[0])
+	if err != nil || blocked {
 		t.Errorf("Expected IsPathBlocked to return false when GF_PLUGIN_UNSAFE_DISABLE_SECURITY_BLOCKLIST is 'true', but got true")
 	}
 }
@@ -172,14 +219,16 @@ func TestIsPathBlocked_DisableGrafanaBlocklistEnv(t *testing.T) {
 		}
 	}()
 
-	if !IsPathBlocked(defaultGrafanaInternalBlockList[0]) {
+	blocked, err := IsPathBlocked(defaultGrafanaInternalBlockList[0])
+	if err != nil || !blocked {
 		t.Errorf("Expected IsPathBlocked to return true when GF_PLUGIN_UNSAFE_DISABLE_GRAFANA_INTERNAL_BLOCKLIST is unset, but got false")
 	}
 
 	_ = os.Setenv("GF_PLUGIN_UNSAFE_DISABLE_GRAFANA_INTERNAL_BLOCKLIST", "true")
 
 	// Should NOT be blocked when env var is set
-	if IsPathBlocked(defaultGrafanaInternalBlockList[0]) {
+	blocked, err = IsPathBlocked(defaultGrafanaInternalBlockList[0])
+	if err != nil || blocked {
 		t.Errorf("Expected IsPathBlocked to return false when GF_PLUGIN_UNSAFE_DISABLE_GRAFANA_INTERNAL_BLOCKLIST is 'true', but got true")
 	}
 }

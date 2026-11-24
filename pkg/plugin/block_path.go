@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"fmt"
 	"net/url"
 	"os"
 	"strings"
@@ -51,12 +52,12 @@ var defaultGrafanaInternalBlockList = []string{
 	"grafana.db",
 }
 
-func IsPathBlocked(path string) bool {
+func IsPathBlocked(path string) (bool, error) {
 	// Also check the percent-decoded path to catch URI-encoded bypasses like
 	// "grafana%2Edb" which SQLite resolves to "grafana.db".
 	decoded, err := url.PathUnescape(path)
 	if err != nil {
-		decoded = path
+		return true, fmt.Errorf("invalid URL encoding in database path: %w", err)
 	}
 
 	lowerPath := strings.ToLower(path)
@@ -70,7 +71,7 @@ func IsPathBlocked(path string) bool {
 	if os.Getenv("GF_PLUGIN_UNSAFE_DISABLE_SECURITY_BLOCKLIST") != "true" {
 		for _, term := range defaultSecurityBlockList {
 			if contains(term) {
-				return true
+				return true, nil
 			}
 		}
 	}
@@ -78,7 +79,7 @@ func IsPathBlocked(path string) bool {
 	if os.Getenv("GF_PLUGIN_UNSAFE_DISABLE_GRAFANA_INTERNAL_BLOCKLIST") != "true" {
 		for _, term := range defaultGrafanaInternalBlockList {
 			if contains(term) {
-				return true
+				return true, nil
 			}
 		}
 	}
@@ -90,10 +91,10 @@ func IsPathBlocked(path string) bool {
 		for _, term := range blockedTerms {
 			term = strings.TrimSpace(term)
 			if term != "" && contains(term) {
-				return true
+				return true, nil
 			}
 		}
 	}
 
-	return false
+	return false, nil
 }

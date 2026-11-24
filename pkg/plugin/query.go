@@ -363,13 +363,18 @@ func query(dataQuery backend.DataQuery, config pluginConfig, ctx context.Context
 	// - Health checks do not prevent saving a datasource configuration in Grafana
 	// - Users can still execute queries even if the health check fails
 	// - This provides runtime protection against accessing blocked paths
-	if IsPathBlocked(config.PathPrefix + config.Path) {
+	blocked, err := IsPathBlocked(config.PathPrefix + config.Path)
+	if err != nil {
+		response.Error = err
+		return response
+	}
+	if blocked {
 		response.Error = fmt.Errorf("path contains blocked term from GF_PLUGIN_BLOCK_LIST")
 		return response
 	}
 
 	var qm queryModel
-	err := json.Unmarshal(dataQuery.JSON, &qm)
+	err = json.Unmarshal(dataQuery.JSON, &qm)
 	if err != nil {
 		log.DefaultLogger.Error("Could not unmarshal query", "err", err)
 		response.Error = err

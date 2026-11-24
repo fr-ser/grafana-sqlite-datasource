@@ -8,6 +8,13 @@ The following changes are waiting for the next major release:
 
 - supporting only Grafana v10 onwards
 
+## [Unreleased]
+
+### Security
+
+- updating the backend (go) and frontend (npm) packages
+- Reject database paths with invalid percent-encoding to prevent blocklist bypasses.
+
 ## [4.0.6] - 2026-05-11
 
 ### Security
