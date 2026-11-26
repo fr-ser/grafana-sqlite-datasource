@@ -11,7 +11,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
-func checkDB(pathPrefix string, path string, options string) error {
+func checkDB(pathPrefix string, path string, options string) (resultErr error) {
 	blocked, err := IsPathBlocked(pathPrefix + path)
 	if err != nil {
 		return err
@@ -35,6 +35,11 @@ func checkDB(pathPrefix string, path string, options string) error {
 	if err != nil {
 		return fmt.Errorf("error opening %s%s: %v", pathPrefix, path, err)
 	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			resultErr = errors.Join(resultErr, fmt.Errorf("error closing database file: %v", err))
+		}
+	}()
 
 	_, err = db.Exec("pragma schema_version;")
 	if err != nil {
@@ -45,11 +50,6 @@ func checkDB(pathPrefix string, path string, options string) error {
 				" connections. See the FAQ for solutions: https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/docs/faq.md#i-want-to-open-a-read-only-database-and-get-errors"
 		}
 		return errors.New(errMsg)
-	}
-
-	err = db.Close()
-	if err != nil {
-		return fmt.Errorf("error closing database file: %v", err)
 	}
 
 	return nil

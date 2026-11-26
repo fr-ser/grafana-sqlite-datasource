@@ -24,15 +24,7 @@ Table of contents:
 
 ## Plugin Installation
 
-The recommended way to install the plugin for most users is to use the grafana CLI:
-
-1. Run this command: `grafana-cli plugins install frser-sqlite-datasource`
-2. Restart the Grafana server.
-3. To make sure the plugin was installed, check the list of installed data sources. Click the
-   Plugins item in the main menu. Both core data sources and installed data sources will appear.
-
-For other installation options (e.g. to install versions not yet released in the Grafana registry but in Github) see
-[./docs/installation.md](https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/docs/installation.md).
+For in depth installation options, including versions not yet released in the Grafana registry, see the [detailed installation instructions](https://github.com/fr-ser/grafana-sqlite-datasource/blob/main/docs/installation.md).
 
 ## Security considerations
 

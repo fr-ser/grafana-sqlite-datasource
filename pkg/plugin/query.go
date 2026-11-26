@@ -285,18 +285,17 @@ func fetchData(
 		)
 		return columns, err
 	}
-
-	columnTypes, err := rows.ColumnTypes()
-	if err != nil {
-		log.DefaultLogger.Error("Could not get column types", "err", err)
-		return columns, err
-	}
 	defer func() {
 		if err := rows.Close(); err != nil {
 			log.DefaultLogger.Error("Error closing connection", "err", err)
 		}
 	}()
 
+	columnTypes, err := rows.ColumnTypes()
+	if err != nil {
+		log.DefaultLogger.Error("Could not get column types", "err", err)
+		return columns, err
+	}
 	columnCount := len(columnTypes)
 	columns = make([]*sqlColumn, columnCount)
 

@@ -445,3 +445,22 @@ func TestEpochGroupSecondsShouldRequireNonNullTimeColumnForGapFilling(t *testing
 		t.Errorf("Expected null in time column error but got: %+v", response.Error)
 	}
 }
+
+func TestEpochGroupSecondsShouldRejectNullFirstTimeForGapFilling(t *testing.T) {
+	dbPath, cleanup := createTmpDB(`
+		CREATE TABLE test(time INTEGER, value INTEGER);
+		INSERT INTO test(time, value) VALUES (NULL, 1), (14, 2);
+	`)
+	defer cleanup()
+
+	dataQuery := getDataQuery(queryModel{
+		QueryText:   `SELECT $__unixEpochGroupSeconds("time", 10, NULL) as window, value FROM test ORDER BY time`,
+		TimeColumns: []string{"window"},
+	})
+	dataQuery.QueryType = tableType
+
+	response := query(dataQuery, pluginConfig{Path: dbPath}, context.Background())
+	if response.Error == nil || !strings.Contains(response.Error.Error(), "NULL value in time column") {
+		t.Fatalf("Expected null in time column error, got: %v", response.Error)
+	}
+}

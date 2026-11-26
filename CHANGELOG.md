@@ -8,6 +8,18 @@ The following changes are waiting for the next major release:
 
 - supporting only Grafana v10 onwards
 
+## [Unreleased]
+
+### Fixed
+
+- Close the database handle when a health check fails.
+- Close query rows when retrieving column types fails.
+- Return an error instead of panicking when the first time value is NULL during gap filling.
+
+### Documentation
+
+- Simplify the README installation section while retaining the link to detailed instructions.
+
 ## [4.0.9] - 2026-11-24
 
 ### Security
