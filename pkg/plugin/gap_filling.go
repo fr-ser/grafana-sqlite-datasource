@@ -17,6 +17,9 @@ func fillGaps(columns []*sqlColumn, queryConfig *queryConfigStruct) error {
 		// gaps cannot be filled. This a not an error but a noop
 		return nil
 	}
+	if (*timeColumn)[0] == nil {
+		return fmt.Errorf("received NULL value in time column")
+	}
 
 	gapFilledColumns := make([]*sqlColumn, len(columns))
 	for idx, column := range columns {
