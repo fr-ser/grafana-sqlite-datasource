@@ -119,7 +119,8 @@ Security-sensitive env vars (set via `grafana.ini` `[plugin.frser-sqlite-datasou
 
 ### CI (`.github/workflows/branches.yml`)
 
-On every push: backend tests + lint, frontend tests + lint + typecheck, multi-arch backend build, Playwright E2E tests. On `main` only: `semantic-release` for automated versioning and tagging.
+On branch pushes: backend tests + lint, frontend tests + lint + typecheck, multi-arch backend build, and Playwright E2E tests, except for `chore(release): ` commits on `main`.
+On `main` only: `semantic-release` for automated versioning and tagging, also skipped for release commits.
 
 **Important:** Keep runtime versions in sync across all files that pin them:
 

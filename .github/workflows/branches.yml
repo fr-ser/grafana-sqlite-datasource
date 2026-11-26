@@ -7,6 +7,7 @@ on:
 
 jobs:
   test-backend:
+    if: "${{ github.ref != 'refs/heads/main' || !startsWith(github.event.head_commit.message, 'chore(release): ') }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -19,6 +20,7 @@ jobs:
       - name: Run tests
         run: make test-backend
   test-frontend:
+    if: "${{ github.ref != 'refs/heads/main' || !startsWith(github.event.head_commit.message, 'chore(release): ') }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -32,6 +34,7 @@ jobs:
       - name: test frontend
         run: make test-frontend
   build-plugin-backend:
+    if: "${{ github.ref != 'refs/heads/main' || !startsWith(github.event.head_commit.message, 'chore(release): ') }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -92,6 +95,7 @@ jobs:
         if: ${{ failure() }}
         run: docker compose logs grafana
   verify-release:
+    if: "${{ github.ref != 'refs/heads/main' || !startsWith(github.event.head_commit.message, 'chore(release): ') }}"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
